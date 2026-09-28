@@ -12,6 +12,7 @@ abstract class AccreditationTypeDomainObjectAbstract extends \HiEvents\DomainObj
     final public const PLURAL_NAME = 'accreditation_types';
     final public const ID = 'id';
     final public const EVENT_ID = 'event_id';
+    final public const BADGE_TEMPLATE_ID = 'badge_template_id';
     final public const SHORT_ID = 'short_id';
     final public const CODE = 'code';
     final public const NAME = 'name';
@@ -33,6 +34,7 @@ abstract class AccreditationTypeDomainObjectAbstract extends \HiEvents\DomainObj
 
     protected int $id;
     protected int $event_id;
+    protected ?int $badge_template_id = null;
     protected string $short_id;
     protected string $code;
     protected string $name;
@@ -57,6 +59,7 @@ abstract class AccreditationTypeDomainObjectAbstract extends \HiEvents\DomainObj
         return [
                     'id' => $this->id ?? null,
                     'event_id' => $this->event_id ?? null,
+                    'badge_template_id' => $this->badge_template_id ?? null,
                     'short_id' => $this->short_id ?? null,
                     'code' => $this->code ?? null,
                     'name' => $this->name ?? null,
@@ -98,6 +101,17 @@ abstract class AccreditationTypeDomainObjectAbstract extends \HiEvents\DomainObj
     public function getEventId(): int
     {
         return $this->event_id;
+    }
+
+    public function setBadgeTemplateId(?int $badge_template_id): self
+    {
+        $this->badge_template_id = $badge_template_id;
+        return $this;
+    }
+
+    public function getBadgeTemplateId(): ?int
+    {
+        return $this->badge_template_id;
     }
 
     public function setShortId(string $short_id): self
