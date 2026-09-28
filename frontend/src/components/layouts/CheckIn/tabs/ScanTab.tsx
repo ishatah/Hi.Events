@@ -14,7 +14,7 @@ interface ScanTabProps {
     hidBuffer: string;
     isSoundOn: boolean;
     onSoundToggle: () => void;
-    onAttendeeScanned: (attendeePublicId: string) => void;
+    onAttendeeScanned: (attendeePublicId: string) => void | Promise<boolean>;
     onOpenRecentScan?: (attendeePublicId: string) => void;
     recentScans: RecentScan[];
 }

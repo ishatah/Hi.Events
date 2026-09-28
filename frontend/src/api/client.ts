@@ -1,6 +1,7 @@
 import axios from "axios";
 import {isSsr} from "../utilites/helpers.ts";
 import {getConfig} from "../utilites/config.ts";
+import {getSsrRequestContext} from "../utilites/ssrRequestContext.ts";
 
 const BASE_URL = isSsr()
     ? getConfig('VITE_API_URL_SERVER')
@@ -33,6 +34,20 @@ export const api = axios.create({
         'Content-Type': 'application/json'
     },
     withCredentials: true,
+});
+
+api.interceptors.request.use((config) => {
+    if (isSsr()) {
+        const token = getSsrRequestContext()?.authToken;
+
+        if (token) {
+            config.headers.set('Authorization', `Bearer ${token}`);
+        } else {
+            config.headers.delete('Authorization');
+        }
+    }
+
+    return config;
 });
 
 api.interceptors.response.use(

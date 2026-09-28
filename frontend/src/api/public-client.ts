@@ -2,6 +2,7 @@ import axios from "axios";
 import {isSsr} from "../utilites/helpers";
 import {getConfig} from "../utilites/config";
 import {getCheckoutSessionIdentifier} from "../utilites/checkoutSession";
+import {getSsrRequestContext} from "../utilites/ssrRequestContext";
 
 export const publicApi = axios.create({
     withCredentials: true,
@@ -13,6 +14,16 @@ publicApi.interceptors.request.use((config) => {
         : getConfig('VITE_API_URL_CLIENT');
 
     config.baseURL = `${baseUrl}/public`;
+
+    if (isSsr()) {
+        const token = getSsrRequestContext()?.authToken;
+
+        if (token) {
+            config.headers.set('Authorization', `Bearer ${token}`);
+        } else {
+            config.headers.delete('Authorization');
+        }
+    }
 
     const orderShortId = config.url?.match(/\/order\/([^/?#]+)/)?.[1];
     if (orderShortId && !config.url?.includes('session_identifier=')) {

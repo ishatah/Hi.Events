@@ -7,7 +7,7 @@ import {IconBulb, IconBulbOff, IconCameraRotate} from "@tabler/icons-react";
 import classes from "./InlineCameraScanner.module.scss";
 
 interface Props {
-    onAttendeeScanned: (attendeePublicId: string) => void;
+    onAttendeeScanned: (attendeePublicId: string) => void | Promise<boolean>;
 }
 
 export const InlineCameraScanner = ({onAttendeeScanned}: Props) => {
@@ -72,9 +72,15 @@ export const InlineCameraScanner = ({onAttendeeScanned}: Props) => {
     useEffect(() => {
         if (!debouncedId) return;
         if (latestProcessedRef.current.includes(debouncedId)) return;
-        onAttendeeScanned(debouncedId);
-        setProcessed(prev => [...prev, debouncedId]);
+
+        const scannedId = debouncedId;
         setCurrentId(null);
+
+        Promise.resolve(onAttendeeScanned(scannedId)).then((checkedIn) => {
+            if (checkedIn !== false) {
+                setProcessed(prev => [...prev, scannedId]);
+            }
+        });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [debouncedId]);
 

@@ -224,53 +224,62 @@ const CheckIn = () => {
         });
     }, [deleteCheckInMutation, checkInListShortId, playSuccessSound, playErrorSound, haptic]);
 
-    const handleCheckInAction = (attendee: Attendee, action: "check-in" | "check-in-and-mark-order-as-paid") => {
-        checkInMutation.mutate({
-            checkInListShortId: checkInListShortId,
-            attendeePublicId: attendee.public_id,
-            action: action,
-        }, {
-            onSuccess: (response) => {
-                const {errors, data} = response;
-                if (errors && errors[attendee.public_id]) {
-                    showError(errors[attendee.public_id]);
+    const handleCheckInAction = (
+        attendee: Attendee,
+        action: "check-in" | "check-in-and-mark-order-as-paid",
+    ): Promise<boolean> => {
+        return new Promise<boolean>((resolve) => {
+            checkInMutation.mutate({
+                checkInListShortId: checkInListShortId,
+                attendeePublicId: attendee.public_id,
+                action: action,
+            }, {
+                onSuccess: (response) => {
+                    const {errors, data} = response;
+                    if (errors && errors[attendee.public_id]) {
+                        showError(errors[attendee.public_id]);
+                        playErrorSound();
+                        haptic("error");
+                        recordScan(attendee, attendee.public_id, "error");
+                        resolve(false);
+                        return;
+                    }
+                    playSuccessSound();
+                    haptic("success");
+                    recordScan(attendee, attendee.public_id, "success");
+                    checkInModalHandlers.close();
+                    setSelectedAttendee(null);
+
+                    const createdCheckIn = data?.find((c: any) => c.attendee_id === attendee.id);
+                    const message = <Trans>{attendee.first_name} <b>checked in</b></Trans>;
+
+                    if (createdCheckIn) {
+                        showSuccessWithUndo(
+                            message,
+                            () => undoCheckIn(attendee, String(createdCheckIn.short_id)),
+                            {undoLabel: t`Undo`},
+                        );
+                    } else {
+                        showSuccess(message);
+                    }
+                    resolve(true);
+                },
+                onError: (error) => {
                     playErrorSound();
                     haptic("error");
                     recordScan(attendee, attendee.public_id, "error");
-                    return;
-                }
-                playSuccessSound();
-                haptic("success");
-                recordScan(attendee, attendee.public_id, "success");
-                checkInModalHandlers.close();
-                setSelectedAttendee(null);
+                    if (!networkStatus.online) {
+                        showError(t`You are offline. This ticket was not checked in — scan it again once you are back online.`);
+                        resolve(false);
+                        return;
+                    }
 
-                const createdCheckIn = data?.find((c: any) => c.attendee_id === attendee.id);
-                const message = <Trans>{attendee.first_name} <b>checked in</b></Trans>;
-
-                if (createdCheckIn) {
-                    showSuccessWithUndo(
-                        message,
-                        () => undoCheckIn(attendee, String(createdCheckIn.short_id)),
-                        {undoLabel: t`Undo`},
-                    );
-                } else {
-                    showSuccess(message);
-                }
-            },
-            onError: (error) => {
-                playErrorSound();
-                haptic("error");
-                recordScan(attendee, attendee.public_id, "error");
-                if (!networkStatus.online) {
-                    showError(t`You are offline`);
-                    return;
-                }
-
-                if (error instanceof AxiosError) {
-                    showError(error?.response?.data?.message || t`Unable to check in attendee`);
-                }
-            },
+                    if (error instanceof AxiosError) {
+                        showError(error?.response?.data?.message || t`Unable to check in attendee`);
+                    }
+                    resolve(false);
+                },
+            });
         });
     };
 
@@ -319,9 +328,9 @@ const CheckIn = () => {
         handleCheckInAction(attendee, "check-in");
     };
 
-    const handleQrCheckIn = useCallback(async (attendeePublicId: string) => {
+    const handleQrCheckIn = useCallback(async (attendeePublicId: string): Promise<boolean> => {
         if (isProcessingRef.current) {
-            return;
+            return false;
         }
 
         const now = Date.now();
@@ -329,7 +338,7 @@ const CheckIn = () => {
             now - lastScanTimeRef.current < 3000) {
             showError(t`This ticket was just scanned. Please wait before scanning again.`);
             playErrorSound();
-            return;
+            return false;
         }
 
         isProcessingRef.current = true;
@@ -346,7 +355,7 @@ const CheckIn = () => {
                 playErrorSound();
                 recordScan(null, attendeePublicId, "error");
                 isProcessingRef.current = false;
-                return;
+                return false;
             }
 
             if (!attendee) {
@@ -354,7 +363,7 @@ const CheckIn = () => {
                 playErrorSound();
                 recordScan(null, attendeePublicId, "error");
                 isProcessingRef.current = false;
-                return;
+                return false;
             }
         }
 
@@ -365,7 +374,7 @@ const CheckIn = () => {
             recordScan(attendee, attendeePublicId, "duplicate");
             processedBarcodesRef.current.add(attendeePublicId);
             isProcessingRef.current = false;
-            return;
+            return true;
         }
 
         const isAttendeeAwaitingPayment = attendee.status === "AWAITING_PAYMENT";
@@ -374,7 +383,7 @@ const CheckIn = () => {
             setSelectedAttendee(attendee);
             checkInModalHandlers.open();
             isProcessingRef.current = false;
-            return;
+            return false;
         }
 
         if (!allowOrdersAwaitingOfflinePaymentToCheckIn && isAttendeeAwaitingPayment) {
@@ -382,16 +391,20 @@ const CheckIn = () => {
             playErrorSound();
             recordScan(attendee, attendeePublicId, "error");
             isProcessingRef.current = false;
-            return;
+            return false;
         }
 
-        processedBarcodesRef.current.add(attendeePublicId);
-        setTimeout(() => {
-            processedBarcodesRef.current.delete(attendeePublicId);
-        }, 10000);
+        const checkedIn = await handleCheckInAction(attendee, "check-in");
 
-        await handleCheckInAction(attendee, "check-in");
+        if (checkedIn) {
+            processedBarcodesRef.current.add(attendeePublicId);
+            setTimeout(() => {
+                processedBarcodesRef.current.delete(attendeePublicId);
+            }, 10000);
+        }
+
         isProcessingRef.current = false;
+        return checkedIn;
     }, [attendees, checkInListShortId, allowOrdersAwaitingOfflinePaymentToCheckIn, checkInModalHandlers, handleCheckInAction, playErrorSound, recordScan]);
 
     const processBarcode = useCallback((barcode: string) => {

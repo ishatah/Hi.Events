@@ -1,21 +1,16 @@
 import { QueryClient } from "@tanstack/react-query";
 import {isSsr} from "./helpers.ts";
 import {queryClient} from "./queryClient.ts";
-
-let ssrQueryClient: QueryClient | null = null;
-
-export function setSsrQueryClient(client: QueryClient | null) {
-    ssrQueryClient = client;
-}
-
-export function getSsrQueryClient(): QueryClient | null {
-    return ssrQueryClient;
-}
+import {getSsrRequestContext} from "./ssrRequestContext.ts";
 
 export function getQueryClient(): QueryClient {
-    if (isSsr() && ssrQueryClient) {
-        return ssrQueryClient;
+    if (isSsr()) {
+        const contextClient = getSsrRequestContext()?.queryClient;
+
+        if (contextClient) {
+            return contextClient;
+        }
     }
-    
+
     return queryClient;
 }

@@ -4,11 +4,13 @@ import {dehydrate, QueryClient} from "@tanstack/react-query";
 
 import {router} from "./router";
 import {App} from "./App";
-import {setAuthToken} from "./utilites/apiClient.ts";
+import {AsyncLocalStorage} from "node:async_hooks";
+import {initSsrRequestContextStorage, runWithSsrRequestContext} from "./utilites/ssrRequestContext.ts";
 import {createStaticHandler, createStaticRouter, StaticRouterProvider} from "react-router";
 import {dynamicActivateLocale} from "./locales.ts";
-import {setSsrQueryClient} from "./utilites/ssrQueryClient.ts";
 import {generateThemeColors} from "./utilites/themeColors.ts";
+
+initSsrRequestContextStorage(new AsyncLocalStorage());
 
 const themeColors = generateThemeColors();
 
@@ -25,8 +27,6 @@ export async function render(params: {
     req: express.Request;
     res: express.Response;
 }) {
-    setAuthToken(params.req.cookies.token);
-
     const queryClient = new QueryClient({
         defaultOptions: {
             queries: {
@@ -40,39 +40,44 @@ export async function render(params: {
         },
     });
 
-    setSsrQueryClient(queryClient);
-
     const helmetContext = {};
 
-    const {query, dataRoutes} = createStaticHandler(router);
-    const remixRequest = createFetchRequest(params.req, params.res);
-    const context = await query(remixRequest);
+    const {appHtml, dehydratedState, context} = await runWithSsrRequestContext(
+        {queryClient, authToken: params.req.cookies.token},
+        async () => {
+            const {query, dataRoutes} = createStaticHandler(router);
+            const remixRequest = createFetchRequest(params.req, params.res);
+            const routerContext = await query(remixRequest);
 
-    if (context instanceof Response) {
-        throw context;
-    }
+            if (routerContext instanceof Response) {
+                throw routerContext;
+            }
 
-    await dynamicActivateLocale(getLocale(params.req));
+            await dynamicActivateLocale(getLocale(params.req));
 
-    const routerWithContext = createStaticRouter(dataRoutes, context);
-    
-    const appHtml = ReactDOMServer.renderToString(
-        <App
-            queryClient={queryClient}
-            helmetContext={helmetContext}
-            locale={getLocale(params.req)}
-            themeColors={themeColors}
-        >
-            <StaticRouterProvider
-                router={routerWithContext}
-                context={context}
-            />
-        </App>
+            const routerWithContext = createStaticRouter(dataRoutes, routerContext);
+
+            const html = ReactDOMServer.renderToString(
+                <App
+                    queryClient={queryClient}
+                    helmetContext={helmetContext}
+                    locale={getLocale(params.req)}
+                    themeColors={themeColors}
+                >
+                    <StaticRouterProvider
+                        router={routerWithContext}
+                        context={routerContext}
+                    />
+                </App>
+            );
+
+            return {
+                appHtml: html,
+                dehydratedState: dehydrate(queryClient),
+                context: routerContext,
+            };
+        },
     );
-
-    const dehydratedState = dehydrate(queryClient);
-
-    setSsrQueryClient(null);
 
     return {
         appHtml: appHtml,

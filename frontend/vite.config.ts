@@ -42,7 +42,6 @@ export default defineConfig({
         }),
     ],
     define: {
-        "process.env": process.env,
         "__APP_VERSION__": JSON.stringify(getVersion()),
     },
     ssr: {
