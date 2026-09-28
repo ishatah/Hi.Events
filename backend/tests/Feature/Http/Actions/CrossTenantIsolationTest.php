@@ -7,6 +7,7 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
 use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 use PHPUnit\Framework\Attributes\DataProvider;
+use Tests\Concerns\AuthenticatesApiRequests;
 use Tests\TestCase;
 
 /**
@@ -24,6 +25,7 @@ use Tests\TestCase;
  */
 class CrossTenantIsolationTest extends TestCase
 {
+    use AuthenticatesApiRequests;
     use DatabaseTransactions;
 
     private string $tenantAToken;
@@ -218,10 +220,4 @@ class CrossTenantIsolationTest extends TestCase
     /**
      * @return array<string, string>
      */
-    private function authHeaders(string $token): array
-    {
-        $this->app['auth']->forgetGuards();
-
-        return ['Authorization' => 'Bearer '.$token];
-    }
 }

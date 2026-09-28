@@ -131,7 +131,7 @@ class Phase2AccreditationSchemaTest extends TestCase
 
         $this->assertSame(
             $first,
-            (int)DB::table('credentials')->where('id', $second)->value('replaces_credential_id')
+            (int) DB::table('credentials')->where('id', $second)->value('replaces_credential_id')
         );
     }
 
@@ -140,8 +140,8 @@ class Phase2AccreditationSchemaTest extends TestCase
         if ($this->accountId === null) {
             $user = User::factory()->withAccount()->create();
 
-            $this->userId = (int)$user->id;
-            $this->accountId = (int)$user->accounts()->first()->id;
+            $this->userId = (int) $user->id;
+            $this->accountId = (int) $user->accounts()->first()->id;
         }
 
         return $this->accountId;
@@ -155,7 +155,7 @@ class Phase2AccreditationSchemaTest extends TestCase
 
         $accountId = $this->accountId();
 
-        $organizerId = (int)DB::table('organizers')->insertGetId([
+        $organizerId = (int) DB::table('organizers')->insertGetId([
             'account_id' => $accountId,
             'name' => 'Accreditation Organizer',
             'email' => 'org-'.Str::lower(Str::random(10)).'@test.local',
@@ -165,7 +165,7 @@ class Phase2AccreditationSchemaTest extends TestCase
             'updated_at' => now(),
         ]);
 
-        $this->eventId = (int)DB::table('events')->insertGetId([
+        $this->eventId = (int) DB::table('events')->insertGetId([
             'title' => 'Accreditation Test Event',
             'account_id' => $accountId,
             'user_id' => $this->userId,
@@ -182,7 +182,7 @@ class Phase2AccreditationSchemaTest extends TestCase
 
     private function makePerson(): int
     {
-        return (int)DB::table('persons')->insertGetId([
+        return (int) DB::table('persons')->insertGetId([
             'short_id' => 'pn_'.Str::lower(Str::random(20)),
             'account_id' => $this->accountId(),
             'first_name' => 'Test',
@@ -195,7 +195,7 @@ class Phase2AccreditationSchemaTest extends TestCase
 
     private function makeAccreditationType(string $code): int
     {
-        return (int)DB::table('accreditation_types')->insertGetId([
+        return (int) DB::table('accreditation_types')->insertGetId([
             'short_id' => 'at_'.Str::lower(Str::random(20)),
             'event_id' => $this->makeEvent(),
             'code' => $code,
@@ -207,7 +207,7 @@ class Phase2AccreditationSchemaTest extends TestCase
 
     private function insertAccreditation(int $typeId, int $personId): int
     {
-        return (int)DB::table('accreditations')->insertGetId([
+        return (int) DB::table('accreditations')->insertGetId([
             'short_id' => 'ac_'.Str::lower(Str::random(20)),
             'event_id' => $this->makeEvent(),
             'person_id' => $personId,
@@ -230,7 +230,7 @@ class Phase2AccreditationSchemaTest extends TestCase
     {
         $eventId = $this->makeEvent();
 
-        $productId = (int)DB::table('products')->insertGetId([
+        $productId = (int) DB::table('products')->insertGetId([
             'title' => 'Accreditation Test Ticket',
             'event_id' => $eventId,
             'type' => 'FREE',
@@ -240,14 +240,14 @@ class Phase2AccreditationSchemaTest extends TestCase
             'updated_at' => now(),
         ]);
 
-        $productPriceId = (int)DB::table('product_prices')->insertGetId([
+        $productPriceId = (int) DB::table('product_prices')->insertGetId([
             'product_id' => $productId,
             'price' => 0,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
 
-        $orderId = (int)DB::table('orders')->insertGetId([
+        $orderId = (int) DB::table('orders')->insertGetId([
             'short_id' => 'or_'.Str::lower(Str::random(16)),
             'public_id' => 'O-'.Str::upper(Str::random(10)),
             'event_id' => $eventId,
@@ -260,7 +260,7 @@ class Phase2AccreditationSchemaTest extends TestCase
             'updated_at' => now(),
         ]);
 
-        return (int)DB::table('attendees')->insertGetId([
+        return (int) DB::table('attendees')->insertGetId([
             'short_id' => 'at_'.Str::lower(Str::random(16)),
             'public_id' => 'A-'.Str::upper(Str::random(10)),
             'first_name' => 'Test',
@@ -283,7 +283,7 @@ class Phase2AccreditationSchemaTest extends TestCase
     {
         $identifier ??= Str::random(40);
 
-        return (int)DB::table('credentials')->insertGetId(array_merge([
+        return (int) DB::table('credentials')->insertGetId(array_merge([
             'short_id' => 'cr_'.Str::lower(Str::random(20)),
             'event_id' => $this->makeEvent(),
             'credential_type' => 'ATTENDEE',

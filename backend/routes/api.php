@@ -264,6 +264,56 @@ use HiEvents\Http\Actions\Webhooks\EditWebhookAction;
 use HiEvents\Http\Actions\Webhooks\GetWebhookAction;
 use HiEvents\Http\Actions\Webhooks\GetWebhookLogsAction;
 use HiEvents\Http\Actions\Webhooks\GetWebhooksAction;
+use HiEvents\Http\Actions\Venue\CreateVenueAction;
+use HiEvents\Http\Actions\Venue\GetVenuesAction;
+use HiEvents\Http\Actions\Venue\GetVenueAction;
+use HiEvents\Http\Actions\Venue\UpdateVenueAction;
+use HiEvents\Http\Actions\Venue\DeleteVenueAction;
+use HiEvents\Http\Actions\Zone\CreateZoneAction;
+use HiEvents\Http\Actions\Zone\GetZonesAction;
+use HiEvents\Http\Actions\Zone\GetZoneAction;
+use HiEvents\Http\Actions\Zone\UpdateZoneAction;
+use HiEvents\Http\Actions\Zone\DeleteZoneAction;
+use HiEvents\Http\Actions\AccessPoint\CreateAccessPointAction;
+use HiEvents\Http\Actions\AccessPoint\GetAccessPointsAction;
+use HiEvents\Http\Actions\AccessPoint\GetAccessPointAction;
+use HiEvents\Http\Actions\AccessPoint\UpdateAccessPointAction;
+use HiEvents\Http\Actions\AccessPoint\DeleteAccessPointAction;
+use HiEvents\Http\Actions\Room\CreateRoomAction;
+use HiEvents\Http\Actions\Room\GetRoomsAction;
+use HiEvents\Http\Actions\Room\GetRoomAction;
+use HiEvents\Http\Actions\Room\UpdateRoomAction;
+use HiEvents\Http\Actions\Room\DeleteRoomAction;
+use HiEvents\Http\Actions\Track\CreateTrackAction;
+use HiEvents\Http\Actions\Track\GetTracksAction;
+use HiEvents\Http\Actions\Track\GetTrackAction;
+use HiEvents\Http\Actions\Track\UpdateTrackAction;
+use HiEvents\Http\Actions\Track\DeleteTrackAction;
+use HiEvents\Http\Actions\Speaker\CreateSpeakerAction;
+use HiEvents\Http\Actions\Speaker\GetSpeakersAction;
+use HiEvents\Http\Actions\Speaker\GetSpeakerAction;
+use HiEvents\Http\Actions\Speaker\UpdateSpeakerAction;
+use HiEvents\Http\Actions\Speaker\DeleteSpeakerAction;
+use HiEvents\Http\Actions\Session\CreateSessionAction;
+use HiEvents\Http\Actions\Session\GetSessionsAction;
+use HiEvents\Http\Actions\Session\GetSessionAction;
+use HiEvents\Http\Actions\Session\UpdateSessionAction;
+use HiEvents\Http\Actions\Session\DeleteSessionAction;
+use HiEvents\Http\Actions\AccreditationType\CreateAccreditationTypeAction;
+use HiEvents\Http\Actions\AccreditationType\GetAccreditationTypesAction;
+use HiEvents\Http\Actions\AccreditationType\GetAccreditationTypeAction;
+use HiEvents\Http\Actions\AccreditationType\UpdateAccreditationTypeAction;
+use HiEvents\Http\Actions\AccreditationType\DeleteAccreditationTypeAction;
+use HiEvents\Http\Actions\AccessRule\CreateAccessRuleAction;
+use HiEvents\Http\Actions\AccessRule\GetAccessRulesAction;
+use HiEvents\Http\Actions\AccessRule\GetAccessRuleAction;
+use HiEvents\Http\Actions\AccessRule\UpdateAccessRuleAction;
+use HiEvents\Http\Actions\AccessRule\DeleteAccessRuleAction;
+use HiEvents\Http\Actions\AccessLog\GetAccessLogsAction;
+use HiEvents\Http\Actions\AccessLog\RecordAccessScanAction;
+use HiEvents\Http\Actions\Credential\GetCredentialsAction;
+use HiEvents\Http\Actions\Credential\IssueCredentialAction;
+use HiEvents\Http\Actions\Credential\RevokeCredentialAction;
 use Illuminate\Routing\Router;
 
 /** @var Router|Router $router */
@@ -498,6 +548,79 @@ $router->middleware(['auth:api'])->group(
         $router->get('/events/{event_id}/check-in-lists/{check_in_list_id}', GetCheckInListAction::class);
         $router->put('/events/{event_id}/check-in-lists/{check_in_list_id}', UpdateCheckInListAction::class);
         $router->delete('/events/{event_id}/check-in-lists/{check_in_list_id}', DeleteCheckInListAction::class);
+
+        // Space, programme, accreditation and access (ARZO master plan documents 21-30)
+        // Venues (account scoped)
+        $router->post('/venues', CreateVenueAction::class);
+        $router->get('/venues', GetVenuesAction::class);
+        $router->get('/venues/{id}', GetVenueAction::class);
+        $router->put('/venues/{id}', UpdateVenueAction::class);
+        $router->delete('/venues/{id}', DeleteVenueAction::class);
+
+        // Zones
+        $router->post('/venues/{venue_id}/zones', CreateZoneAction::class);
+        $router->get('/venues/{venue_id}/zones', GetZonesAction::class);
+        $router->get('/venues/{venue_id}/zones/{id}', GetZoneAction::class);
+        $router->put('/venues/{venue_id}/zones/{id}', UpdateZoneAction::class);
+        $router->delete('/venues/{venue_id}/zones/{id}', DeleteZoneAction::class);
+
+        // Access points
+        $router->post('/zones/{zone_id}/access-points', CreateAccessPointAction::class);
+        $router->get('/zones/{zone_id}/access-points', GetAccessPointsAction::class);
+        $router->get('/zones/{zone_id}/access-points/{id}', GetAccessPointAction::class);
+        $router->put('/zones/{zone_id}/access-points/{id}', UpdateAccessPointAction::class);
+        $router->delete('/zones/{zone_id}/access-points/{id}', DeleteAccessPointAction::class);
+
+        // Rooms
+        $router->post('/venues/{venue_id}/rooms', CreateRoomAction::class);
+        $router->get('/venues/{venue_id}/rooms', GetRoomsAction::class);
+        $router->get('/venues/{venue_id}/rooms/{id}', GetRoomAction::class);
+        $router->put('/venues/{venue_id}/rooms/{id}', UpdateRoomAction::class);
+        $router->delete('/venues/{venue_id}/rooms/{id}', DeleteRoomAction::class);
+
+        // Tracks
+        $router->post('/events/{event_id}/tracks', CreateTrackAction::class);
+        $router->get('/events/{event_id}/tracks', GetTracksAction::class);
+        $router->get('/events/{event_id}/tracks/{id}', GetTrackAction::class);
+        $router->put('/events/{event_id}/tracks/{id}', UpdateTrackAction::class);
+        $router->delete('/events/{event_id}/tracks/{id}', DeleteTrackAction::class);
+
+        // Speakers
+        $router->post('/events/{event_id}/speakers', CreateSpeakerAction::class);
+        $router->get('/events/{event_id}/speakers', GetSpeakersAction::class);
+        $router->get('/events/{event_id}/speakers/{id}', GetSpeakerAction::class);
+        $router->put('/events/{event_id}/speakers/{id}', UpdateSpeakerAction::class);
+        $router->delete('/events/{event_id}/speakers/{id}', DeleteSpeakerAction::class);
+
+        // Sessions
+        $router->post('/events/{event_id}/sessions', CreateSessionAction::class);
+        $router->get('/events/{event_id}/sessions', GetSessionsAction::class);
+        $router->get('/events/{event_id}/sessions/{id}', GetSessionAction::class);
+        $router->put('/events/{event_id}/sessions/{id}', UpdateSessionAction::class);
+        $router->delete('/events/{event_id}/sessions/{id}', DeleteSessionAction::class);
+
+        // Accreditation types
+        $router->post('/events/{event_id}/accreditation-types', CreateAccreditationTypeAction::class);
+        $router->get('/events/{event_id}/accreditation-types', GetAccreditationTypesAction::class);
+        $router->get('/events/{event_id}/accreditation-types/{id}', GetAccreditationTypeAction::class);
+        $router->put('/events/{event_id}/accreditation-types/{id}', UpdateAccreditationTypeAction::class);
+        $router->delete('/events/{event_id}/accreditation-types/{id}', DeleteAccreditationTypeAction::class);
+
+        // Access rules
+        $router->post('/events/{event_id}/access-rules', CreateAccessRuleAction::class);
+        $router->get('/events/{event_id}/access-rules', GetAccessRulesAction::class);
+        $router->get('/events/{event_id}/access-rules/{id}', GetAccessRuleAction::class);
+        $router->put('/events/{event_id}/access-rules/{id}', UpdateAccessRuleAction::class);
+        $router->delete('/events/{event_id}/access-rules/{id}', DeleteAccessRuleAction::class);
+
+        // Access logs and scanning
+        $router->get('/events/{event_id}/access-logs', GetAccessLogsAction::class);
+        $router->post('/events/{event_id}/access-scans', RecordAccessScanAction::class);
+
+        // Credentials
+        $router->get('/events/{event_id}/credentials', GetCredentialsAction::class);
+        $router->post('/events/{event_id}/credentials', IssueCredentialAction::class);
+        $router->post('/events/{event_id}/credentials/{id}/revoke', RevokeCredentialAction::class);
 
         // Webhooks
         $router->post('/events/{event_id}/webhooks', CreateWebhookAction::class);

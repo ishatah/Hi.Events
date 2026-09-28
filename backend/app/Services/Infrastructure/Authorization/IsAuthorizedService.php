@@ -10,6 +10,7 @@ use HiEvents\DomainObjects\OrganizerDomainObject;
 use HiEvents\DomainObjects\Status\UserStatus;
 use HiEvents\DomainObjects\TaxAndFeesDomainObject;
 use HiEvents\DomainObjects\UserDomainObject;
+use HiEvents\DomainObjects\VenueDomainObject;
 use HiEvents\Exceptions\UnauthorizedException;
 use HiEvents\Repository\Interfaces\AccountRepositoryInterface;
 use HiEvents\Repository\Interfaces\AccountUserRepositoryInterface;
@@ -18,6 +19,7 @@ use HiEvents\Repository\Interfaces\ImageRepositoryInterface;
 use HiEvents\Repository\Interfaces\OrganizerRepositoryInterface;
 use HiEvents\Repository\Interfaces\TaxAndFeeRepositoryInterface;
 use HiEvents\Repository\Interfaces\UserRepositoryInterface;
+use HiEvents\Repository\Interfaces\VenueRepositoryInterface;
 use Illuminate\Auth\AuthManager;
 use Illuminate\Foundation\Application;
 
@@ -63,6 +65,14 @@ readonly class IsAuthorizedService
             TaxAndFeesDomainObject::class => $this->app->make(TaxAndFeeRepositoryInterface::class),
             OrganizerDomainObject::class => $this->app->make(OrganizerRepositoryInterface::class),
             ImageDomainObject::class => $this->app->make(ImageRepositoryInterface::class),
+            VenueDomainObject::class => $this->app->make(VenueRepositoryInterface::class),
+
+            // A match with no default arm throws UnhandledMatchError, which surfaces as a
+            // 500 rather than a 403. Denying an unrecognised type is both safer and more
+            // honest. See docs/arzo-master-plan/02-current-state-audit.md finding F12.
+            default => throw new UnauthorizedException(
+                sprintf('Authorization is not defined for entity type %s.', $entityType)
+            ),
         };
 
         $entity = $repository->findById($entityId);
@@ -70,10 +80,12 @@ readonly class IsAuthorizedService
         $result = match ($entityType) {
             EventDomainObject::class,
             ImageDomainObject::class,
-            OrganizerDomainObject::class => $entity?->getAccountId() === $authAccountId,
+            OrganizerDomainObject::class,
+            VenueDomainObject::class => $entity?->getAccountId() === $authAccountId,
             AccountDomainObject::class => $entity?->getId() === $authAccountId,
             UserDomainObject::class => $this->validateUserUpdate($entity, $authAccountId),
             TaxAndFeesDomainObject::class => $this->validateTax($entity, $authAccountId),
+            default => false,
         };
 
         if (! $result) {
