@@ -32,11 +32,15 @@ class CredentialIssuanceService
 
     public function issueForAttendee(int $eventId, int $attendeeId, ?int $personId = null): CredentialDomainObject
     {
+        $productId = $this->databaseManager->table('attendees')
+            ->where('id', $attendeeId)
+            ->value('product_id');
+
         return $this->issue($eventId, [
             CredentialDomainObjectAbstract::ATTENDEE_ID => $attendeeId,
             CredentialDomainObjectAbstract::PERSON_ID => $personId,
             CredentialDomainObjectAbstract::CREDENTIAL_TYPE => 'ATTENDEE',
-        ]);
+        ], subjects: $productId !== null ? ['PRODUCT' => (int) $productId] : []);
     }
 
     /**
@@ -73,14 +77,16 @@ class CredentialIssuanceService
     /**
      * @param  array<string, mixed>  $source
      * @param  array<int, int>|null  $approvedZoneIds
+     * @param  array<string, int|null>  $subjects
      */
     private function issue(
         int $eventId,
         array $source,
         ?int $accreditationTypeId = null,
         ?array $approvedZoneIds = null,
+        array $subjects = [],
     ): CredentialDomainObject {
-        return $this->databaseManager->transaction(function () use ($eventId, $source, $accreditationTypeId, $approvedZoneIds) {
+        return $this->databaseManager->transaction(function () use ($eventId, $source, $accreditationTypeId, $approvedZoneIds, $subjects) {
             // Opaque and random. A sequential or email-derived identifier would be a
             // forgery vector, since the identifier is what a scanner reads.
             $identifier = Str::lower(Str::random(40));
@@ -99,6 +105,7 @@ class CredentialIssuanceService
                 eventId: $eventId,
                 accreditationTypeId: $accreditationTypeId,
                 approvedZoneIds: $approvedZoneIds,
+                subjects: $subjects,
             );
 
             return $credential;

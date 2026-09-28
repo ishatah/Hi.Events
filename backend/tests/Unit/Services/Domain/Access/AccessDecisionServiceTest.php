@@ -439,6 +439,8 @@ class AccessDecisionServiceTest extends TestCase
         int $entryCountForZone = 0,
         ?int $zoneOccupancy = null,
         ?int $zoneCapacity = null,
+        array $subjects = [],
+        string $venueTimezone = 'UTC',
     ): AccessContextDTO {
         return new AccessContextDTO(
             credential: $credential,
@@ -448,7 +450,8 @@ class AccessDecisionServiceTest extends TestCase
             zoneId: 42,
             direction: $direction,
             occurredAt: $occurredAt ?? $this->now,
-            venueTimezone: 'UTC',
+            subjects: $subjects,
+            venueTimezone: $venueTimezone,
             lastLogForZone: $lastLogForZone,
             entryCountForZone: $entryCountForZone,
             zoneOccupancy: $zoneOccupancy,
@@ -522,5 +525,142 @@ class AccessDecisionServiceTest extends TestCase
             'direction' => 'ENTRY',
             'occurred_at' => $this->now->copy()->subHour()->toDateTimeString(),
         ], $overrides);
+    }
+
+    public function test_a_deny_rule_for_another_accreditation_type_does_not_deny_this_holder(): void
+    {
+        $context = $this->context(
+            credential: $this->credential(),
+            grants: [$this->grant()],
+            rules: [(object) [
+                'id' => 900,
+                'name' => 'Subject rule 900',
+                'effect' => 'DENY',
+                'is_active' => true,
+                'subject_type' => 'ACCREDITATION_TYPE',
+                'subject_id' => 5,
+                'target_type' => 'ZONE',
+                'target_id' => 42,
+            ]],
+            subjects: ['ACCREDITATION_TYPE' => 6],
+        );
+
+        $decision = $this->service->decide($context);
+
+        $this->assertTrue($decision->isGranted());
+        $this->assertNull($decision->matchedRuleId);
+    }
+
+    public function test_a_deny_rule_for_this_accreditation_type_denies(): void
+    {
+        $context = $this->context(
+            credential: $this->credential(),
+            grants: [$this->grant()],
+            rules: [(object) [
+                'id' => 901,
+                'name' => 'Subject rule 901',
+                'effect' => 'DENY',
+                'is_active' => true,
+                'subject_type' => 'ACCREDITATION_TYPE',
+                'subject_id' => 6,
+                'target_type' => 'ZONE',
+                'target_id' => 42,
+            ]],
+            subjects: ['ACCREDITATION_TYPE' => 6],
+        );
+
+        $decision = $this->service->decide($context);
+
+        $this->assertFalse($decision->isGranted());
+        $this->assertSame(901, $decision->matchedRuleId);
+    }
+
+    public function test_a_deny_rule_subject_all_denies_every_holder(): void
+    {
+        $context = $this->context(
+            credential: $this->credential(),
+            grants: [$this->grant()],
+            rules: [(object) [
+                'id' => 902,
+                'name' => 'Subject rule 902',
+                'effect' => 'DENY',
+                'is_active' => true,
+                'subject_type' => 'ALL',
+                'subject_id' => null,
+                'target_type' => 'ZONE',
+                'target_id' => 42,
+            ]],
+            subjects: ['PRODUCT' => 3],
+        );
+
+        $this->assertFalse($this->service->decide($context)->isGranted());
+    }
+
+    public function test_a_deny_rule_naming_a_subject_type_the_holder_lacks_does_not_apply(): void
+    {
+        $context = $this->context(
+            credential: $this->credential(),
+            grants: [$this->grant()],
+            rules: [(object) [
+                'id' => 903,
+                'name' => 'Subject rule 903',
+                'effect' => 'DENY',
+                'is_active' => true,
+                'subject_type' => 'ACCREDITATION_TYPE',
+                'subject_id' => null,
+                'target_type' => 'ZONE',
+                'target_id' => 42,
+            ]],
+            subjects: ['PRODUCT' => 3],
+        );
+
+        $this->assertTrue($this->service->decide($context)->isGranted());
+    }
+
+    public function test_a_daily_window_uses_the_venue_timezone_not_utc(): void
+    {
+        $grant = $this->grant(['time_from' => '09:00:00', 'time_to' => '17:00:00']);
+
+        $inDoha = $this->context(
+            credential: $this->credential(),
+            grants: [$grant],
+            occurredAt: Carbon::parse('2030-06-01T07:30:00Z'),
+            venueTimezone: 'Asia/Qatar',
+        );
+
+        $this->assertTrue($this->service->decide($inDoha)->isGranted());
+
+        $sameInstantInUtc = $this->context(
+            credential: $this->credential(),
+            grants: [$grant],
+            occurredAt: Carbon::parse('2030-06-01T07:30:00Z'),
+            venueTimezone: 'UTC',
+        );
+
+        $this->assertFalse($this->service->decide($sameInstantInUtc)->isGranted());
+    }
+
+    public function test_day_of_week_is_evaluated_in_the_venue_timezone(): void
+    {
+        // 2030-06-01T22:30Z is a Saturday in UTC but already Sunday in Asia/Qatar.
+        $sundayOnly = $this->grant(['days_of_week' => [7]]);
+
+        $context = $this->context(
+            credential: $this->credential(),
+            grants: [$sundayOnly],
+            occurredAt: Carbon::parse('2030-06-01T22:30:00Z'),
+            venueTimezone: 'Asia/Qatar',
+        );
+
+        $this->assertTrue($this->service->decide($context)->isGranted());
+
+        $utcContext = $this->context(
+            credential: $this->credential(),
+            grants: [$sundayOnly],
+            occurredAt: Carbon::parse('2030-06-01T22:30:00Z'),
+            venueTimezone: 'UTC',
+        );
+
+        $this->assertFalse($this->service->decide($utcContext)->isGranted());
     }
 }

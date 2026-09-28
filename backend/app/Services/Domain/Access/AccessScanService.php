@@ -80,7 +80,8 @@ class AccessScanService
             zoneId: $zoneId,
             direction: $direction,
             occurredAt: $occurredAt,
-            venueTimezone: 'UTC',
+            subjects: $credential !== null ? $this->subjectsFor($credential) : [],
+            venueTimezone: $this->timezoneFor($zoneId, $eventId),
             lastLogForZone: $credential !== null && $zoneId !== null
                 ? $this->lastLogFor((int) $credential->id, $zoneId)
                 : null,
@@ -109,6 +110,66 @@ class AccessScanService
         );
 
         return $decision;
+    }
+
+    /**
+     * The identities a rule can name this credential by. A rule whose subject is not one
+     * of these does not concern the holder, so the key being absent is meaningful and not
+     * the same as a null value.
+     *
+     * @return array<string, int|null>
+     */
+    private function subjectsFor(object $credential): array
+    {
+        $subjects = ['CREDENTIAL' => (int) $credential->id];
+
+        if ($credential->accreditation_id !== null) {
+            $accreditation = $this->databaseManager->table('accreditations')
+                ->where('id', $credential->accreditation_id)
+                ->whereNull('deleted_at')
+                ->first();
+
+            if ($accreditation !== null) {
+                $subjects['ACCREDITATION_TYPE'] = (int) $accreditation->accreditation_type_id;
+            }
+        }
+
+        if ($credential->attendee_id !== null) {
+            $attendee = $this->databaseManager->table('attendees')
+                ->where('id', $credential->attendee_id)
+                ->whereNull('deleted_at')
+                ->first();
+
+            if ($attendee !== null) {
+                $subjects['PRODUCT'] = (int) $attendee->product_id;
+            }
+        }
+
+        return $subjects;
+    }
+
+    /**
+     * Daily wall-clock windows are meaningless without the venue's own timezone: a
+     * 09:00-17:00 rule in Doha evaluated in UTC opens three hours late.
+     */
+    private function timezoneFor(?int $zoneId, int $eventId): string
+    {
+        if ($zoneId !== null) {
+            $timezone = $this->databaseManager->table('zones')
+                ->join('venues', 'venues.id', '=', 'zones.venue_id')
+                ->where('zones.id', $zoneId)
+                ->value('venues.timezone');
+
+            if ($timezone !== null) {
+                return (string) $timezone;
+            }
+        }
+
+        $timezone = $this->databaseManager->table('events')
+            ->where('id', $eventId)
+            ->value('timezone');
+
+        return $timezone !== null ? (string) $timezone : 'UTC';
     }
 
     private function defaultDirectionFor(?object $accessPoint): AccessDirection

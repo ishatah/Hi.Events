@@ -73,7 +73,7 @@ class AccessDecisionService
         // 4. Narrow to grants whose window includes now.
         $activeGrants = array_values(array_filter(
             $candidateGrants,
-            fn (object $grant): bool => $this->grantWindowIncludes($grant, $context->occurredAt)
+            fn (object $grant): bool => $this->grantWindowIncludes($grant, $context->occurredAt, $context->venueTimezone)
         ));
 
         if ($activeGrants === []) {
@@ -96,7 +96,7 @@ class AccessDecisionService
                 credentialId: $credentialId,
                 matchedGrantId: $grantId,
                 matchedRuleId: (int) $denyRule->id,
-                reason: sprintf('Denied by rule "%s".', (string) $denyRule->name),
+                reason: sprintf('Denied by rule "%s".', (string) ($denyRule->name ?? 'unnamed')),
             );
         }
 
@@ -190,7 +190,13 @@ class AccessDecisionService
         }));
     }
 
-    private function grantWindowIncludes(object $grant, CarbonInterface $now): bool
+    /**
+     * Absolute windows are instants and compare directly. Day-of-week and wall-clock
+     * windows are what a human wrote on a schedule, so they are read in the venue's own
+     * timezone: 09:00-17:00 at a Doha venue evaluated in UTC opens three hours late, and a
+     * day-of-week filter evaluated in UTC changes day at the wrong moment.
+     */
+    private function grantWindowIncludes(object $grant, CarbonInterface $now, string $venueTimezone): bool
     {
         if (! empty($grant->starts_at) && $now->lt($this->toCarbon($grant->starts_at, $now))) {
             return false;
@@ -200,16 +206,18 @@ class AccessDecisionService
             return false;
         }
 
+        $local = $now->copy()->setTimezone($venueTimezone);
+
         $daysOfWeek = $this->decodeArray($grant->days_of_week ?? null);
 
-        if ($daysOfWeek !== [] && ! in_array((int) $now->dayOfWeekIso, array_map('intval', $daysOfWeek), true)) {
+        if ($daysOfWeek !== [] && ! in_array((int) $local->dayOfWeekIso, array_map('intval', $daysOfWeek), true)) {
             return false;
         }
 
         return $this->withinDailyWindow(
             $grant->time_from ?? null,
             $grant->time_to ?? null,
-            $now
+            $local
         );
     }
 
@@ -245,11 +253,15 @@ class AccessDecisionService
                 continue;
             }
 
+            if (! $this->ruleAppliesToHolder($rule, $context)) {
+                continue;
+            }
+
             if (! $this->ruleTargetsThisPoint($rule, $context)) {
                 continue;
             }
 
-            if (! $this->grantWindowIncludes($rule, $context->occurredAt)) {
+            if (! $this->grantWindowIncludes($rule, $context->occurredAt, $context->venueTimezone)) {
                 continue;
             }
 
@@ -257,6 +269,27 @@ class AccessDecisionService
         }
 
         return null;
+    }
+
+    private function ruleAppliesToHolder(object $rule, AccessContextDTO $context): bool
+    {
+        $subjectType = (string) ($rule->subject_type ?? 'ALL');
+
+        if ($subjectType === 'ALL') {
+            return true;
+        }
+
+        if (! array_key_exists($subjectType, $context->subjects)) {
+            return false;
+        }
+
+        $subjectId = $rule->subject_id ?? null;
+
+        if ($subjectId === null) {
+            return $context->subjects[$subjectType] !== null;
+        }
+
+        return $context->subjects[$subjectType] === (int) $subjectId;
     }
 
     private function ruleTargetsThisPoint(object $rule, AccessContextDTO $context): bool

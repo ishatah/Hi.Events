@@ -40,6 +40,7 @@ class GrantMaterializationService
         int $eventId,
         ?int $accreditationTypeId = null,
         ?array $approvedZoneIds = null,
+        array $subjects = [],
     ): int {
         $this->revokeExisting($credentialId);
 
@@ -70,7 +71,15 @@ class GrantMaterializationService
             $created++;
         }
 
+        if ($accreditationTypeId !== null) {
+            $subjects['ACCREDITATION_TYPE'] = $accreditationTypeId;
+        }
+
         foreach ($this->eventAllowRules($eventId) as $rule) {
+            if (! $this->ruleAppliesToHolder($rule, $subjects)) {
+                continue;
+            }
+
             if ($rule->getTargetType() !== 'ZONE' || $rule->getTargetId() === null) {
                 continue;
             }
@@ -98,6 +107,34 @@ class GrantMaterializationService
         }
 
         return $created;
+    }
+
+    /**
+     * A rule names the holders it concerns. Granting every event-wide ALLOW rule to every
+     * credential would hand a press-only zone to general admission, so a rule whose
+     * subject this credential does not match is not materialised for it.
+     *
+     * @param  array<string, int|null>  $subjects
+     */
+    private function ruleAppliesToHolder(object $rule, array $subjects): bool
+    {
+        $subjectType = (string) ($rule->getSubjectType() ?? 'ALL');
+
+        if ($subjectType === 'ALL') {
+            return true;
+        }
+
+        if (! array_key_exists($subjectType, $subjects)) {
+            return false;
+        }
+
+        $subjectId = $rule->getSubjectId();
+
+        if ($subjectId === null) {
+            return $subjects[$subjectType] !== null;
+        }
+
+        return $subjects[$subjectType] === (int) $subjectId;
     }
 
     /**

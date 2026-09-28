@@ -374,7 +374,7 @@ class AccessScanServiceTest extends TestCase
         ]);
     }
 
-    private function makeAttendee(): int
+    private function makeAttendee(?int &$productIdOut = null): int
     {
         $productId = (int) DB::table('products')->insertGetId([
             'title' => 'Access Ticket',
@@ -385,6 +385,8 @@ class AccessScanServiceTest extends TestCase
             'created_at' => now(),
             'updated_at' => now(),
         ]);
+
+        $productIdOut = $productId;
 
         $productPriceId = (int) DB::table('product_prices')->insertGetId([
             'product_id' => $productId,
@@ -420,5 +422,137 @@ class AccessScanServiceTest extends TestCase
             'created_at' => now(),
             'updated_at' => now(),
         ]);
+    }
+
+    public function test_an_event_allow_rule_for_another_product_is_not_granted_to_this_holder(): void
+    {
+        $productId = null;
+        $attendeeId = $this->makeAttendee($productId);
+
+        $restricted = $this->makeZone($this->venueId, 'VIP');
+
+        DB::table('access_rules')->insert([
+            'short_id' => 'ar_'.Str::lower(Str::random(16)),
+            'event_id' => $this->eventId,
+            'name' => 'VIP product only',
+            'priority' => 10,
+            'effect' => 'ALLOW',
+            'subject_type' => 'PRODUCT',
+            'subject_id' => $productId + 1000,
+            'target_type' => 'ZONE',
+            'target_id' => $restricted,
+            'allow_reentry' => true,
+            'enforce_capacity' => false,
+            'requires_escort' => false,
+            'is_active' => true,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $credential = $this->issuanceService->issueForAttendee(
+            eventId: $this->eventId,
+            attendeeId: $attendeeId,
+        );
+
+        $grantedZones = DB::table('access_grants')
+            ->where('credential_id', $credential->getId())
+            ->pluck('zone_id')
+            ->all();
+
+        $this->assertNotContains(
+            $restricted,
+            array_map('intval', $grantedZones),
+            'A rule naming another product must not be granted to this holder.'
+        );
+    }
+
+    public function test_an_event_allow_rule_for_this_product_is_granted(): void
+    {
+        $productId = null;
+        $attendeeId = $this->makeAttendee($productId);
+
+        $hall = $this->makeZone($this->venueId, 'HALL2');
+
+        DB::table('access_rules')->insert([
+            'short_id' => 'ar_'.Str::lower(Str::random(16)),
+            'event_id' => $this->eventId,
+            'name' => 'This product',
+            'priority' => 10,
+            'effect' => 'ALLOW',
+            'subject_type' => 'PRODUCT',
+            'subject_id' => $productId,
+            'target_type' => 'ZONE',
+            'target_id' => $hall,
+            'allow_reentry' => true,
+            'enforce_capacity' => false,
+            'requires_escort' => false,
+            'is_active' => true,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $credential = $this->issuanceService->issueForAttendee(
+            eventId: $this->eventId,
+            attendeeId: $attendeeId,
+        );
+
+        $grantedZones = array_map('intval', DB::table('access_grants')
+            ->where('credential_id', $credential->getId())
+            ->pluck('zone_id')
+            ->all());
+
+        $this->assertContains($hall, $grantedZones);
+    }
+
+    public function test_a_daily_window_is_evaluated_in_the_venue_timezone(): void
+    {
+        DB::table('venues')->where('id', $this->venueId)->update(['timezone' => 'Asia/Qatar']);
+
+        $attendeeId = $this->makeAttendee();
+
+        DB::table('access_rules')->insert([
+            'short_id' => 'ar_'.Str::lower(Str::random(16)),
+            'event_id' => $this->eventId,
+            'name' => 'Business hours only',
+            'priority' => 10,
+            'effect' => 'ALLOW',
+            'subject_type' => 'ALL',
+            'subject_id' => null,
+            'target_type' => 'ZONE',
+            'target_id' => $this->zoneId,
+            'time_from' => '09:00:00',
+            'time_to' => '17:00:00',
+            'allow_reentry' => true,
+            'enforce_capacity' => false,
+            'requires_escort' => false,
+            'is_active' => true,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $credential = $this->issuanceService->issueForAttendee(
+            eventId: $this->eventId,
+            attendeeId: $attendeeId,
+        );
+
+        $identifier = (string) DB::table('credentials')
+            ->where('id', $credential->getId())
+            ->value('identifier');
+
+        // 07:30 UTC is 10:30 in Doha, inside the window. Evaluated as UTC it would fall
+        // outside it, which is the defect this covers.
+        $decision = $this->scanService->scan(
+            eventId: $this->eventId,
+            identifier: $identifier,
+            accessPointId: $this->accessPointId,
+            direction: AccessDirection::ENTRY,
+            operatorUserId: $this->userId,
+            occurredAt: Carbon::parse('2030-06-01T07:30:00Z'),
+        );
+
+        $this->assertTrue(
+            $decision->isGranted(),
+            'A Doha venue window must be read in Asia/Qatar, not UTC. Got: '.$decision->reason
+        );
     }
 }

@@ -22,6 +22,10 @@ class AccessContextDTO extends BaseDataObject
     /**
      * @param  array<int, object>  $grants  Grants already filtered to this credential
      * @param  array<int, object>  $rules  Active rules for the event, priority ordered
+     * @param  array<string, int|null>  $subjects  The scanned credential's identity by
+     *                                             subject_type, used to decide which rules
+     *                                             apply to it. A rule whose subject is
+     *                                             absent here does not concern this holder.
      */
     public function __construct(
         public readonly ?object $credential,
@@ -31,6 +35,7 @@ class AccessContextDTO extends BaseDataObject
         public readonly ?int $zoneId,
         public readonly AccessDirection $direction,
         public readonly CarbonInterface $occurredAt,
+        public readonly array $subjects = [],
         public readonly string $venueTimezone = 'UTC',
         public readonly ?object $lastLogForZone = null,
         public readonly int $entryCountForZone = 0,
