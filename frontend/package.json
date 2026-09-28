@@ -14,6 +14,9 @@
     "start": "cross-env NODE_ENV=production node --import ./instrument.mjs server.js",
     "build": "npm run messages:extract && npm run messages:compile && npm run build:ssr:client && npm run build:ssr:server",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --config vitest.config.ts",
+    "test:watch": "vitest --config vitest.config.ts",
     "messages:extract": "lingui extract",
     "messages:compile": "lingui compile"
   },
@@ -103,10 +106,12 @@
     "typescript": "^5.8.3",
     "vite": "^5.4.19",
     "vite-bundle-visualizer": "^1.2.1",
-    "vite-plugin-copy": "^0.1.6"
+    "vite-plugin-copy": "^0.1.6",
+    "vitest": "2.1.9"
   },
   "resolutions": {
     "prosemirror-model": "^1.25.7",
     "prosemirror-view": "1.41.8"
-  }
+  },
+  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
 }

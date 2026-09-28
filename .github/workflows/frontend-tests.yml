@@ -1,0 +1,78 @@
+name: Frontend Tests
+
+on:
+  push:
+    branches: [ main, develop, 'v*.*.*-*' ]
+    paths:
+      - 'frontend/**'
+      - '.github/workflows/frontend-tests.yml'
+  pull_request:
+    paths:
+      - 'frontend/**'
+      - '.github/workflows/frontend-tests.yml'
+
+concurrency:
+  group: frontend-tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Lint, typecheck and unit tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'yarn'
+          cache-dependency-path: frontend/yarn.lock
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Compile translations
+        run: yarn messages:compile
+
+      - name: Unit tests
+        run: yarn test
+
+      # eslint is not yet clean either: 768 pre-existing errors, dominated by
+      # lingui/no-unlocalized-strings. Same treatment as tsc - gate the count.
+      - name: Lint (no new errors)
+        run: |
+          set -o pipefail
+          BASELINE=768
+          COUNT=$(yarn --silent lint 2>&1 | grep -cE "^\s+[0-9]+:[0-9]+\s+error" || true)
+          echo "ESLint errors: $COUNT (baseline $BASELINE)"
+          if [ "$COUNT" -gt "$BASELINE" ]; then
+            echo "::error::ESLint errors increased from $BASELINE to $COUNT."
+            exit 1
+          fi
+          if [ "$COUNT" -lt "$BASELINE" ]; then
+            echo "::notice::ESLint errors dropped to $COUNT. Lower BASELINE in this workflow."
+          fi
+
+      # tsc is not yet clean: 46 pre-existing errors are tracked in
+      # docs/arzo-master-plan/121-technical-debt.md. Gate on the count so it cannot
+      # grow, and drop this step for a plain `yarn typecheck` once it reaches zero.
+      - name: Typecheck (no new errors)
+        run: |
+          set -o pipefail
+          BASELINE=46
+          COUNT=$(yarn --silent typecheck 2>&1 | grep -cE "error TS" || true)
+          echo "TypeScript errors: $COUNT (baseline $BASELINE)"
+          if [ "$COUNT" -gt "$BASELINE" ]; then
+            echo "::error::TypeScript errors increased from $BASELINE to $COUNT."
+            yarn --silent typecheck 2>&1 | grep -E "error TS" || true
+            exit 1
+          fi
+          if [ "$COUNT" -lt "$BASELINE" ]; then
+            echo "::notice::TypeScript errors dropped to $COUNT. Lower BASELINE in this workflow."
+          fi
