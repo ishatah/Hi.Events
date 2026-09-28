@@ -24,7 +24,7 @@ jobs:
       # a live connection — it only reads DB_DATABASE for the _test guard check
       # in CreatesApplication — so it runs in parallel with Postgres warming up.
       postgres:
-        image: postgres:15
+        image: postgres:17
         env:
           POSTGRES_DB: hievents_test
           POSTGRES_USER: hievents

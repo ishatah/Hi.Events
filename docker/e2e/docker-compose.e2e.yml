@@ -68,7 +68,7 @@ services:
             - app
 
     pgsql:
-        image: 'postgres:15'
+        image: 'postgres:17'
         environment:
             POSTGRES_DB: hievents_e2e
             POSTGRES_USER: hievents

@@ -1,9 +1,21 @@
 <?php
 
 return [
-    'webhook_queue_name' => env('WEBHOOK_QUEUE_NAME', env('QUEUE_CONNECTION', 'sync')),
+    /*
+    |--------------------------------------------------------------------------
+    | Named Queues
+    |--------------------------------------------------------------------------
+    |
+    | These are queue *names*, not connection names. Every name here must appear in
+    | the --queue list of a running worker, or jobs pushed to it are never consumed.
+    | See docker/all-in-one/supervisor/supervisord.conf and
+    | docker/development/start-dev.sh.
+    |
+    */
 
-    'occurrences_queue_name' => env('OCCURRENCES_QUEUE_NAME'),
+    'webhook_queue_name' => env('WEBHOOK_QUEUE_NAME', 'webhook-queue'),
+
+    'occurrences_queue_name' => env('OCCURRENCES_QUEUE_NAME', 'occurrences'),
 
     /*
     |--------------------------------------------------------------------------

@@ -60,6 +60,14 @@ services:
             VITE_STRIPE_PUBLISHABLE_KEY: '${STRIPE_PUBLIC_KEY}'
             VITE_FRONTEND_URL: '${FRONTEND_URL}'
             VITE_APP_NAME: '${APP_NAME}'
+            VITE_APP_PRIMARY_COLOR: '${APP_PRIMARY_COLOR}'
+            VITE_APP_SECONDARY_COLOR: '${APP_SECONDARY_COLOR}'
+            VITE_APP_LOGO_LIGHT: '${APP_LOGO_LIGHT}'
+            VITE_APP_LOGO_DARK: '${APP_LOGO_DARK}'
+            VITE_APP_FAVICON: '${APP_FAVICON}'
+            VITE_PLATFORM_SUPPORT_EMAIL: '${APP_PLATFORM_SUPPORT_EMAIL}'
+            VITE_TOS_URL: '${APP_TOS_URL}'
+            VITE_PRIVACY_URL: '${APP_PRIVACY_URL}'
         networks:
             - app
 
@@ -101,6 +109,10 @@ services:
         networks:
             - app
     pgsql:
+        # Production (docker/all-in-one) runs postgres:17, as do CI and the e2e stack.
+        # Bumping this pin will not start against an existing v15 data directory: dump
+        # first, then `docker compose down -v`, then restore. Tracked in
+        # docs/arzo-master-plan/121-technical-debt.md.
         image: 'postgres:15'
         ports:
             - '${FORWARD_DB_PORT:-5432}:5432'
