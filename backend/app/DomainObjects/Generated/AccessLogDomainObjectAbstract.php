@@ -18,6 +18,7 @@ abstract class AccessLogDomainObjectAbstract extends \HiEvents\DomainObjects\Abs
     final public const PERSON_ID = 'person_id';
     final public const OPERATOR_USER_ID = 'operator_user_id';
     final public const OVERRIDE_BY = 'override_by';
+    final public const CREDENTIAL_ID = 'credential_id';
     final public const SHORT_ID = 'short_id';
     final public const OCCURRED_AT = 'occurred_at';
     final public const RECORDED_AT = 'recorded_at';
@@ -41,6 +42,7 @@ abstract class AccessLogDomainObjectAbstract extends \HiEvents\DomainObjects\Abs
     protected ?int $person_id = null;
     protected ?int $operator_user_id = null;
     protected ?int $override_by = null;
+    protected ?int $credential_id = null;
     protected string $short_id;
     protected string $occurred_at;
     protected string $recorded_at = 'CURRENT_TIMESTAMP';
@@ -67,6 +69,7 @@ abstract class AccessLogDomainObjectAbstract extends \HiEvents\DomainObjects\Abs
                     'person_id' => $this->person_id ?? null,
                     'operator_user_id' => $this->operator_user_id ?? null,
                     'override_by' => $this->override_by ?? null,
+                    'credential_id' => $this->credential_id ?? null,
                     'short_id' => $this->short_id ?? null,
                     'occurred_at' => $this->occurred_at ?? null,
                     'recorded_at' => $this->recorded_at ?? null,
@@ -170,6 +173,17 @@ abstract class AccessLogDomainObjectAbstract extends \HiEvents\DomainObjects\Abs
     public function getOverrideBy(): ?int
     {
         return $this->override_by;
+    }
+
+    public function setCredentialId(?int $credential_id): self
+    {
+        $this->credential_id = $credential_id;
+        return $this;
+    }
+
+    public function getCredentialId(): ?int
+    {
+        return $this->credential_id;
     }
 
     public function setShortId(string $short_id): self

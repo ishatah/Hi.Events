@@ -5,10 +5,11 @@
 (ARZ-010, ARZ-020–023, ARZ-030–032, ARZ-040). Remaining Phase 1: ARZ-011 RBAC migration,
 ARZ-012 per-event roles, ARZ-013 tenant global scope, ARZ-041 check-in consolidation.
 
-**Unverified:** the accreditation/credential schema (ARZ-050, ARZ-052) is committed but
-**has not been migrated or tested** — Docker Desktop stopped mid-change on 2026-09-29.
-Run `php artisan migrate`, `generate-domain-objects` and
-`--filter=Phase2AccreditationSchemaTest` before treating it as done.
+**Phase 2 started:** the accreditation and credential schema (ARZ-050, ARZ-052) is
+migrated and verified — 98 tables live, `credentials_exactly_one_source` enforced,
+10 schema tests passing, 1224 unit tests green. The remaining Phase 2 work is
+behaviour rather than schema: ARZ-051 approval workflow, ARZ-053 credential backfill,
+ARZ-060–064 the access rules engine, ARZ-070–074 badges.
 
 ---
 
@@ -60,9 +61,9 @@ one competent engineer or pair. Dates are deliberately absent.
 
 | ID | Epic | Item | Cx | Depends on | Status |
 |---|---|---|---|---|---|
-| ARZ-050 | Accreditation | `accreditation_types` + type rules | M | ARZ-021 | SCHEMA LANDED (unverified) |
+| ARZ-050 | Accreditation | `accreditation_types` + type rules | M | ARZ-021 | **DONE** (schema) |
 | ARZ-051 | Accreditation | `accreditations` application + approval workflow | L | ARZ-050, ARZ-011 | TODO |
-| ARZ-052 | Accreditation | `credentials` + one-of CHECK constraint | M | ARZ-051, ARZ-010 | SCHEMA LANDED (unverified) |
+| ARZ-052 | Accreditation | `credentials` + one-of CHECK constraint | M | ARZ-051, ARZ-010 | **DONE** (schema) |
 | ARZ-053 | Accreditation | Backfill credentials for existing attendees | S | ARZ-052 | TODO |
 | ARZ-060 | Access | `access_rules` engine + priority evaluation | L | ARZ-040, ARZ-052 | TODO |
 | ARZ-061 | Access | `access_grants` materialization | M | ARZ-060 | TODO |
