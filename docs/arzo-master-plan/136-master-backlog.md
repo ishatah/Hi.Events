@@ -1,7 +1,9 @@
 # Master Backlog
 
 **Status:** WRITTEN · **Authority:** AUTHORITATIVE for work items · **Audit date:** 2026-09-28
-**Progress:** Phase 0 complete (ARZ-001 … ARZ-008). Phase 1 not started.
+**Progress:** Phase 0 complete (ARZ-001 … ARZ-008). Phase 1 additive schema complete
+(ARZ-010, ARZ-020–023, ARZ-030–032, ARZ-040). Remaining Phase 1: ARZ-011 RBAC migration,
+ARZ-012 per-event roles, ARZ-013 tenant global scope, ARZ-041 check-in consolidation.
 
 ---
 
@@ -35,18 +37,18 @@ one competent engineer or pair. Dates are deliberately absent.
 | ARZ-006 | Stabilize | Cross-tenant 403 test suite (F11) | M | — | **DONE** |
 | ARZ-007 | Stabilize | Frontend test runner + CI lint/typecheck (F9) | M | — | **DONE** |
 | ARZ-008 | Stabilize | Align queue names dev/prod/e2e; pin Postgres (F7, F13) | S | — | **DONE** |
-| ARZ-010 | Foundation | `persons` table + `attendees.person_id` | M | — | TODO |
+| ARZ-010 | Foundation | `persons` table + `attendees.person_id` | M | — | **DONE** |
 | ARZ-011 | Foundation | RBAC/ABAC model replacing the 3-role enum | L | ARZ-005 | TODO |
 | ARZ-012 | Foundation | Per-event roles and assignments | M | ARZ-011 | TODO |
 | ARZ-013 | Foundation | Tenant global scope replacing static state (F11) | M | ARZ-006 | TODO |
-| ARZ-020 | Space | `venues`, `buildings`, `floors` | M | — | TODO |
-| ARZ-021 | Space | `zones` with nesting + `access_points` | M | ARZ-020 | TODO |
-| ARZ-022 | Space | `rooms`; link to zones | S | ARZ-021 | TODO |
-| ARZ-023 | Space | `event_venues` join + backfill from `event_locations` | S | ARZ-020 | TODO |
-| ARZ-030 | Time | `tracks`, `speakers` | S | — | TODO |
-| ARZ-031 | Time | `sessions` + GiST room-overlap exclusion constraint | L | ARZ-022, ARZ-030 | TODO |
-| ARZ-032 | Time | `session_speakers`, `session_products` | S | ARZ-031 | TODO |
-| ARZ-040 | Access | `access_logs` append-only table | M | ARZ-021 | TODO |
+| ARZ-020 | Space | `venues`, `buildings`, `floors` | M | — | **DONE** |
+| ARZ-021 | Space | `zones` with nesting + `access_points` | M | ARZ-020 | **DONE** |
+| ARZ-022 | Space | `rooms`; link to zones | S | ARZ-021 | **DONE** |
+| ARZ-023 | Space | `event_venues` join + backfill from `event_locations` | S | ARZ-020 | **DONE** |
+| ARZ-030 | Time | `tracks`, `speakers` | S | — | **DONE** |
+| ARZ-031 | Time | `sessions` + GiST room-overlap exclusion constraint | L | ARZ-022, ARZ-030 | **DONE** |
+| ARZ-032 | Time | `session_speakers`, `session_products` | S | ARZ-031 | **DONE** |
+| ARZ-040 | Access | `access_logs` append-only table | M | ARZ-021 | **DONE** |
 | ARZ-041 | Check-in | Consolidate the two check-in write models (F10) | L | ARZ-040 | TODO |
 
 ## P1 — Core platform

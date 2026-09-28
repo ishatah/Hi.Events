@@ -3,9 +3,9 @@
 **Status:** Living document
 **Last full code audit:** 2026-09-28
 **Audited commit baseline:** `develop` @ `7dec84ca`
-**Current platform maturity:** Ticketing & registration platform — production-capable in commerce, absent in on-site operations
-**Current roadmap phase:** Pre-Phase-0 (planning)
-**Documents:** 141 total — 28 WRITTEN (executable depth), 113 SCAFFOLD (purpose, verified current state, decisions, open questions)
+**Current platform maturity:** Ticketing & registration platform — production-capable in commerce, absent in on-site operations. Phase 0 defects closed; Phase 1 space/programme/identity schema in place (22 tables).
+**Current roadmap phase:** Phase 1 in progress — Phase 0 complete, Phase 1 additive schema landed
+**Documents:** 141 total — 34 WRITTEN (executable depth), 107 SCAFFOLD (purpose, verified current state, decisions, open questions)
 
 ---
 
@@ -117,8 +117,8 @@ open questions captured; expand before executing) · `PENDING`.
 | `01-executive-vision.md` | Target state, business rationale, non-goals | WRITTEN |
 | `02-current-state-audit.md` | Capability-by-capability audit with evidence | WRITTEN |
 | `03-gap-analysis.md` | Gaps grouped by root cause | WRITTEN |
-| `04-product-strategy.md` | Positioning, buyer, build-vs-partner | SCAFFOLD |
-| `05-product-architecture.md` | Target system architecture | SCAFFOLD |
+| `04-product-strategy.md` | Positioning, buyer, build-vs-partner | WRITTEN |
+| `05-product-architecture.md` | Target system architecture | WRITTEN |
 
 ### Foundation
 
@@ -126,16 +126,16 @@ open questions captured; expand before executing) · `PENDING`.
 |---|---|---|
 | `06-domain-model.md` | Complete entity model | WRITTEN |
 | `07-database-evolution.md` | Migration sequence, 72 → target | WRITTEN |
-| `08-multi-tenancy.md` | Tenant isolation model | SCAFFOLD |
+| `08-multi-tenancy.md` | Tenant isolation model | WRITTEN |
 | `09-permissions-and-roles.md` | RBAC/ABAC replacing the 3-role enum | WRITTEN |
 
 ### Commerce & registration (largely exists)
 
 | Doc | Purpose | Status |
 |---|---|---|
-| `10-registration-platform.md` | Registration flows | SCAFFOLD |
-| `11-ticketing-commerce.md` | Products, orders, checkout | SCAFFOLD |
-| `12-rsvp-registration.md` | RSVP as distinct from ticketing | SCAFFOLD |
+| `10-registration-platform.md` | Registration flows | WRITTEN |
+| `11-ticketing-commerce.md` | Products, orders, checkout | WRITTEN |
+| `12-rsvp-registration.md` | RSVP as distinct from ticketing | WRITTEN |
 | `13-pricing-and-promotions.md` | Tiers, early bird, promos | SCAFFOLD |
 | `14-waitlist-and-capacity.md` | Waitlists, capacity pools | SCAFFOLD |
 | `15-payments-invoicing-vat.md` | Payments, invoices, VAT | SCAFFOLD |
