@@ -1,6 +1,7 @@
 # Master Backlog
 
 **Status:** WRITTEN · **Authority:** AUTHORITATIVE for work items · **Audit date:** 2026-09-28
+**Progress:** Phase 0 complete (ARZ-001 … ARZ-008). Phase 1 not started.
 
 ---
 
@@ -26,14 +27,14 @@ one competent engineer or pair. Dates are deliberately absent.
 
 | ID | Epic | Item | Cx | Depends on | Status |
 |---|---|---|---|---|---|
-| ARZ-001 | Stabilize | Fix offline scan loss + dedupe-before-await ordering (F1) | S | — | TODO |
-| ARZ-002 | Stabilize | Request-scope SSR query client and axios auth (F5) | M | — | TODO |
-| ARZ-003 | Stabilize | Remove `process.env` inlining from client bundle (F6) | S | — | TODO |
-| ARZ-004 | Stabilize | Architecture test: no Eloquent above repositories | S | — | TODO |
-| ARZ-005 | Stabilize | Architecture test: every non-public Action authorizes (F12) | M | — | TODO |
-| ARZ-006 | Stabilize | Cross-tenant 403 test suite (F11) | M | — | TODO |
-| ARZ-007 | Stabilize | Frontend test runner + CI lint/typecheck (F9) | M | — | TODO |
-| ARZ-008 | Stabilize | Align queue names dev/prod/e2e; pin Postgres (F7, F13) | S | — | TODO |
+| ARZ-001 | Stabilize | Fix offline scan loss + dedupe-before-await ordering (F1) | S | — | **DONE** |
+| ARZ-002 | Stabilize | Request-scope SSR query client and axios auth (F5) | M | — | **DONE** |
+| ARZ-003 | Stabilize | Remove `process.env` inlining from client bundle (F6) | S | — | **DONE** |
+| ARZ-004 | Stabilize | Architecture test: no Eloquent above repositories | S | — | **DONE** |
+| ARZ-005 | Stabilize | Architecture test: every non-public Action authorizes (F12) | M | — | **DONE** |
+| ARZ-006 | Stabilize | Cross-tenant 403 test suite (F11) | M | — | **DONE** |
+| ARZ-007 | Stabilize | Frontend test runner + CI lint/typecheck (F9) | M | — | **DONE** |
+| ARZ-008 | Stabilize | Align queue names dev/prod/e2e; pin Postgres (F7, F13) | S | — | **DONE** |
 | ARZ-010 | Foundation | `persons` table + `attendees.person_id` | M | — | TODO |
 | ARZ-011 | Foundation | RBAC/ABAC model replacing the 3-role enum | L | ARZ-005 | TODO |
 | ARZ-012 | Foundation | Per-event roles and assignments | M | ARZ-011 | TODO |

@@ -28,7 +28,7 @@ graph TD
     P5["Phase 5 — Intelligence<br/>command center, analytics, AI"]
 ```
 
-## Phase 0 — Stabilize · complexity **S**
+## Phase 0 — Stabilize · complexity **S** · **COMPLETE 2026-09-28**
 
 Not in the original brief. It earns its place because the audit found a **live bug** and no safety
 net, and because every later phase lands on these same foundations.

@@ -2,6 +2,7 @@
 
 **Status:** WRITTEN · **Authority:** AUTHORITATIVE — the record of what exists · **Audit date:** 2026-09-28
 **Baseline:** `develop` @ `7dec84ca` · **Method:** code reading, live schema queries, live index inspection
+**Remediation:** Phase 0 complete 2026-09-28 — F1, F5, F6, F7, F9, F12, F13 addressed; F11 now covered by a test. See `113-roadmap.md`.
 
 ---
 
@@ -186,7 +187,7 @@ mistaken for offline support.
 
 Ordered by operational severity. The first is a live bug, not a gap.
 
-### F1 — Offline scans are silently lost, and retry is blocked · `CONFIRMED`
+### F1 — Offline scans are silently lost, and retry is blocked · `CONFIRMED` · **FIXED (ARZ-001)**
 
 Two defects compound in `frontend/src/components/layouts/CheckIn/index.tsx`:
 
@@ -238,7 +239,7 @@ handing a link to volunteers; unacceptable for accredited access control.
 `broadcasting.php` is the stock stub; no driver configured; no client library. The command center
 (`53`) is blocked on new infrastructure, not new queries.
 
-### F5 — SSR query client is a cross-request singleton · `CONFIRMED`
+### F5 — SSR query client is a cross-request singleton · `CONFIRMED` · **FIXED (ARZ-002)**
 
 `frontend/src/utilites/ssrQueryClient.ts` holds a module-scope `let`, set in
 `entry.server.tsx:43`, nulled at L75, across an `await`ed render. Under concurrency, request B
@@ -273,7 +274,7 @@ described.
 **Residual item:** ensure no secret-bearing variable is ever given a `VITE_` prefix, since that
 prefix means "safe to ship to the browser". Worth a CI check on the env contract.
 
-### F7 — Dev/prod queue divergence · `CONFIRMED`
+### F7 — Dev/prod queue divergence · `CONFIRMED` · **PARTLY FIXED (ARZ-008)** — queue names aligned and CI/e2e Postgres moved to 17; the dev Postgres pin stays at 15 pending a dump/restore
 
 - Dev: worker + scheduler are **un-supervised `docker exec -d`** processes started by an interactive prompt in `start-dev.sh`; a container restart silently kills them.
 - Prod: supervisord runs `queue:work --queue=default,webhook-queue` — **omitting the `occurrences` queue** that dev runs.
@@ -290,7 +291,7 @@ server-side PDF endpoint. `@react-pdf/renderer` is a **production dependency wit
 
 Badge-on-demand at a door requires a real print pipeline (`22-badge-design-printing.md`).
 
-### F9 — No frontend test safety net · `CONFIRMED`
+### F9 — No frontend test safety net · `CONFIRMED` · **PARTLY FIXED (ARZ-007)** — vitest plus a CI workflow added with 24 tests; component and check-in E2E coverage still thin
 
 Zero frontend unit tests, no runner. Check-in — the most operationally critical surface — has
 **one** E2E spec covering the search path only. Nothing exercises QR, the USB wedge, the dedupe
@@ -314,7 +315,7 @@ Checking someone in via the dashboard and via the scanner produces **different d
 fires webhooks. Any access-control or attendance work must consolidate these first, or it inherits
 two sources of truth. `CONFIRMED`: `grep -c DomainEventDispatcher CheckInAttendeeHandler.php` → 0.
 
-### F11 — Tenant id is static mutable state on a model · `CONFIRMED`
+### F11 — Tenant id is static mutable state on a model · `CONFIRMED` · **GUARDED (ARZ-006)** — a 20-case cross-tenant suite now proves the boundary; the global scope and request-scoped tenant are still Phase 1
 
 `backend/app/Models/User.php:43` — `protected static ?int $currentAccountId`, set by
 `SetAccountContext` middleware from the JWT, read by `User::currentAccount()` / `currentAccountUser()`.
@@ -330,7 +331,7 @@ descendant resources are scoped by **parent only**: `GetProductsHandler` filters
 there is no defence in depth. `UNVERIFIED`: no cross-tenant test exists to prove the 159 call sites
 are complete.
 
-### F12 — Authorization is imperative with no declarative layer · `CONFIRMED`
+### F12 — Authorization is imperative with no declarative layer · `CONFIRMED` · **GUARDED (ARZ-005)** — a CI test now asserts every action authorizes; the declarative policy layer is still Phase 1
 
 `app/Providers/AuthServiceProvider.php` has `$policies = []` and an empty `boot()`; no `app/Policies/`
 exists. Authorization is 159 hand-written `isActionAuthorized()` calls plus 50 `minimumAllowedRole()`.
@@ -346,7 +347,7 @@ admin action that forgets `minimumAllowedRole()` is exposed to any authenticated
 `CONFIRMED`: only **7 of 268 Actions** have a Feature test. The authorization layer is effectively
 untested.
 
-### F13 — `occurrences` queue is unconsumed in production · `CONFIRMED`
+### F13 — `occurrences` queue is unconsumed in production · `CONFIRMED` · **FIXED (ARZ-008)**
 
 Four jobs route to it — `GenerateOccurrencesJob`, `BulkCancelOccurrencesJob`,
 `RefundOccurrenceOrdersJob`, `SendOccurrenceCancellationEmailJob` — via
