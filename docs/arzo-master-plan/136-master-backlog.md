@@ -5,6 +5,11 @@
 (ARZ-010, ARZ-020–023, ARZ-030–032, ARZ-040). Remaining Phase 1: ARZ-011 RBAC migration,
 ARZ-012 per-event roles, ARZ-013 tenant global scope, ARZ-041 check-in consolidation.
 
+**Unverified:** the accreditation/credential schema (ARZ-050, ARZ-052) is committed but
+**has not been migrated or tested** — Docker Desktop stopped mid-change on 2026-09-29.
+Run `php artisan migrate`, `generate-domain-objects` and
+`--filter=Phase2AccreditationSchemaTest` before treating it as done.
+
 ---
 
 ## How to read this
@@ -55,9 +60,9 @@ one competent engineer or pair. Dates are deliberately absent.
 
 | ID | Epic | Item | Cx | Depends on | Status |
 |---|---|---|---|---|---|
-| ARZ-050 | Accreditation | `accreditation_types` + type rules | M | ARZ-021 | TODO |
+| ARZ-050 | Accreditation | `accreditation_types` + type rules | M | ARZ-021 | SCHEMA LANDED (unverified) |
 | ARZ-051 | Accreditation | `accreditations` application + approval workflow | L | ARZ-050, ARZ-011 | TODO |
-| ARZ-052 | Accreditation | `credentials` + one-of CHECK constraint | M | ARZ-051, ARZ-010 | TODO |
+| ARZ-052 | Accreditation | `credentials` + one-of CHECK constraint | M | ARZ-051, ARZ-010 | SCHEMA LANDED (unverified) |
 | ARZ-053 | Accreditation | Backfill credentials for existing attendees | S | ARZ-052 | TODO |
 | ARZ-060 | Access | `access_rules` engine + priority evaluation | L | ARZ-040, ARZ-052 | TODO |
 | ARZ-061 | Access | `access_grants` materialization | M | ARZ-060 | TODO |
