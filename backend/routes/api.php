@@ -324,6 +324,8 @@ use HiEvents\Http\Actions\Session\GetSessionStatsAction;
 use HiEvents\Http\Actions\Session\RecordSessionAttendanceAction;
 use HiEvents\Http\Actions\Session\RegisterForSessionAction;
 use HiEvents\Http\Actions\Accreditation\ApproveAccreditationAction;
+use HiEvents\Http\Actions\Badge\CapturePersonPhotoAction;
+use HiEvents\Http\Actions\Badge\DeletePersonPhotoAction;
 use HiEvents\Http\Actions\Accreditation\GetAccreditationAuditTrailAction;
 use HiEvents\Http\Actions\Accreditation\IssueAccreditationCredentialAction;
 use HiEvents\Http\Actions\Accreditation\RejectAccreditationAction;
@@ -654,6 +656,9 @@ $router->middleware(['auth:api'])->group(
         $router->post('/events/{event_id}/accreditations/{accreditation_id}/reject', RejectAccreditationAction::class);
         $router->post('/events/{event_id}/accreditations/{accreditation_id}/credential', IssueAccreditationCredentialAction::class);
         $router->get('/events/{event_id}/accreditations/{accreditation_id}/audit-trail', GetAccreditationAuditTrailAction::class);
+        // Badge photo capture at the desk
+        $router->post('/events/{event_id}/persons/{person_id}/photo', CapturePersonPhotoAction::class);
+        $router->delete('/events/{event_id}/persons/{person_id}/photo', DeletePersonPhotoAction::class);
 
         // Credentials
         $router->get('/events/{event_id}/credentials', GetCredentialsAction::class);

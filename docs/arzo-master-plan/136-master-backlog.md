@@ -134,7 +134,7 @@ feature and cost far less before it than after.
 | ARZ-071 | Badges | Server-side render, raster-capable, Arabic-tested (replaces F8) | L | ARZ-070 | **DONE** — dompdf at exact mm, DejaVu Sans renders Arabic, QR at ECC H as PNG; pixel-verified zone bar and bit-exact QR |
 | ARZ-072 | Badges | `badge_print_jobs` queue + failure recovery | M | ARZ-071 | **DONE** — `skipLocked` claim, bounded auto-retry then FAILED, manual retry, stalled-job query |
 | ARZ-073 | Badges | Reprint, void, badge history | M | ARZ-072 | **DONE** — reprint creates a new badge linked by `replaces_badge_id`; void cancels queued jobs |
-| ARZ-074 | Badges | Photo capture at the desk | M | ARZ-052 | TODO |
+| ARZ-074 | Badges | Photo capture at the desk | M | ARZ-052 | **DONE** — private disk, random filename, EXIF/GPS stripped, orientation baked in, bounded to 1200px; renderer embeds it as a data URI. Frontend capture UI is not built |
 | ARZ-080 | Sessions | Session registration + capacity | M | ARZ-031 | **DONE** — counted not stored; row lock proven against 8-way concurrency for 1 seat |
 | ARZ-081 | Sessions | Session waitlist — **sibling** `session_waitlist_entries` (table created), shared offer policy (`14`) | M | ARZ-080 | **DONE** — FIFO promotion on cancel; outstanding offers hold a seat. Offer emails/expiry job still TODO → ARZ-337 |
 | ARZ-082 | Sessions | `session_attendance` + session check-in, `ENTRY`/`EXIT` vocabulary | M | ARZ-031, ARZ-040, ARZ-314 | **DONE** — append-only log, distinct-attendee counts, replay-idempotent |

@@ -9,6 +9,7 @@ use HiEvents\DomainObjects\Enums\BadgeElementType;
 use HiEvents\DomainObjects\Enums\BadgeField;
 use HiEvents\Exceptions\ResourceConflictException;
 use HiEvents\Services\Domain\Badge\DTO\BadgeRenderDataDTO;
+use Illuminate\Contracts\Filesystem\Factory as FilesystemFactory;
 use Illuminate\Database\DatabaseManager;
 
 /**
@@ -31,6 +32,7 @@ class BadgeRenderService
     public function __construct(
         private readonly DatabaseManager $databaseManager,
         private readonly BadgeQrCodeService $badgeQrCodeService,
+        private readonly FilesystemFactory $filesystemFactory,
     ) {}
 
     /**
@@ -99,7 +101,7 @@ class BadgeRenderService
                 ->map(static fn ($c): string => (string) $c)
                 ->values()
                 ->all(),
-            photoUrl: $this->photoPathFor($person),
+            photoUrl: $this->photoDataUriFor($person),
         );
     }
 
@@ -108,7 +110,7 @@ class BadgeRenderService
      * A missing file yields null and the template falls back to its placeholder rather than
      * failing the render with somebody waiting at the desk.
      */
-    private function photoPathFor(?object $person): ?string
+    private function photoDataUriFor(?object $person): ?string
     {
         if ($person === null || $person->photo_image_id === null) {
             return null;
@@ -122,9 +124,17 @@ class BadgeRenderService
             return null;
         }
 
-        $absolute = storage_path('app/public/'.$path);
+        $disk = $this->filesystemFactory->disk(config('filesystems.default'));
 
-        return is_readable($absolute) ? $absolute : null;
+        if (! $disk->exists($path)) {
+            return null;
+        }
+
+        // A badge photo lives on a private disk and may not be on local storage at all, so
+        // it is embedded as a data URI rather than referenced by path. dompdf would
+        // otherwise need filesystem access to a location it is deliberately denied.
+        return 'data:'.($disk->mimeType($path) ?: 'image/jpeg').';base64,'
+            .base64_encode((string) $disk->get($path));
     }
 
     /**
@@ -284,7 +294,7 @@ class BadgeRenderService
                 ? sprintf(
                     '<div class="el" style="%s"><img src="%s" style="width:100%%;height:100%%;object-fit:cover"></div>',
                     $box,
-                    e($data->photoUrl)
+                    $data->photoUrl
                 )
                 // A photo template used before a photo is captured leaves a placeholder
                 // rather than collapsing the layout around the gap.
