@@ -133,8 +133,8 @@ rejection_reason NULL text, internal_notes NULL text,
 expires_at NULL,
 form_data jsonb,                   -- answers to type-specific questions
 documents jsonb,                   -- uploaded supporting files (image ids)
-requested_zones NULL bigint[],     -- applicant's requested access
-approved_zones NULL bigint[],      -- what was actually granted
+requested_zones NULL jsonb,        -- applicant's requested access (shipped as jsonb, not bigint[])
+approved_zones NULL jsonb,         -- what was actually granted
 metadata jsonb, timestamps, deleted_at
 INDEX (event_id, status)
 UNIQUE (event_id, person_id, accreditation_type_id) WHERE deleted_at IS NULL

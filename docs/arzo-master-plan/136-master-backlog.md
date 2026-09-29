@@ -120,7 +120,7 @@ feature and cost far less before it than after.
 | ID | Epic | Item | Cx | Depends on | Status |
 |---|---|---|---|---|---|
 | ARZ-050 | Accreditation | `accreditation_types` + type rules | M | ARZ-021 | **DONE** (schema) |
-| ARZ-051 | Accreditation | `accreditations` application + approval workflow, audited | L | ARZ-050, ARZ-011, ARZ-012, ARZ-319 | TODO |
+| ARZ-051 | Accreditation | `accreditations` application + approval workflow, audited | L | ARZ-050, ARZ-011, ARZ-012, ARZ-319 | **DONE** — submit/approve/reject/issue + `accreditation_audit_logs`; gated on `accreditation.approve`/`.reject`/`credential.issue`. Built its own audit table rather than adopting the dormant `event_logs`, so ARZ-319 was not a blocker |
 | ARZ-052 | Accreditation | `credentials` + one-of CHECK constraint; issuance service | M | ARZ-051, ARZ-010 | **DONE** — two sources by design; staff and exhibitor staff come through accreditation (`32`, `57`) |
 | ARZ-053 | Accreditation | Backfill credentials for existing attendees — as a command, `chunkById`, grants in a second pass (`122` D2) | S | ARZ-052, ARZ-301 | TODO |
 | ARZ-060 | Access | `access_rules` engine + priority evaluation | L | ARZ-040, ARZ-052 | **DONE** — pure decision function, scan service, subject matching, venue-local windows; CRUD exposed over HTTP |
