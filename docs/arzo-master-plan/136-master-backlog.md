@@ -143,7 +143,7 @@ feature and cost far less before it than after.
 | ARZ-090 | API | API keys, scopes, rate limits | L | ARZ-011 | **DONE** — `api_keys`, `arzo_`/`arzod_` prefixes, sha256 hashing, scopes from the `09` vocabulary, per-key throttle, `/api/v1` group |
 | ARZ-091 | API | Versioned webhook payload boundary (F14) | M | ARZ-090, ARZ-304 | TODO |
 | ARZ-092 | API | Device-scoped keys (stored on `devices`, shared resolver with API keys) | M | ARZ-090 | **DONE** — device keys resolve through the same hasher and authenticator; minimal scopes by device type; suspension revokes |
-| ARZ-100 | Offline | Device registry + enrolment, heartbeat, commands | M | ARZ-092, ARZ-314 | TODO — table landed |
+| ARZ-100 | Offline | Device registry + enrolment, heartbeat, commands | M | ARZ-092, ARZ-314 | **PARTLY DONE** — enrolment by expiring pairing code, key rotation, suspension, heartbeat with clock skew, queued commands. HTTP layer not built |
 | ARZ-101 | Offline | Local store + sync protocol | XL | ARZ-100, ARZ-061 | TODO |
 | ARZ-102 | Offline | Conflict resolution + reconciliation reporting | L | ARZ-101 | TODO |
 | ARZ-103 | Offline | Emergency/degraded mode UX | M | ARZ-101 | TODO |
@@ -158,8 +158,8 @@ feature and cost far less before it than after.
 | ARZ-112 | On-site | Queue management + wait estimates | M | ARZ-063 | TODO |
 | ARZ-120 | Hardware | Scanner abstraction (camera, USB, BT, dedicated) | L | ARZ-100 | TODO |
 | ARZ-121 | Hardware | Print host + printer registry + raster adapters (`37`, `39`) | L | ARZ-071 | TODO |
-| ARZ-122 | Hardware | RFID/NFC read + encode via `credential_media` (`36`) | XL | ARZ-120, ARZ-052, ARZ-314 | TODO |
-| ARZ-123 | Hardware | Device health + fleet dashboard | M | ARZ-100, ARZ-104 | TODO |
+| ARZ-122 | Hardware | RFID/NFC read + encode via `credential_media` (`36`) | XL | ARZ-120, ARZ-052, ARZ-314 | **PARTLY DONE** — `credential_media` with hashed UIDs, replace-chain and a one-live-tag index. The on-device encoder is hardware |
+| ARZ-123 | Hardware | Device health + fleet dashboard | M | ARZ-100, ARZ-104 | **PARTLY DONE** — fleet status derived from `last_seen_at`, health events on state change only. Dashboard UI and realtime push not built |
 | ARZ-130 | Exhibitors | `companies` + `event_exhibitors` + magic-link portal (`32`) | L | ARZ-011 | **PARTLY DONE** — `companies`, `event_exhibitors`, `exhibitor_staff` schema + services; organizer CRUD endpoints and the magic-link portal not built |
 | ARZ-131 | Exhibitors | Booth correction + `booth_assignments` (`35`) | M | ARZ-021, ARZ-130, ARZ-314 | **DONE** — `booths.event_id` correction + `booth_assignments` with hold/assign/built/release; one-primary index proven against 6-way concurrency |
 | ARZ-132 | Exhibitors | Staff passes as `EXHIBITOR` accreditations within quota (`32`) | M | ARZ-051, ARZ-130 | **DONE** — staff passes are `EXHIBITOR` accreditations inside quota; withdrawal revokes the credential |
