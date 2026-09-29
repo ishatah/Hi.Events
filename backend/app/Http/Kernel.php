@@ -94,5 +94,8 @@ class Kernel extends HttpKernel
         'password.confirm' => RequirePassword::class,
         'throttle' => ThrottleRequests::class,
         'verified' => EnsureEmailIsVerified::class,
+        'api-key' => Middleware\AuthenticateApiKey::class,
+        'api-scope' => Middleware\RequireApiScope::class,
+        'api-key-throttle' => Middleware\ThrottleApiKey::class,
     ];
 }

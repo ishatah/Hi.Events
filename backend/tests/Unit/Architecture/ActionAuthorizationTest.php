@@ -111,7 +111,10 @@ class ActionAuthorizationTest extends TestCase
         $unauthorized = [];
 
         foreach ($this->actionFiles() as $relativePath => $contents) {
-            if ($this->authorizes($contents) || $this->scopesToAuthenticatedAccount($contents)) {
+            if ($this->authorizes($contents)
+                || $this->scopesToAuthenticatedAccount($contents)
+                || $this->scopesToApiPrincipal($contents)
+            ) {
                 continue;
             }
 
@@ -172,6 +175,20 @@ class ActionAuthorizationTest extends TestCase
             "Admin actions must gate on Role::SUPERADMIN. The /admin route group only applies\n"
             ."auth:api, so enforcement is per action.\n".implode("\n", $offenders)
         );
+    }
+
+    /**
+     * Machine-facing actions authenticate by API key, not by JWT.
+     *
+     * The route carries an api-scope middleware that rejects a key without the right
+     * permission, and the action constrains its query to the resolved principal's account.
+     * Requiring isActionAuthorized() here instead would mean resolving a user that does not
+     * exist for a key.
+     */
+    private function scopesToApiPrincipal(string $contents): bool
+    {
+        return str_contains($contents, 'ApiPrincipalContext')
+            && preg_match('/\$principal->accountId/', $contents) === 1;
     }
 
     private function authorizes(string $contents): bool

@@ -140,9 +140,9 @@ feature and cost far less before it than after.
 | ARZ-082 | Sessions | `session_attendance` + session check-in, `ENTRY`/`EXIT` vocabulary | M | ARZ-031, ARZ-040, ARZ-314 | **DONE** — append-only log, distinct-attendee counts, replay-idempotent |
 | ARZ-083 | Sessions | Agenda UI + conflict detection | L | ARZ-031 | **PARTIAL** — conflict detection + agenda endpoint done; the UI is frontend work, not started |
 | ARZ-084 | Sessions | Session + agenda ICS export | S | ARZ-031 | **DONE** — RFC 5545 escaping and folding, UTC instants, unpublished sessions excluded |
-| ARZ-090 | API | API keys, scopes, rate limits | L | ARZ-011 | TODO |
+| ARZ-090 | API | API keys, scopes, rate limits | L | ARZ-011 | **DONE** — `api_keys`, `arzo_`/`arzod_` prefixes, sha256 hashing, scopes from the `09` vocabulary, per-key throttle, `/api/v1` group |
 | ARZ-091 | API | Versioned webhook payload boundary (F14) | M | ARZ-090, ARZ-304 | TODO |
-| ARZ-092 | API | Device-scoped keys (stored on `devices`, shared resolver with API keys) | M | ARZ-090 | TODO |
+| ARZ-092 | API | Device-scoped keys (stored on `devices`, shared resolver with API keys) | M | ARZ-090 | **DONE** — device keys resolve through the same hasher and authenticator; minimal scopes by device type; suspension revokes |
 | ARZ-100 | Offline | Device registry + enrolment, heartbeat, commands | M | ARZ-092, ARZ-314 | TODO — table landed |
 | ARZ-101 | Offline | Local store + sync protocol | XL | ARZ-100, ARZ-061 | TODO |
 | ARZ-102 | Offline | Conflict resolution + reconciliation reporting | L | ARZ-101 | TODO |

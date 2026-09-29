@@ -324,6 +324,10 @@ use HiEvents\Http\Actions\Session\GetSessionStatsAction;
 use HiEvents\Http\Actions\Session\RecordSessionAttendanceAction;
 use HiEvents\Http\Actions\Session\RegisterForSessionAction;
 use HiEvents\Http\Actions\Accreditation\ApproveAccreditationAction;
+use HiEvents\Http\Actions\V1\GetV1EventAttendeesAction;
+use HiEvents\Http\Actions\ApiKey\CreateApiKeyAction;
+use HiEvents\Http\Actions\ApiKey\GetApiKeysAction;
+use HiEvents\Http\Actions\ApiKey\RevokeApiKeyAction;
 use HiEvents\Http\Actions\Badge\CapturePersonPhotoAction;
 use HiEvents\Http\Actions\Badge\DeletePersonPhotoAction;
 use HiEvents\Http\Actions\Accreditation\GetAccreditationAuditTrailAction;
@@ -659,6 +663,10 @@ $router->middleware(['auth:api'])->group(
         // Badge photo capture at the desk
         $router->post('/events/{event_id}/persons/{person_id}/photo', CapturePersonPhotoAction::class);
         $router->delete('/events/{event_id}/persons/{person_id}/photo', DeletePersonPhotoAction::class);
+        // API keys
+        $router->get('/api-keys', GetApiKeysAction::class);
+        $router->post('/api-keys', CreateApiKeyAction::class);
+        $router->delete('/api-keys/{api_key_id}', RevokeApiKeyAction::class);
 
         // Credentials
         $router->get('/events/{event_id}/credentials', GetCredentialsAction::class);
@@ -849,6 +857,20 @@ $router->prefix('/public')->group(
         $router->get('/sitemap-organizers-{page}.xml', GetSitemapOrganizersAction::class)->where('page', '[0-9]+');
     }
 );
+
+/*
+ * Machine-to-machine API.
+ *
+ * Versioned from the start: an integration built against v1 keeps working when the
+ * dashboard's own endpoints change shape, which the unversioned routes above do not
+ * promise.
+ */
+$router->prefix('v1')
+    ->middleware(['api-key', 'api-key-throttle'])
+    ->group(function (Router $router): void {
+        $router->get('/events/{event_id}/attendees', GetV1EventAttendeesAction::class)
+            ->middleware('api-scope:attendee.view');
+    });
 
 if (app()->environment('local', 'development')) {
     include_once __DIR__.'/mail.php';

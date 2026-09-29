@@ -9,6 +9,7 @@ use HiEvents\DomainObjects\EventDomainObject;
 use HiEvents\DomainObjects\OrganizerDomainObject;
 use HiEvents\Models\Event;
 use HiEvents\Models\Organizer;
+use HiEvents\Services\Infrastructure\ApiKey\ApiPrincipalContext;
 use HiEvents\Services\Infrastructure\CurrencyConversion\CurrencyConversionClientInterface;
 use HiEvents\Services\Infrastructure\CurrencyConversion\NoOpCurrencyConversionClient;
 use HiEvents\Services\Infrastructure\CurrencyConversion\OpenExchangeRatesCurrencyConversionClient;
@@ -38,6 +39,7 @@ class AppServiceProvider extends ServiceProvider
         $this->bindGeoProvider();
 
         $this->app->scoped(TenantContext::class);
+        $this->app->scoped(ApiPrincipalContext::class);
     }
 
     /**
