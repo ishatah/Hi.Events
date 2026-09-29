@@ -144,8 +144,8 @@ feature and cost far less before it than after.
 | ARZ-091 | API | Versioned webhook payload boundary (F14) | M | ARZ-090, ARZ-304 | TODO |
 | ARZ-092 | API | Device-scoped keys (stored on `devices`, shared resolver with API keys) | M | ARZ-090 | **DONE** — device keys resolve through the same hasher and authenticator; minimal scopes by device type; suspension revokes |
 | ARZ-100 | Offline | Device registry + enrolment, heartbeat, commands | M | ARZ-092, ARZ-314 | **PARTLY DONE** — enrolment by expiring pairing code, key rotation, suspension, heartbeat with clock skew, queued commands. HTTP layer not built |
-| ARZ-101 | Offline | Local store + sync protocol | XL | ARZ-100, ARZ-061 | TODO |
-| ARZ-102 | Offline | Conflict resolution + reconciliation reporting | L | ARZ-101 | TODO |
+| ARZ-101 | Offline | Local store + sync protocol | XL | ARZ-100, ARZ-061 | **PARTLY DONE** — server side of the sync protocol: bidirectional, idempotent, cursor deltas, full deny-list, bounded payload. The on-device local store is the client half |
+| ARZ-102 | Offline | Conflict resolution + reconciliation reporting | L | ARZ-101 | **PARTLY DONE** — `access_reconciliation_findings` + service; offline grants the server would deny are flagged, never rewritten. Review UI not built |
 | ARZ-103 | Offline | Emergency/degraded mode UX | M | ARZ-101 | TODO |
 | ARZ-104 | Realtime | Reverb transport + channel authorization | L | ARZ-011 | TODO |
 
