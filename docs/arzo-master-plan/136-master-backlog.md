@@ -73,6 +73,8 @@ waits for it. Each item's evidence is in the cited document.
 | ARZ-328 | P1 | Admin order search fails on any term (ambiguous `email`) | S | Soon | `72` | TODO |
 | ARZ-334 | P1 | **Public check-in list returns every attendee's `public_id` — the ticket QR itself**; anyone holding a list link can mint every ticket | S | Soon | `68` FR1, `38` | TODO |
 | ARZ-335 | P1 | Order creation applies promo codes under only the global 180/min limit — hidden VIP and comp products brute-forceable around the 10/min validation throttle | S | Soon | `68` FR2, `46` | TODO |
+| ARZ-339 | P1 | dompdf retains ~6MB per rendered document in static caches — reproduced against a bare `Dompdf` object, so it is upstream, not ours. Badge rendering must run on a queue worker with a bounded `--max-jobs`, never in a long-lived process | S | Before a desk prints at volume | `21`, `70` | TODO |
+| ARZ-338 | **P0** | dompdf 3.1.5 carries 6 advisories fixed in 3.1.6 — local file read via SVG/data-URI, DoS via oversized bitmaps, chroot bypass. Now load-bearing for badge rendering | S | Before badge templates accept any user-supplied image or SVG | `21`, `64` | TODO |
 | ARZ-337 | P1 | Session waitlist offers are accepted immediately on promotion — no offer email, no `offer_expires_at` timer, no expiry job to pass the seat on | M | Before a session waitlist is used live | `27` | TODO |
 | ARZ-336 | P1 | Credential lifecycle: `issued_by` never set; a second revocation overwrites the first and leaves grants active; raw identifiers copied into every access log | S | Before revocation ships | `67`, `68` FR3, `94` | TODO |
 | ARZ-315 | P2 | Statistics: page views lost without orders; partial batches never flushed; no repair command | S | Later | `52` | TODO |

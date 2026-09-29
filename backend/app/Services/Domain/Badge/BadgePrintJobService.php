@@ -103,8 +103,10 @@ class BadgePrintJobService
                         ->orWhereNull('printer_identifier');
                 })
                 ->orderBy('queued_at')
-                ->lockForUpdate()
-                ->skipLocked()
+                // SKIP LOCKED rather than a plain FOR UPDATE: a second print host polling
+                // the same printer steps over the locked row instead of blocking behind it,
+                // so neither waits and neither takes the same job.
+                ->lock('for update skip locked')
                 ->first();
 
             if ($job === null) {

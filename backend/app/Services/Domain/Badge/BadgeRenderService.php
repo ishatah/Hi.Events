@@ -150,8 +150,17 @@ class BadgeRenderService
             $heightMm / self::MM_PER_POINT,
         ]);
 
+        $output = $pdf->output();
+
+        // dompdf retains roughly 6MB per document in its own static caches, regardless of
+        // how the instance is created — reproduced against a bare Dompdf object with none
+        // of this service involved. Nothing here can free it, so badge rendering must run
+        // on a queue worker with a bounded job count rather than in a long-lived process.
+        // Tracked as ARZ-339.
+        unset($pdf);
+
         return [
-            'pdf' => $pdf->output(),
+            'pdf' => $output,
             'snapshot' => [
                 'fields' => $resolved,
                 'zone_colours' => $data->zoneColours,
