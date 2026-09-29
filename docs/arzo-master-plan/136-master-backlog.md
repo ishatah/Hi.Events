@@ -128,10 +128,10 @@ feature and cost far less before it than after.
 | ARZ-062 | Access | Anti-passback + re-entry rules | M | ARZ-061 | **DONE** in the decision function |
 | ARZ-063 | Access | Derived zone occupancy + snapshot cache | M | ARZ-061 | **DONE** — SQL aggregation, 30s snapshots via a scheduled job, computed only where capacity is enforced |
 | ARZ-064 | Access | Rule simulator ("would this badge get in?") | M | ARZ-060 | **DONE** — shares the scan context path; verdict only, no log |
-| ARZ-070 | Badges | `badge_templates` + **presets first**, canvas deferred (`22`) | L | ARZ-052, ARZ-313 | TODO — schema landed |
-| ARZ-071 | Badges | Server-side render, raster-capable, Arabic-tested (replaces F8) | L | ARZ-070 | TODO |
-| ARZ-072 | Badges | `badge_print_jobs` queue + failure recovery | M | ARZ-071 | TODO — schema landed |
-| ARZ-073 | Badges | Reprint, void, badge history | M | ARZ-072 | TODO |
+| ARZ-070 | Badges | `badge_templates` + **presets first**, canvas deferred (`22`) | L | ARZ-052, ARZ-313 | **DONE** — 3 presets (A6 portrait, CR80 card, A7 photo); layout is the same element tree a canvas would write |
+| ARZ-071 | Badges | Server-side render, raster-capable, Arabic-tested (replaces F8) | L | ARZ-070 | **DONE** — dompdf at exact mm, DejaVu Sans renders Arabic, QR at ECC H as PNG; pixel-verified zone bar and bit-exact QR |
+| ARZ-072 | Badges | `badge_print_jobs` queue + failure recovery | M | ARZ-071 | **DONE** — `skipLocked` claim, bounded auto-retry then FAILED, manual retry, stalled-job query |
+| ARZ-073 | Badges | Reprint, void, badge history | M | ARZ-072 | **DONE** — reprint creates a new badge linked by `replaces_badge_id`; void cancels queued jobs |
 | ARZ-074 | Badges | Photo capture at the desk | M | ARZ-052 | TODO |
 | ARZ-080 | Sessions | Session registration + capacity | M | ARZ-031 | **DONE** — counted not stored; row lock proven against 8-way concurrency for 1 seat |
 | ARZ-081 | Sessions | Session waitlist — **sibling** `session_waitlist_entries` (table created), shared offer policy (`14`) | M | ARZ-080 | **DONE** — FIFO promotion on cancel; outstanding offers hold a seat. Offer emails/expiry job still TODO → ARZ-337 |

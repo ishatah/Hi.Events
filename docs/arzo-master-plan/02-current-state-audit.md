@@ -283,7 +283,7 @@ prefix means "safe to ship to the browser". Worth a CI check on the env contract
 
 Queued work therefore behaves differently in all three environments.
 
-### F8 — Printing cannot support badges · `CONFIRMED`
+### F8 — Printing cannot support badges · `CONFIRMED` · **FIXED (ARZ-070/071)** — server-side PDF render at exact mm, DejaVu Sans for Arabic, `bacon/bacon-qr-code` at ECC H; verified by rasterising the PDF at 600dpi and matching all 1369 QR modules against the payload
 
 All printing is `window.print()` behind a 500 ms timeout, with `@media print` CSS in 3 files. No
 page-size control beyond one `@page` rule, no print-dialog bypass, no label/ESC-POS path, no

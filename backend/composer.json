@@ -9,6 +9,7 @@
         "php": "^8.3",
         "ext-intl": "*",
         "ext-xmlwriter": "*",
+        "bacon/bacon-qr-code": "^3.0",
         "barryvdh/laravel-dompdf": "^3.0",
         "brick/money": "^0.10.1",
         "dedoc/scramble": "^0.13",
