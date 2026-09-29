@@ -6,6 +6,7 @@ namespace HiEvents\Http\Actions;
 
 use HiEvents\DataTransferObjects\BaseDataObject;
 use HiEvents\DataTransferObjects\BaseDTO;
+use HiEvents\DomainObjects\Enums\Permission;
 use HiEvents\DomainObjects\Enums\Role;
 use HiEvents\DomainObjects\Interfaces\DomainObjectInterface;
 use HiEvents\DomainObjects\Interfaces\IsFilterable;
@@ -17,6 +18,7 @@ use HiEvents\Http\ResponseCodes;
 use HiEvents\Resources\BaseResource;
 use HiEvents\Services\Domain\Auth\AuthUserService;
 use HiEvents\Services\Infrastructure\Authorization\IsAuthorizedService;
+use HiEvents\Services\Infrastructure\Authorization\PermissionGateService;
 use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\JsonResponse;
@@ -157,6 +159,34 @@ abstract class BaseAction extends Controller
             $this->getAuthenticatedUser(),
             $this->getAuthenticatedAccountId(),
             $minimumRole
+        );
+    }
+
+    /**
+     * Requires a named capability across the account.
+     *
+     * Additive to isActionAuthorized(): that answers whether the entity is yours, this
+     * answers whether you may do this to it. Both must pass.
+     */
+    protected function requirePermission(Permission $permission): void
+    {
+        app(PermissionGateService::class)->authorizeAccountPermission(
+            $this->getAuthenticatedUser()->getId(),
+            $this->getAuthenticatedAccountId(),
+            $permission
+        );
+    }
+
+    /**
+     * Requires a named capability for one event, honouring per-event grants.
+     */
+    protected function requireEventPermission(int $eventId, Permission $permission): void
+    {
+        app(PermissionGateService::class)->authorizeEventPermission(
+            $this->getAuthenticatedUser()->getId(),
+            $this->getAuthenticatedAccountId(),
+            $eventId,
+            $permission
         );
     }
 

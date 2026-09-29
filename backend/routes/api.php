@@ -312,6 +312,9 @@ use HiEvents\Http\Actions\AccessRule\DeleteAccessRuleAction;
 use HiEvents\Http\Actions\AccessLog\GetAccessLogsAction;
 use HiEvents\Http\Actions\AccessLog\RecordAccessScanAction;
 use HiEvents\Http\Actions\AccessLog\SimulateAccessScanAction;
+use HiEvents\Http\Actions\EventUser\GetEventUsersAction;
+use HiEvents\Http\Actions\EventUser\GrantEventRoleAction;
+use HiEvents\Http\Actions\EventUser\RevokeEventRoleAction;
 use HiEvents\Http\Actions\Credential\GetCredentialsAction;
 use HiEvents\Http\Actions\Credential\IssueCredentialAction;
 use HiEvents\Http\Actions\Credential\RevokeCredentialAction;
@@ -618,6 +621,11 @@ $router->middleware(['auth:api'])->group(
         $router->get('/events/{event_id}/access-logs', GetAccessLogsAction::class);
         $router->post('/events/{event_id}/access-scans', RecordAccessScanAction::class);
         $router->post('/events/{event_id}/access-scans/simulate', SimulateAccessScanAction::class);
+
+        // Per-event roles
+        $router->get('/events/{event_id}/users', GetEventUsersAction::class);
+        $router->post('/events/{event_id}/users', GrantEventRoleAction::class);
+        $router->delete('/events/{event_id}/users/{user_id}', RevokeEventRoleAction::class);
 
         // Credentials
         $router->get('/events/{event_id}/credentials', GetCredentialsAction::class);

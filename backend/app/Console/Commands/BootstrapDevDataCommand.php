@@ -26,6 +26,7 @@ use HiEvents\Services\Application\Handlers\Product\DTO\UpsertProductDTO;
 use HiEvents\Services\Application\Handlers\PromoCode\CreatePromoCodeHandler;
 use HiEvents\Services\Application\Handlers\PromoCode\DTO\UpsertPromoCodeDTO;
 use HiEvents\Services\Domain\Auth\LoginService;
+use HiEvents\Services\Domain\Permission\RoleSeedService;
 use HiEvents\Services\Domain\Product\DTO\ProductPriceDTO;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
@@ -49,6 +50,7 @@ class BootstrapDevDataCommand extends Command
         CreateAffiliateHandler $createAffiliateHandler,
         GenerateOccurrencesFromRuleHandler $generateOccurrencesHandler,
         LoginService $loginService,
+        RoleSeedService $roleSeedService,
     ): int {
         if (app()->environment('production') && ! $this->option('force')) {
             $this->error('Refusing to run in production. Pass --force to override.');
@@ -57,6 +59,7 @@ class BootstrapDevDataCommand extends Command
         }
 
         $this->seedCurrencyDefaultConfigurations();
+        $roleSeedService->seedSystemRoles();
 
         $email = $this->option('email') ?: 'agent+'.now()->format('YmdHis').'@dev.test';
         $password = $this->option('password');

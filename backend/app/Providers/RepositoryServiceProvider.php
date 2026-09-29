@@ -41,6 +41,7 @@ use HiEvents\Repository\Eloquent\EventRepository;
 use HiEvents\Repository\Eloquent\EventSettingsRepository;
 use HiEvents\Repository\Eloquent\EventSpamCheckRepository;
 use HiEvents\Repository\Eloquent\EventStatisticRepository;
+use HiEvents\Repository\Eloquent\EventUserRepository;
 use HiEvents\Repository\Eloquent\EventVenueRepository;
 use HiEvents\Repository\Eloquent\FloorRepository;
 use HiEvents\Repository\Eloquent\ImageRepository;
@@ -62,6 +63,9 @@ use HiEvents\Repository\Eloquent\OrganizerVatSettingRepository;
 use HiEvents\Repository\Eloquent\OutgoingMessageRepository;
 use HiEvents\Repository\Eloquent\PasswordResetRepository;
 use HiEvents\Repository\Eloquent\PasswordResetTokenRepository;
+use HiEvents\Repository\Eloquent\PermissionRepository;
+use HiEvents\Repository\Eloquent\PermissionRolePermissionRepository;
+use HiEvents\Repository\Eloquent\PermissionRoleRepository;
 use HiEvents\Repository\Eloquent\PersonRepository;
 use HiEvents\Repository\Eloquent\ProductCategoryRepository;
 use HiEvents\Repository\Eloquent\ProductOccurrenceVisibilityRepository;
@@ -131,6 +135,7 @@ use HiEvents\Repository\Interfaces\EventRepositoryInterface;
 use HiEvents\Repository\Interfaces\EventSettingsRepositoryInterface;
 use HiEvents\Repository\Interfaces\EventSpamCheckRepositoryInterface;
 use HiEvents\Repository\Interfaces\EventStatisticRepositoryInterface;
+use HiEvents\Repository\Interfaces\EventUserRepositoryInterface;
 use HiEvents\Repository\Interfaces\EventVenueRepositoryInterface;
 use HiEvents\Repository\Interfaces\FloorRepositoryInterface;
 use HiEvents\Repository\Interfaces\ImageRepositoryInterface;
@@ -152,6 +157,9 @@ use HiEvents\Repository\Interfaces\OrganizerVatSettingRepositoryInterface;
 use HiEvents\Repository\Interfaces\OutgoingMessageRepositoryInterface;
 use HiEvents\Repository\Interfaces\PasswordResetRepositoryInterface;
 use HiEvents\Repository\Interfaces\PasswordResetTokenRepositoryInterface;
+use HiEvents\Repository\Interfaces\PermissionRepositoryInterface;
+use HiEvents\Repository\Interfaces\PermissionRolePermissionRepositoryInterface;
+use HiEvents\Repository\Interfaces\PermissionRoleRepositoryInterface;
 use HiEvents\Repository\Interfaces\PersonRepositoryInterface;
 use HiEvents\Repository\Interfaces\ProductCategoryRepositoryInterface;
 use HiEvents\Repository\Interfaces\ProductOccurrenceVisibilityRepositoryInterface;
@@ -260,6 +268,10 @@ class RepositoryServiceProvider extends ServiceProvider
         SeatRepositoryInterface::class => SeatRepository::class,
         BoothRepositoryInterface::class => BoothRepository::class,
         EventVenueRepositoryInterface::class => EventVenueRepository::class,
+        PermissionRepositoryInterface::class => PermissionRepository::class,
+        PermissionRoleRepositoryInterface::class => PermissionRoleRepository::class,
+        PermissionRolePermissionRepositoryInterface::class => PermissionRolePermissionRepository::class,
+        EventUserRepositoryInterface::class => EventUserRepository::class,
         TrackRepositoryInterface::class => TrackRepository::class,
         SpeakerRepositoryInterface::class => SpeakerRepository::class,
         SessionRepositoryInterface::class => SessionRepository::class,

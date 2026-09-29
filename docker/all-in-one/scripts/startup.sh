@@ -11,6 +11,14 @@ if ! php artisan migrate --force; then
     exit 1
 fi
 
+if ! php artisan permissions:seed-roles; then
+    echo "============================================"
+    echo "ERROR: Permission roles could not be seeded. Check the error above."
+    echo "Aborting startup: authorization would deny every request."
+    echo "============================================"
+    exit 1
+fi
+
 php artisan cache:clear
 php artisan config:clear
 php artisan route:clear
