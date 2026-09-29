@@ -30,6 +30,9 @@ class RecordAccessScanAction extends BaseAction
             accessPointId: (int) $request->validated('access_point_id'),
             direction: $direction !== null ? AccessDirection::from($direction) : null,
             operatorUserId: $this->getAuthenticatedUser()->getId(),
+            deviceId: $request->validated('device_id') !== null
+                ? (int) $request->validated('device_id')
+                : null,
             clientGeneratedId: $request->validated('client_generated_id'),
             occurredAt: $request->validated('occurred_at') !== null
                 ? Carbon::parse((string) $request->validated('occurred_at'))

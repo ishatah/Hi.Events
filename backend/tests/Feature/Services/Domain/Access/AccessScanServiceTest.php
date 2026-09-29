@@ -54,6 +54,7 @@ class AccessScanServiceTest extends TestCase
 
         $this->eventId = $this->makeEvent();
         $this->venueId = $this->makeVenue();
+        $this->linkVenueToEvent($this->venueId, $this->eventId);
         $this->zoneId = $this->makeZone($this->venueId, 'HALL');
         $this->accessPointId = $this->makeAccessPoint($this->zoneId, 'DOOR1');
     }
@@ -346,6 +347,17 @@ class AccessScanServiceTest extends TestCase
         ]);
     }
 
+    private function linkVenueToEvent(int $venueId, int $eventId): void
+    {
+        DB::table('event_venues')->insert([
+            'event_id' => $eventId,
+            'venue_id' => $venueId,
+            'is_primary' => true,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+    }
+
     private function makeZone(int $venueId, string $code): int
     {
         return (int) DB::table('zones')->insertGetId([
@@ -541,14 +553,20 @@ class AccessScanServiceTest extends TestCase
 
         // 07:30 UTC is 10:30 in Doha, inside the window. Evaluated as UTC it would fall
         // outside it, which is the defect this covers.
-        $decision = $this->scanService->scan(
-            eventId: $this->eventId,
-            identifier: $identifier,
-            accessPointId: $this->accessPointId,
-            direction: AccessDirection::ENTRY,
-            operatorUserId: $this->userId,
-            occurredAt: Carbon::parse('2030-06-01T07:30:00Z'),
-        );
+        Carbon::setTestNow(Carbon::parse('2030-06-01T07:30:00Z'));
+
+        try {
+            $decision = $this->scanService->scan(
+                eventId: $this->eventId,
+                identifier: $identifier,
+                accessPointId: $this->accessPointId,
+                direction: AccessDirection::ENTRY,
+                operatorUserId: $this->userId,
+                occurredAt: Carbon::parse('2030-06-01T07:30:00Z'),
+            );
+        } finally {
+            Carbon::setTestNow();
+        }
 
         $this->assertTrue(
             $decision->isGranted(),
@@ -576,7 +594,7 @@ class AccessScanServiceTest extends TestCase
             identifier: $identifier,
             accessPointId: $this->accessPointId,
             direction: AccessDirection::ENTRY,
-            occurredAt: Carbon::parse('2030-06-01T10:00:00Z'),
+            occurredAt: Carbon::now(),
         );
 
         $this->assertSame(
@@ -591,7 +609,7 @@ class AccessScanServiceTest extends TestCase
             accessPointId: $this->accessPointId,
             direction: AccessDirection::ENTRY,
             operatorUserId: $this->userId,
-            occurredAt: Carbon::parse('2030-06-01T10:00:00Z'),
+            occurredAt: Carbon::now(),
         );
 
         $this->assertSame($real->result, $simulated->result);
@@ -610,5 +628,124 @@ class AccessScanServiceTest extends TestCase
         $this->assertFalse($simulated->isGranted());
         $this->assertSame(AccessResult::DENIED_NO_CREDENTIAL, $simulated->result);
         $this->assertSame(0, DB::table('access_logs')->where('event_id', $this->eventId)->count());
+    }
+
+    public function test_an_access_point_from_another_event_is_refused(): void
+    {
+        $foreignVenue = $this->makeVenue();
+        $foreignZone = $this->makeZone($foreignVenue, 'FOREIGN');
+        $foreignPoint = $this->makeAccessPoint($foreignZone, 'FOREIGNDOOR');
+
+        $decision = $this->scanService->scan(
+            eventId: $this->eventId,
+            identifier: 'anything',
+            accessPointId: $foreignPoint,
+            direction: AccessDirection::ENTRY,
+            operatorUserId: $this->userId,
+        );
+
+        $this->assertFalse($decision->isGranted());
+        $this->assertSame(AccessResult::DENIED_WRONG_POINT, $decision->result);
+    }
+
+    public function test_an_inactive_access_point_is_refused(): void
+    {
+        DB::table('access_points')->where('id', $this->accessPointId)->update(['is_active' => false]);
+
+        $decision = $this->scanService->scan(
+            eventId: $this->eventId,
+            identifier: 'anything',
+            accessPointId: $this->accessPointId,
+            direction: AccessDirection::ENTRY,
+            operatorUserId: $this->userId,
+        );
+
+        $this->assertSame(AccessResult::DENIED_WRONG_POINT, $decision->result);
+    }
+
+    public function test_a_replayed_client_id_from_another_event_does_not_return_this_events_verdict(): void
+    {
+        $clientId = (string) Str::uuid();
+
+        $this->scanService->scan(
+            eventId: $this->eventId,
+            identifier: 'first-scan',
+            accessPointId: $this->accessPointId,
+            direction: AccessDirection::ENTRY,
+            operatorUserId: $this->userId,
+            clientGeneratedId: $clientId,
+        );
+
+        $otherEventId = $this->makeEvent();
+        $this->linkVenueToEvent($this->venueId, $otherEventId);
+
+        $decision = $this->scanService->scan(
+            eventId: $otherEventId,
+            identifier: 'second-scan',
+            accessPointId: $this->accessPointId,
+            direction: AccessDirection::ENTRY,
+            operatorUserId: $this->userId,
+            clientGeneratedId: $clientId,
+        );
+
+        $this->assertNotSame(
+            'Already recorded; replay ignored.',
+            $decision->reason,
+            'A replay lookup must not cross events.'
+        );
+    }
+
+    public function test_a_device_clock_far_in_the_future_is_not_trusted(): void
+    {
+        $decision = $this->scanService->scan(
+            eventId: $this->eventId,
+            identifier: 'anything',
+            accessPointId: $this->accessPointId,
+            direction: AccessDirection::ENTRY,
+            operatorUserId: $this->userId,
+            occurredAt: Carbon::now()->addYears(5),
+        );
+
+        $recorded = Carbon::parse((string) DB::table('access_logs')
+            ->where('event_id', $this->eventId)
+            ->orderByDesc('id')
+            ->value('occurred_at'));
+
+        $this->assertLessThan(
+            60,
+            abs($recorded->diffInSeconds(Carbon::now())),
+            'An implausible device clock must fall back to the server clock.'
+        );
+        $this->assertFalse($decision->isGranted());
+    }
+
+    public function test_the_scanning_device_is_recorded(): void
+    {
+        $deviceId = (int) DB::table('devices')->insertGetId([
+            'short_id' => 'dv_'.Str::lower(Str::random(20)),
+            'account_id' => $this->accountId,
+            'event_id' => $this->eventId,
+            'name' => 'Gate Scanner 1',
+            'device_type' => 'SCANNER',
+            'status' => 'ACTIVE',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $this->scanService->scan(
+            eventId: $this->eventId,
+            identifier: 'anything',
+            accessPointId: $this->accessPointId,
+            direction: AccessDirection::ENTRY,
+            deviceId: $deviceId,
+        );
+
+        $this->assertSame(
+            $deviceId,
+            (int) DB::table('access_logs')
+                ->where('event_id', $this->eventId)
+                ->orderByDesc('id')
+                ->value('device_id')
+        );
     }
 }

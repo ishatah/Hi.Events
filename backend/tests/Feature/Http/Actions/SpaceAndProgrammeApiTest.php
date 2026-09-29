@@ -227,6 +227,7 @@ class SpaceAndProgrammeApiTest extends TestCase
     public function test_a_scan_returns_a_verdict_and_writes_a_log(): void
     {
         $venueId = $this->createVenue();
+        $this->linkVenueToEvent($venueId, $this->eventId);
         $zoneId = $this->createZone($venueId);
 
         $accessPointId = $this->postJson("/zones/{$zoneId}/access-points", [
@@ -252,6 +253,7 @@ class SpaceAndProgrammeApiTest extends TestCase
     public function test_a_simulated_scan_returns_a_verdict_without_writing_a_log(): void
     {
         $venueId = $this->createVenue();
+        $this->linkVenueToEvent($venueId, $this->eventId);
         $zoneId = $this->createZone($venueId);
 
         $accessPointId = $this->postJson("/zones/{$zoneId}/access-points", [
@@ -325,6 +327,17 @@ class SpaceAndProgrammeApiTest extends TestCase
         return (int) $this->postJson('/venues', [
             'name' => 'Test Venue '.Str::random(6),
         ], $this->authHeaders($this->token))->json('data.id');
+    }
+
+    private function linkVenueToEvent(int $venueId, int $eventId): void
+    {
+        DB::table('event_venues')->insert([
+            'event_id' => $eventId,
+            'venue_id' => $venueId,
+            'is_primary' => true,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
     }
 
     private function createZone(int $venueId): int

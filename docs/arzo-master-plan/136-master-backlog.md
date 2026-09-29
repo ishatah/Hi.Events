@@ -55,7 +55,7 @@ waits for it. Each item's evidence is in the cited document.
 | ARZ-313 | **P0** | Credential identifier format: versioned prefix, upper-case, case-insensitive resolution | S | Before the first printed badge | `38` | TODO |
 | ARZ-314 | **P0** | Schema corrections while tables are empty: `booths.event_id` + `booth_assignments`; `credential_media`; `session_attendance` direction; `device_id` columns | M | Before the first writer of each table | `35`, `36`, `40`, `54` | TODO |
 | ARZ-320 | **P0** | Access rules ignore `subject_type`/`subject_id` — a DENY for one badge closes the zone to all; every ALLOW is copied to every credential | M | Before the rule CRUD merges and before golden vectors | `124` ST1, `115` | **DONE** — both paths match subject; absent subject type ≠ null |
-| ARZ-321 | **P0** | Scan endpoint trust: access point not checked against the event or `is_active`; replay lookup crosses tenants; client `occurred_at` and `direction` trusted; `device_id` dropped; concurrent replay → 500 | M | Before the scan route merges | `94`, `107`, `124`, `125` | TODO |
+| ARZ-321 | **P0** | Scan endpoint trust: access point not checked against the event or `is_active`; replay lookup crosses tenants; client `occurred_at` and `direction` trusted; `device_id` dropped; concurrent replay → 500 | M | Before the scan route merges | `94`, `107`, `124`, `125` | **DONE** — point checked via `event_venues` + `is_active`; replay scoped per event (unique index now `(event_id, client_generated_id)`); device clock clamped to +5min/-7d; `device_id` recorded and exposed; concurrent replay caught |
 | ARZ-323 | **P0** | Account deletion leaves names and emails in `persons` and never touches credentials, badges, access logs, invitations | M | Before any data-bearing deploy | `108`, `65` | TODO |
 | ARZ-304 | P1 | Webhook retries never run (`dispatchSync`); head-of-line blocking; job untested; `DispatchOccurrenceWebhookJob` runs synchronously | S | Soon | `49`, `70` | TODO |
 | ARZ-306 | P1 | Stripe webhook accepts before verifying; raw payloads logged on failure | S | Soon | `50`, `124` | TODO |
@@ -126,7 +126,7 @@ feature and cost far less before it than after.
 | ARZ-061 | Access | `access_grants` materialization | M | ARZ-060 | **DONE** — subject-gated; grants are a snapshot, so a changed rule needs rematerialisation |
 | ARZ-062 | Access | Anti-passback + re-entry rules | M | ARZ-061 | **DONE** in the decision function |
 | ARZ-063 | Access | Derived zone occupancy + snapshot cache | M | ARZ-061 | **PARTIAL** — derived per scan, does not scale → ARZ-307; snapshot job not started |
-| ARZ-064 | Access | Rule simulator ("would this badge get in?") | M | ARZ-060 | TODO — before any rule UI (`115`) |
+| ARZ-064 | Access | Rule simulator ("would this badge get in?") | M | ARZ-060 | **DONE** — shares the scan context path; verdict only, no log |
 | ARZ-070 | Badges | `badge_templates` + **presets first**, canvas deferred (`22`) | L | ARZ-052, ARZ-313 | TODO — schema landed |
 | ARZ-071 | Badges | Server-side render, raster-capable, Arabic-tested (replaces F8) | L | ARZ-070 | TODO |
 | ARZ-072 | Badges | `badge_print_jobs` queue + failure recovery | M | ARZ-071 | TODO — schema landed |

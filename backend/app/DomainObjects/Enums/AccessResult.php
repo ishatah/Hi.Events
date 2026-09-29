@@ -23,6 +23,7 @@ enum AccessResult: string
     case DENIED_MAX_ENTRIES = 'DENIED_MAX_ENTRIES';
     case DENIED_REVOKED = 'DENIED_REVOKED';
     case DENIED_RULE = 'DENIED_RULE';
+    case DENIED_WRONG_POINT = 'DENIED_WRONG_POINT';
 
     public function isGranted(): bool
     {

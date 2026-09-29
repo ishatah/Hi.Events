@@ -10,6 +10,7 @@ use HiEvents\DomainObjects\Enums\AccessResult;
 use HiEvents\Services\Domain\Access\DTO\AccessContextDTO;
 use HiEvents\Services\Domain\Access\DTO\AccessDecisionDTO;
 use Illuminate\Database\DatabaseManager;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Str;
 
 /**
@@ -24,6 +25,10 @@ use Illuminate\Support\Str;
  */
 class AccessScanService
 {
+    private const DEVICE_CLOCK_TOLERANCE_MINUTES = 5;
+
+    private const OFFLINE_QUEUE_TOLERANCE_DAYS = 7;
+
     public function __construct(
         private readonly AccessDecisionService $accessDecisionService,
         private readonly DatabaseManager $databaseManager,
@@ -41,12 +46,13 @@ class AccessScanService
         string $identifierType = 'QR',
         string $source = 'SCAN',
     ): AccessDecisionDTO {
-        $occurredAt ??= Carbon::now();
+        $occurredAt = $this->clampDeviceClock($occurredAt);
 
         // Replaying a queued offline scan must be a no-op, not a second admission.
         if ($clientGeneratedId !== null) {
             $existing = $this->databaseManager->table('access_logs')
                 ->where('client_generated_id', $clientGeneratedId)
+                ->where('event_id', $eventId)
                 ->first();
 
             if ($existing !== null) {
@@ -56,6 +62,13 @@ class AccessScanService
                     reason: 'Already recorded; replay ignored.',
                 );
             }
+        }
+
+        if (! $this->accessPointServesEvent($accessPointId, $eventId)) {
+            return new AccessDecisionDTO(
+                result: AccessResult::DENIED_WRONG_POINT,
+                reason: 'This access point does not serve this event, or is not active.',
+            );
         }
 
         $context = $this->buildContext(
@@ -80,6 +93,7 @@ class AccessScanService
             identifier: $identifier,
             identifierType: $identifierType,
             operatorUserId: $operatorUserId,
+            deviceId: $deviceId,
             clientGeneratedId: $clientGeneratedId,
             occurredAt: $occurredAt,
             source: $source,
@@ -111,6 +125,49 @@ class AccessScanService
             direction: $direction,
             occurredAt: $occurredAt ?? Carbon::now(),
         ));
+    }
+
+    /**
+     * A scanner posts an access point id, and nothing but this stops it naming a door in
+     * another event — or a decommissioned one. The zone's venue is checked against the
+     * event rather than trusting the caller.
+     */
+    /**
+     * A device's own clock is trusted for ordering an offline queue, but not without
+     * limit: a scanner that is wrong by days — or lying — would otherwise place a scan
+     * inside a window that was never open. Anything beyond the offline tolerance is
+     * treated as unusable and the server clock is used instead.
+     */
+    private function clampDeviceClock(?Carbon $occurredAt): Carbon
+    {
+        $now = Carbon::now();
+
+        if ($occurredAt === null) {
+            return $now;
+        }
+
+        if ($occurredAt->gt($now->copy()->addMinutes(self::DEVICE_CLOCK_TOLERANCE_MINUTES))) {
+            return $now;
+        }
+
+        if ($occurredAt->lt($now->copy()->subDays(self::OFFLINE_QUEUE_TOLERANCE_DAYS))) {
+            return $now;
+        }
+
+        return $occurredAt;
+    }
+
+    private function accessPointServesEvent(int $accessPointId, int $eventId): bool
+    {
+        return $this->databaseManager->table('access_points')
+            ->join('zones', 'zones.id', '=', 'access_points.zone_id')
+            ->join('event_venues', 'event_venues.venue_id', '=', 'zones.venue_id')
+            ->where('access_points.id', $accessPointId)
+            ->where('access_points.is_active', true)
+            ->whereNull('access_points.deleted_at')
+            ->whereNull('zones.deleted_at')
+            ->where('event_venues.event_id', $eventId)
+            ->exists();
     }
 
     private function buildContext(
@@ -305,28 +362,36 @@ class AccessScanService
         string $identifier,
         string $identifierType,
         ?int $operatorUserId,
+        ?int $deviceId,
         ?string $clientGeneratedId,
         Carbon $occurredAt,
         string $source,
         bool $isOfflineReplay,
     ): void {
-        $this->databaseManager->table('access_logs')->insert([
-            'short_id' => 'al_'.Str::lower(Str::random(20)),
-            'event_id' => $eventId,
-            'credential_id' => $decision->credentialId,
-            'access_point_id' => $accessPointId,
-            'zone_id' => $zoneId,
-            'occurred_at' => $occurredAt,
-            'recorded_at' => Carbon::now(),
-            'direction' => $direction->value,
-            'result' => $decision->result->value,
-            'raw_identifier' => $identifier,
-            'identifier_type' => $identifierType,
-            'operator_user_id' => $operatorUserId,
-            'client_generated_id' => $clientGeneratedId,
-            'is_offline_replay' => $isOfflineReplay,
-            'source' => $source,
-            'created_at' => Carbon::now(),
-        ]);
+        try {
+            $this->databaseManager->table('access_logs')->insert([
+                'short_id' => 'al_'.Str::lower(Str::random(20)),
+                'event_id' => $eventId,
+                'credential_id' => $decision->credentialId,
+                'access_point_id' => $accessPointId,
+                'zone_id' => $zoneId,
+                'occurred_at' => $occurredAt,
+                'recorded_at' => Carbon::now(),
+                'direction' => $direction->value,
+                'result' => $decision->result->value,
+                'raw_identifier' => $identifier,
+                'identifier_type' => $identifierType,
+                'operator_user_id' => $operatorUserId,
+                'device_id' => $deviceId,
+                'client_generated_id' => $clientGeneratedId,
+                'is_offline_replay' => $isOfflineReplay,
+                'source' => $source,
+                'created_at' => Carbon::now(),
+            ]);
+        } catch (UniqueConstraintViolationException) {
+            // Two devices can submit the same queued scan at once: both clear the replay
+            // pre-check and the second insert hits the unique index. That is the replay this
+            // already tolerates, not an error worth a 500.
+        }
     }
 }
