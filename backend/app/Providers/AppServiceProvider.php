@@ -17,6 +17,7 @@ use HiEvents\Services\Infrastructure\Geo\GooglePlacesGeoProvider;
 use HiEvents\Services\Infrastructure\Geo\NoOpGeoProvider;
 use HiEvents\Services\Infrastructure\Stripe\StripeClientFactory;
 use HiEvents\Services\Infrastructure\Stripe\StripeConfigurationService;
+use HiEvents\Services\Infrastructure\Tenancy\TenantContext;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -35,6 +36,8 @@ class AppServiceProvider extends ServiceProvider
         $this->bindStripeServices();
         $this->bindCurrencyConversionClient();
         $this->bindGeoProvider();
+
+        $this->app->scoped(TenantContext::class);
     }
 
     /**

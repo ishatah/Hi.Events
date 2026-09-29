@@ -2,6 +2,7 @@
 
 namespace HiEvents\Models;
 
+use HiEvents\Models\Concerns\BelongsToTenant;
 use HiEvents\Models\Traits\HasImages;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -10,6 +11,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Organizer extends BaseModel
 {
+    use BelongsToTenant;
     use HasImages;
     use SoftDeletes;
 

@@ -233,16 +233,21 @@ class LocationCrudTest extends TestCase
             ->assertStatus(ResponseCodes::HTTP_CONFLICT);
     }
 
+    /**
+     * 404 rather than 403: the tenant global scope hides the foreign organizer before
+     * authorization can reject it. That is the stronger answer, because a 403 confirms the
+     * organizer exists and lets another account enumerate ids.
+     */
     public function test_cross_account_access_is_denied(): void
     {
         [, $otherToken] = $this->makeAuthenticatedUser();
 
         $this->getJson("/organizers/{$this->organizerId}/locations", $this->authHeaders($otherToken))
-            ->assertStatus(ResponseCodes::HTTP_FORBIDDEN);
+            ->assertStatus(ResponseCodes::HTTP_NOT_FOUND);
 
         $this->postJson("/organizers/{$this->organizerId}/locations", [
             'structured_address' => ['city' => 'Dublin', 'country' => 'IE'],
-        ], $this->authHeaders($otherToken))->assertStatus(ResponseCodes::HTTP_FORBIDDEN);
+        ], $this->authHeaders($otherToken))->assertStatus(ResponseCodes::HTTP_NOT_FOUND);
     }
 
     public function test_cross_organizer_location_is_not_found(): void

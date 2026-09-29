@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace HiEvents\Models;
 
 use HiEvents\DomainObjects\Generated\EventDomainObjectAbstract;
+use HiEvents\Models\Concerns\BelongsToTenant;
 use HiEvents\Models\Traits\HasImages;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -13,6 +14,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Event extends BaseModel
 {
+    use BelongsToTenant;
     use HasImages;
     use SoftDeletes;
 

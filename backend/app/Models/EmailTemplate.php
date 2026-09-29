@@ -3,11 +3,13 @@
 namespace HiEvents\Models;
 
 use HiEvents\DomainObjects\EmailTemplateDomainObject;
+use HiEvents\Models\Concerns\BelongsToTenant;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class EmailTemplate extends BaseModel
 {
+    use BelongsToTenant;
     use SoftDeletes;
 
     public function getDomainObjectClass(): string

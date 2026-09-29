@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace HiEvents\Models;
 
+use HiEvents\Models\Concerns\BelongsToTenant;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Affiliate extends BaseModel
 {
+    use BelongsToTenant;
+
     protected function getCastMap(): array
     {
         return [

@@ -2,11 +2,13 @@
 
 namespace HiEvents\Models;
 
+use HiEvents\Models\Concerns\BelongsToTenant;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Invoice extends BaseModel
 {
+    use BelongsToTenant;
     use SoftDeletes;
 
     protected function getCastMap(): array

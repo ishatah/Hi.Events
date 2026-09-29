@@ -101,9 +101,9 @@ feature and cost far less before it than after.
 | ARZ-007 | Stabilize | Frontend test runner + CI lint/typecheck (F9) | M | — | **DONE** locally — the workflow has never run for ARZO's code (ARZ-300) |
 | ARZ-008 | Stabilize | Align queue names dev/prod/e2e; pin Postgres (F7, F13) | S | — | **PARTLY DONE** — queue names aligned, F13 fixed; dev Postgres still 15; dev/test/e2e run queues synchronously (`83`) |
 | ARZ-010 | Foundation | `persons` table + `attendees.person_id` | M | — | **DONE** (schema) — backfill defect → ARZ-301 |
-| ARZ-011 | Foundation | RBAC/ABAC model replacing the 3-role enum | L | ARZ-005 | TODO |
-| ARZ-012 | Foundation | Per-event roles and assignments | M | ARZ-011 | TODO |
-| ARZ-013 | Foundation | Tenant global scope replacing static state (F11) | M | ARZ-006 | TODO |
+| ARZ-011 | Foundation | RBAC/ABAC model replacing the 3-role enum | L | ARZ-005 | **DONE** — 43 permissions, 10 seeded roles, per-request resolution; runs alongside `isActionAuthorized`, 159-site migration still incremental |
+| ARZ-012 | Foundation | Per-event roles and assignments | M | ARZ-011 | **DONE** — `event_users` grant/list/revoke over HTTP; `expires_at` honoured at resolution |
+| ARZ-013 | Foundation | Tenant global scope replacing static state (F11) | M | ARZ-006 | **DONE** — scoped `TenantContext` + global scope on 12 models; cross-tenant reads now 404 not 403; architecture test guards coverage |
 | ARZ-020 | Space | `venues`, `buildings`, `floors` | M | — | **DONE** |
 | ARZ-021 | Space | `zones` with nesting + `access_points` | M | ARZ-020 | **DONE** |
 | ARZ-022 | Space | `rooms`; link to zones | S | ARZ-021 | **DONE** |
