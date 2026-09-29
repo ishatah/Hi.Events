@@ -31,6 +31,7 @@ class AccessScanService
 
     public function __construct(
         private readonly AccessDecisionService $accessDecisionService,
+        private readonly ZoneOccupancyService $zoneOccupancyService,
         private readonly DatabaseManager $databaseManager,
     ) {}
 
@@ -205,7 +206,9 @@ class AccessScanService
             entryCountForZone: $credential !== null && $zoneId !== null
                 ? $this->entryCountFor((int) $credential->id, $zoneId)
                 : 0,
-            zoneOccupancy: $zoneId !== null ? $this->occupancyFor($zoneId, $eventId) : null,
+            zoneOccupancy: $zoneId !== null && $this->zoneOccupancyService->isEnforced($eventId, $zoneId)
+                ? $this->zoneOccupancyService->current($zoneId, $eventId)
+                : null,
             zoneCapacity: $zoneId !== null ? $this->capacityFor($zoneId) : null,
         );
     }
@@ -322,26 +325,6 @@ class AccessScanService
             ->where('direction', AccessDirection::ENTRY->value)
             ->where('result', AccessResult::GRANTED->value)
             ->count();
-    }
-
-    /**
-     * Entries minus exits per credential, counting only those currently inside.
-     *
-     * Derived rather than stored: a counter drifts under offline replay, because queued
-     * scans arrive out of order.
-     */
-    private function occupancyFor(int $zoneId, int $eventId): int
-    {
-        $rows = $this->databaseManager->table('access_logs')
-            ->selectRaw('credential_id, SUM(CASE WHEN direction = ? THEN -1 ELSE 1 END) AS net_inside', [AccessDirection::EXIT->value])
-            ->where('zone_id', $zoneId)
-            ->where('event_id', $eventId)
-            ->where('result', AccessResult::GRANTED->value)
-            ->whereNotNull('credential_id')
-            ->groupBy('credential_id')
-            ->get();
-
-        return $rows->filter(static fn (object $row): bool => (int) $row->net_inside > 0)->count();
     }
 
     private function capacityFor(int $zoneId): ?int

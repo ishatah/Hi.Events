@@ -51,7 +51,7 @@ waits for it. Each item's evidence is in the cited document.
 | ARZ-317 | **P0** | Licence and attribution: rebrand hides the required "Powered by" footer (string `"false"` is truthy); no AGPL §13 source offer; licence purchase decision | S + business | **Now** | `98`, `66` | TODO |
 | ARZ-302 | **P0** | Access time windows evaluate in UTC, not venue time | S | Before any rule UI and before golden vectors | `115`, `94` | **DONE** — daily and day-of-week windows convert to venue time; absolute windows stay instants |
 | ARZ-303 | **P0** | `persons` ID document and date-of-birth fields stored in plaintext | S | Before any ID-collecting accreditation type | `65`, `115` | TODO |
-| ARZ-307 | **P0** | Scan-path occupancy: computed every scan, cost grows with the zone's history — make conditional, aggregate in SQL, read snapshots | M | Before any live access scanning | `74`, `75`, `125` | TODO |
+| ARZ-307 | **P0** | Scan-path occupancy: computed every scan, cost grows with the zone's history — make conditional, aggregate in SQL, read snapshots | M | Before any live access scanning | `74`, `75`, `125` | **DONE** — aggregated in SQL, skipped entirely unless the zone or a rule enforces capacity, snapshot-backed |
 | ARZ-313 | **P0** | Credential identifier format: versioned prefix, upper-case, case-insensitive resolution | S | Before the first printed badge | `38` | TODO |
 | ARZ-314 | **P0** | Schema corrections while tables are empty: `booths.event_id` + `booth_assignments`; `credential_media`; `session_attendance` direction; `device_id` columns | M | Before the first writer of each table | `35`, `36`, `40`, `54` | TODO |
 | ARZ-320 | **P0** | Access rules ignore `subject_type`/`subject_id` — a DENY for one badge closes the zone to all; every ALLOW is copied to every credential | M | Before the rule CRUD merges and before golden vectors | `124` ST1, `115` | **DONE** — both paths match subject; absent subject type ≠ null |
@@ -122,11 +122,11 @@ feature and cost far less before it than after.
 | ARZ-050 | Accreditation | `accreditation_types` + type rules | M | ARZ-021 | **DONE** (schema) |
 | ARZ-051 | Accreditation | `accreditations` application + approval workflow, audited | L | ARZ-050, ARZ-011, ARZ-012, ARZ-319 | **DONE** — submit/approve/reject/issue + `accreditation_audit_logs`; gated on `accreditation.approve`/`.reject`/`credential.issue`. Built its own audit table rather than adopting the dormant `event_logs`, so ARZ-319 was not a blocker |
 | ARZ-052 | Accreditation | `credentials` + one-of CHECK constraint; issuance service | M | ARZ-051, ARZ-010 | **DONE** — two sources by design; staff and exhibitor staff come through accreditation (`32`, `57`) |
-| ARZ-053 | Accreditation | Backfill credentials for existing attendees — as a command, `chunkById`, grants in a second pass (`122` D2) | S | ARZ-052, ARZ-301 | TODO |
+| ARZ-053 | Accreditation | Backfill credentials for existing attendees — as a command, `chunkById`, grants in a second pass (`122` D2) | S | ARZ-052, ARZ-301 | **DONE** — `credentials:backfill-attendees`, idempotent, two-pass, `--dry-run`; verified over 25 rows incl. a cancelled attendee |
 | ARZ-060 | Access | `access_rules` engine + priority evaluation | L | ARZ-040, ARZ-052 | **DONE** — pure decision function, scan service, subject matching, venue-local windows; CRUD exposed over HTTP |
 | ARZ-061 | Access | `access_grants` materialization | M | ARZ-060 | **DONE** — subject-gated; grants are a snapshot, so a changed rule needs rematerialisation |
 | ARZ-062 | Access | Anti-passback + re-entry rules | M | ARZ-061 | **DONE** in the decision function |
-| ARZ-063 | Access | Derived zone occupancy + snapshot cache | M | ARZ-061 | **PARTIAL** — derived per scan, does not scale → ARZ-307; snapshot job not started |
+| ARZ-063 | Access | Derived zone occupancy + snapshot cache | M | ARZ-061 | **DONE** — SQL aggregation, 30s snapshots via a scheduled job, computed only where capacity is enforced |
 | ARZ-064 | Access | Rule simulator ("would this badge get in?") | M | ARZ-060 | **DONE** — shares the scan context path; verdict only, no log |
 | ARZ-070 | Badges | `badge_templates` + **presets first**, canvas deferred (`22`) | L | ARZ-052, ARZ-313 | TODO — schema landed |
 | ARZ-071 | Badges | Server-side render, raster-capable, Arabic-tested (replaces F8) | L | ARZ-070 | TODO |
