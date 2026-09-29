@@ -173,9 +173,9 @@ feature and cost far less before it than after.
 | ARZ-152 | Mobile | Native scanner app | L | ARZ-101 | TODO |
 | ARZ-160 | Seating | Seat maps + assignment — **deferred** until a real event needs it; table seating first (`26`) | L | ARZ-022, ARZ-314 | DEFERRED |
 | ARZ-170 | Analytics | Live command center | L | ARZ-104, ARZ-063 | TODO |
-| ARZ-171 | Analytics | Attendance + no-show + dwell reporting | M | ARZ-040 | TODO |
-| ARZ-172 | Analytics | Session attendance analytics | M | ARZ-082 | TODO |
-| ARZ-173 | Analytics | Demographics | M | ARZ-010 | TODO |
+| ARZ-171 | Analytics | Attendance + no-show + dwell reporting | M | ARZ-040 | **PARTLY DONE** — attendance, no-show, arrival curve in event timezone, peak hour, dwell (or an explicit "not measurable"). HTTP layer not built |
+| ARZ-172 | Analytics | Session attendance analytics | M | ARZ-082 | **PARTLY DONE** — session attendance, no-shows, walk-ins, utilisation, no-show ranking. HTTP layer not built |
+| ARZ-173 | Analytics | Demographics | M | ARZ-010 | **PARTLY DONE** — nationality and company breakdowns with small-bucket suppression. HTTP layer not built |
 | ARZ-180 | CRM | HubSpot / Salesforce integration | L | ARZ-090 | TODO |
 | ARZ-190 | Registration | RSVP as a distinct flow | M | — | TODO |
 | ARZ-191 | Payments | A Qatar-licensed payment gateway — **raise to P1**: Stripe does not list Qatar as a supported country, so ARZO cannot be merchant of record through it (`98`, `135`) | L | business: gateway choice | TODO |
