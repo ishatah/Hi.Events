@@ -555,4 +555,60 @@ class AccessScanServiceTest extends TestCase
             'A Doha venue window must be read in Asia/Qatar, not UTC. Got: '.$decision->reason
         );
     }
+
+    public function test_simulation_agrees_with_the_real_scan_and_writes_no_log(): void
+    {
+        $attendeeId = $this->makeAttendee();
+
+        $credential = $this->issuanceService->issueForAttendee(
+            eventId: $this->eventId,
+            attendeeId: $attendeeId,
+        );
+
+        $identifier = (string) DB::table('credentials')
+            ->where('id', $credential->getId())
+            ->value('identifier');
+
+        $logsBefore = DB::table('access_logs')->where('event_id', $this->eventId)->count();
+
+        $simulated = $this->scanService->simulate(
+            eventId: $this->eventId,
+            identifier: $identifier,
+            accessPointId: $this->accessPointId,
+            direction: AccessDirection::ENTRY,
+            occurredAt: Carbon::parse('2030-06-01T10:00:00Z'),
+        );
+
+        $this->assertSame(
+            $logsBefore,
+            DB::table('access_logs')->where('event_id', $this->eventId)->count(),
+            'A simulation must not record anything.'
+        );
+
+        $real = $this->scanService->scan(
+            eventId: $this->eventId,
+            identifier: $identifier,
+            accessPointId: $this->accessPointId,
+            direction: AccessDirection::ENTRY,
+            operatorUserId: $this->userId,
+            occurredAt: Carbon::parse('2030-06-01T10:00:00Z'),
+        );
+
+        $this->assertSame($real->result, $simulated->result);
+        $this->assertSame($real->isGranted(), $simulated->isGranted());
+    }
+
+    public function test_simulation_reports_a_denial_without_recording_it(): void
+    {
+        $simulated = $this->scanService->simulate(
+            eventId: $this->eventId,
+            identifier: 'this-identifier-does-not-exist',
+            accessPointId: $this->accessPointId,
+            direction: AccessDirection::ENTRY,
+        );
+
+        $this->assertFalse($simulated->isGranted());
+        $this->assertSame(AccessResult::DENIED_NO_CREDENTIAL, $simulated->result);
+        $this->assertSame(0, DB::table('access_logs')->where('event_id', $this->eventId)->count());
+    }
 }

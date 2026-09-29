@@ -58,39 +58,16 @@ class AccessScanService
             }
         }
 
-        $accessPoint = $this->databaseManager->table('access_points')
-            ->where('id', $accessPointId)
-            ->whereNull('deleted_at')
-            ->first();
-
-        $zoneId = $accessPoint?->zone_id !== null ? (int) $accessPoint->zone_id : null;
-
-        $direction ??= $this->defaultDirectionFor($accessPoint);
-
-        $credential = $this->databaseManager->table('credentials')
-            ->where('event_id', $eventId)
-            ->where('identifier_hash', hash('sha256', $identifier))
-            ->first();
-
-        $context = new AccessContextDTO(
-            credential: $credential,
-            grants: $credential !== null ? $this->grantsFor((int) $credential->id) : [],
-            rules: $this->activeRulesFor($eventId),
+        $context = $this->buildContext(
+            eventId: $eventId,
+            identifier: $identifier,
             accessPointId: $accessPointId,
-            zoneId: $zoneId,
             direction: $direction,
             occurredAt: $occurredAt,
-            subjects: $credential !== null ? $this->subjectsFor($credential) : [],
-            venueTimezone: $this->timezoneFor($zoneId, $eventId),
-            lastLogForZone: $credential !== null && $zoneId !== null
-                ? $this->lastLogFor((int) $credential->id, $zoneId)
-                : null,
-            entryCountForZone: $credential !== null && $zoneId !== null
-                ? $this->entryCountFor((int) $credential->id, $zoneId)
-                : 0,
-            zoneOccupancy: $zoneId !== null ? $this->occupancyFor($zoneId, $eventId) : null,
-            zoneCapacity: $zoneId !== null ? $this->capacityFor($zoneId) : null,
         );
+
+        $direction = $context->direction;
+        $zoneId = $context->zoneId;
 
         $decision = $this->accessDecisionService->decide($context);
 
@@ -110,6 +87,70 @@ class AccessScanService
         );
 
         return $decision;
+    }
+
+    /**
+     * The same verdict a door would give, without recording it.
+     *
+     * An organizer building a rule set with priorities and both effects will produce
+     * contradictions, and the only trustworthy answer to "would this badge get in?" is the
+     * one the door itself would reach. So this shares the decision path exactly and differs
+     * only in not writing a log.
+     */
+    public function simulate(
+        int $eventId,
+        string $identifier,
+        int $accessPointId,
+        ?AccessDirection $direction = null,
+        ?Carbon $occurredAt = null,
+    ): AccessDecisionDTO {
+        return $this->accessDecisionService->decide($this->buildContext(
+            eventId: $eventId,
+            identifier: $identifier,
+            accessPointId: $accessPointId,
+            direction: $direction,
+            occurredAt: $occurredAt ?? Carbon::now(),
+        ));
+    }
+
+    private function buildContext(
+        int $eventId,
+        string $identifier,
+        int $accessPointId,
+        ?AccessDirection $direction,
+        Carbon $occurredAt,
+    ): AccessContextDTO {
+        $accessPoint = $this->databaseManager->table('access_points')
+            ->where('id', $accessPointId)
+            ->whereNull('deleted_at')
+            ->first();
+
+        $zoneId = $accessPoint?->zone_id !== null ? (int) $accessPoint->zone_id : null;
+
+        $credential = $this->databaseManager->table('credentials')
+            ->where('event_id', $eventId)
+            ->where('identifier_hash', hash('sha256', $identifier))
+            ->first();
+
+        return new AccessContextDTO(
+            credential: $credential,
+            grants: $credential !== null ? $this->grantsFor((int) $credential->id) : [],
+            rules: $this->activeRulesFor($eventId),
+            accessPointId: $accessPointId,
+            zoneId: $zoneId,
+            direction: $direction ?? $this->defaultDirectionFor($accessPoint),
+            occurredAt: $occurredAt,
+            subjects: $credential !== null ? $this->subjectsFor($credential) : [],
+            venueTimezone: $this->timezoneFor($zoneId, $eventId),
+            lastLogForZone: $credential !== null && $zoneId !== null
+                ? $this->lastLogFor((int) $credential->id, $zoneId)
+                : null,
+            entryCountForZone: $credential !== null && $zoneId !== null
+                ? $this->entryCountFor((int) $credential->id, $zoneId)
+                : 0,
+            zoneOccupancy: $zoneId !== null ? $this->occupancyFor($zoneId, $eventId) : null,
+            zoneCapacity: $zoneId !== null ? $this->capacityFor($zoneId) : null,
+        );
     }
 
     /**

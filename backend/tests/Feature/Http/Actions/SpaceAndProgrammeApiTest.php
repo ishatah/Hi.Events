@@ -249,6 +249,52 @@ class SpaceAndProgrammeApiTest extends TestCase
         $this->assertNotEmpty($logs->json('data'));
     }
 
+    public function test_a_simulated_scan_returns_a_verdict_without_writing_a_log(): void
+    {
+        $venueId = $this->createVenue();
+        $zoneId = $this->createZone($venueId);
+
+        $accessPointId = $this->postJson("/zones/{$zoneId}/access-points", [
+            'name' => 'Sim Door',
+            'code' => 'SIM',
+            'direction' => 'ENTRY',
+        ], $this->authHeaders($this->token))->json('data.id');
+
+        $before = $this->getJson("/events/{$this->eventId}/access-logs", $this->authHeaders($this->token));
+        $countBefore = count($before->json('data'));
+
+        $response = $this->postJson("/events/{$this->eventId}/access-scans/simulate", [
+            'identifier' => 'a-credential-that-does-not-exist',
+            'access_point_id' => $accessPointId,
+        ], $this->authHeaders($this->token));
+
+        $response->assertOk();
+        $response->assertJsonPath('granted', false);
+        $response->assertJsonPath('result', 'DENIED_NO_CREDENTIAL');
+
+        $after = $this->getJson("/events/{$this->eventId}/access-logs", $this->authHeaders($this->token));
+        $this->assertCount($countBefore, $after->json('data'), 'A simulation must not write a log.');
+    }
+
+    public function test_a_simulated_scan_refuses_a_foreign_event(): void
+    {
+        $venueId = $this->createVenue();
+        $zoneId = $this->createZone($venueId);
+
+        $accessPointId = $this->postJson("/zones/{$zoneId}/access-points", [
+            'name' => 'Sim Door',
+            'code' => 'SIMX',
+            'direction' => 'ENTRY',
+        ], $this->authHeaders($this->token))->json('data.id');
+
+        $response = $this->postJson("/events/{$this->foreignEventId}/access-scans/simulate", [
+            'identifier' => 'anything',
+            'access_point_id' => $accessPointId,
+        ], $this->authHeaders($this->token));
+
+        $this->assertContains($response->getStatusCode(), [401, 403, 404]);
+    }
+
     /**
      * Every event-scoped endpoint must refuse an event belonging to another account. This
      * is the check that keeps 50 new routes from becoming 50 new leaks.

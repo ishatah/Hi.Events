@@ -311,6 +311,7 @@ use HiEvents\Http\Actions\AccessRule\UpdateAccessRuleAction;
 use HiEvents\Http\Actions\AccessRule\DeleteAccessRuleAction;
 use HiEvents\Http\Actions\AccessLog\GetAccessLogsAction;
 use HiEvents\Http\Actions\AccessLog\RecordAccessScanAction;
+use HiEvents\Http\Actions\AccessLog\SimulateAccessScanAction;
 use HiEvents\Http\Actions\Credential\GetCredentialsAction;
 use HiEvents\Http\Actions\Credential\IssueCredentialAction;
 use HiEvents\Http\Actions\Credential\RevokeCredentialAction;
@@ -616,6 +617,7 @@ $router->middleware(['auth:api'])->group(
         // Access logs and scanning
         $router->get('/events/{event_id}/access-logs', GetAccessLogsAction::class);
         $router->post('/events/{event_id}/access-scans', RecordAccessScanAction::class);
+        $router->post('/events/{event_id}/access-scans/simulate', SimulateAccessScanAction::class);
 
         // Credentials
         $router->get('/events/{event_id}/credentials', GetCredentialsAction::class);
