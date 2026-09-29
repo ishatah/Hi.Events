@@ -73,6 +73,7 @@ waits for it. Each item's evidence is in the cited document.
 | ARZ-328 | P1 | Admin order search fails on any term (ambiguous `email`) | S | Soon | `72` | TODO |
 | ARZ-334 | P1 | **Public check-in list returns every attendee's `public_id` — the ticket QR itself**; anyone holding a list link can mint every ticket | S | Soon | `68` FR1, `38` | TODO |
 | ARZ-335 | P1 | Order creation applies promo codes under only the global 180/min limit — hidden VIP and comp products brute-forceable around the 10/min validation throttle | S | Soon | `68` FR2, `46` | TODO |
+| ARZ-337 | P1 | Session waitlist offers are accepted immediately on promotion — no offer email, no `offer_expires_at` timer, no expiry job to pass the seat on | M | Before a session waitlist is used live | `27` | TODO |
 | ARZ-336 | P1 | Credential lifecycle: `issued_by` never set; a second revocation overwrites the first and leaves grants active; raw identifiers copied into every access log | S | Before revocation ships | `67`, `68` FR3, `94` | TODO |
 | ARZ-315 | P2 | Statistics: page views lost without orders; partial batches never flushed; no repair command | S | Later | `52` | TODO |
 | ARZ-316 | P2 | Affiliates: money as `double`; no unique `(event_id, code)` | S | Later | `45`, `122` | TODO |
@@ -132,11 +133,11 @@ feature and cost far less before it than after.
 | ARZ-072 | Badges | `badge_print_jobs` queue + failure recovery | M | ARZ-071 | TODO — schema landed |
 | ARZ-073 | Badges | Reprint, void, badge history | M | ARZ-072 | TODO |
 | ARZ-074 | Badges | Photo capture at the desk | M | ARZ-052 | TODO |
-| ARZ-080 | Sessions | Session registration + capacity | M | ARZ-031 | TODO |
-| ARZ-081 | Sessions | Session waitlist — **sibling** `session_waitlist_entries` (table created), shared offer policy (`14`) | M | ARZ-080 | TODO — approach changed |
-| ARZ-082 | Sessions | `session_attendance` + session check-in, `ENTRY`/`EXIT` vocabulary | M | ARZ-031, ARZ-040, ARZ-314 | TODO |
-| ARZ-083 | Sessions | Agenda UI + conflict detection | L | ARZ-031 | TODO |
-| ARZ-084 | Sessions | Session + agenda ICS export | S | ARZ-031 | TODO |
+| ARZ-080 | Sessions | Session registration + capacity | M | ARZ-031 | **DONE** — counted not stored; row lock proven against 8-way concurrency for 1 seat |
+| ARZ-081 | Sessions | Session waitlist — **sibling** `session_waitlist_entries` (table created), shared offer policy (`14`) | M | ARZ-080 | **DONE** — FIFO promotion on cancel; outstanding offers hold a seat. Offer emails/expiry job still TODO → ARZ-337 |
+| ARZ-082 | Sessions | `session_attendance` + session check-in, `ENTRY`/`EXIT` vocabulary | M | ARZ-031, ARZ-040, ARZ-314 | **DONE** — append-only log, distinct-attendee counts, replay-idempotent |
+| ARZ-083 | Sessions | Agenda UI + conflict detection | L | ARZ-031 | **PARTIAL** — conflict detection + agenda endpoint done; the UI is frontend work, not started |
+| ARZ-084 | Sessions | Session + agenda ICS export | S | ARZ-031 | **DONE** — RFC 5545 escaping and folding, UTC instants, unpublished sessions excluded |
 | ARZ-090 | API | API keys, scopes, rate limits | L | ARZ-011 | TODO |
 | ARZ-091 | API | Versioned webhook payload boundary (F14) | M | ARZ-090, ARZ-304 | TODO |
 | ARZ-092 | API | Device-scoped keys (stored on `devices`, shared resolver with API keys) | M | ARZ-090 | TODO |

@@ -315,6 +315,14 @@ use HiEvents\Http\Actions\AccessLog\SimulateAccessScanAction;
 use HiEvents\Http\Actions\EventUser\GetEventUsersAction;
 use HiEvents\Http\Actions\EventUser\GrantEventRoleAction;
 use HiEvents\Http\Actions\EventUser\RevokeEventRoleAction;
+use HiEvents\Http\Actions\Session\CancelSessionRegistrationAction;
+use HiEvents\Http\Actions\Session\ExportEventProgrammeIcsAction;
+use HiEvents\Http\Actions\Session\ExportSessionIcsAction;
+use HiEvents\Http\Actions\Session\GetAttendeeAgendaAction;
+use HiEvents\Http\Actions\Session\GetSessionRegistrationsAction;
+use HiEvents\Http\Actions\Session\GetSessionStatsAction;
+use HiEvents\Http\Actions\Session\RecordSessionAttendanceAction;
+use HiEvents\Http\Actions\Session\RegisterForSessionAction;
 use HiEvents\Http\Actions\Credential\GetCredentialsAction;
 use HiEvents\Http\Actions\Credential\IssueCredentialAction;
 use HiEvents\Http\Actions\Credential\RevokeCredentialAction;
@@ -626,6 +634,15 @@ $router->middleware(['auth:api'])->group(
         $router->get('/events/{event_id}/users', GetEventUsersAction::class);
         $router->post('/events/{event_id}/users', GrantEventRoleAction::class);
         $router->delete('/events/{event_id}/users/{user_id}', RevokeEventRoleAction::class);
+        // Session registration, attendance and agenda
+        $router->get('/events/{event_id}/sessions/{session_id}/registrations', GetSessionRegistrationsAction::class);
+        $router->post('/events/{event_id}/sessions/{session_id}/registrations', RegisterForSessionAction::class);
+        $router->delete('/events/{event_id}/sessions/{session_id}/registrations/{attendee_id}', CancelSessionRegistrationAction::class);
+        $router->post('/events/{event_id}/sessions/{session_id}/attendance', RecordSessionAttendanceAction::class);
+        $router->get('/events/{event_id}/sessions/{session_id}/stats', GetSessionStatsAction::class);
+        $router->get('/events/{event_id}/sessions/{session_id}/calendar.ics', ExportSessionIcsAction::class);
+        $router->get('/events/{event_id}/programme.ics', ExportEventProgrammeIcsAction::class);
+        $router->get('/events/{event_id}/attendees/{attendee_id}/agenda', GetAttendeeAgendaAction::class);
 
         // Credentials
         $router->get('/events/{event_id}/credentials', GetCredentialsAction::class);

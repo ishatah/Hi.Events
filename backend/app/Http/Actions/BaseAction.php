@@ -131,6 +131,14 @@ abstract class BaseAction extends Controller
         return new JsonResponse($data, $statusCode);
     }
 
+    protected function calendarResponse(string $calendar, string $filename): LaravelResponse
+    {
+        return Response::make($calendar, ResponseCodes::HTTP_OK, [
+            'Content-Type' => 'text/calendar; charset=utf-8',
+            'Content-Disposition' => sprintf('attachment; filename="%s"', $filename),
+        ]);
+    }
+
     protected function xmlResponse(
         string $xmlContent,
         int $statusCode = ResponseCodes::HTTP_OK,
