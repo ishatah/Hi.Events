@@ -115,7 +115,7 @@ feature and cost far less before it than after.
 | ARZ-031 | Time | `sessions` + GiST room-overlap exclusion constraint | L | ARZ-022, ARZ-030 | **DONE** |
 | ARZ-032 | Time | `session_speakers`, `session_products` | S | ARZ-031 | **DONE** |
 | ARZ-040 | Access | `access_logs` append-only table | M | ARZ-021 | **DONE** |
-| ARZ-041 | Check-in | Consolidate the two check-in write models (F10) | L | ARZ-040 | TODO |
+| ARZ-041 | Check-in | Consolidate the two check-in write models (F10) | L | ARZ-040 | **DONE** — one write path via the system-default check-in list; both dispatch domain events; verified over HTTP |
 
 ## P1 — Core platform
 

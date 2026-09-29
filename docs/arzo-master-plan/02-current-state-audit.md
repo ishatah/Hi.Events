@@ -298,7 +298,7 @@ Zero frontend unit tests, no runner. Check-in — the most operationally critica
 guard, or network failure.
 
 
-### F10 — The check-in domain is bifurcated · `CONFIRMED`
+### F10 — The check-in domain is bifurcated · `CONFIRMED` · **FIXED (ARZ-041)** — the dashboard path now delegates to the same domain services as the scanner, writes `attendee_check_ins` rows, and dispatches `checkin.created`/`checkin.deleted`; the attendee columns stay in step because the list and exports read them
 
 Two independent write models for "checked in", of unequal quality:
 
