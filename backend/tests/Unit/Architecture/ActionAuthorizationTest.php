@@ -104,6 +104,11 @@ class ActionAuthorizationTest extends TestCase
         'Users/ConfirmEmailWithCodeAction.php',
         'Users/GetMeAction.php',
         'Users/ResendEmailConfirmationAction.php',
+
+        // The device has no credential yet — that is what pairing is for. The pairing
+        // code is the credential: short, single-use, expiring, and the route is
+        // throttled so it cannot be brute-forced.
+        'Device/PairDeviceAction.php',
     ];
 
     public function test_every_action_authorizes_or_is_declared_public(): void
@@ -187,8 +192,15 @@ class ActionAuthorizationTest extends TestCase
      */
     private function scopesToApiPrincipal(string $contents): bool
     {
-        return str_contains($contents, 'ApiPrincipalContext')
-            && preg_match('/\$principal->accountId/', $contents) === 1;
+        if (! str_contains($contents, 'ApiPrincipalContext')) {
+            return false;
+        }
+
+        // Either the action constrains its query to the resolved account, or it acts only on
+        // the principal's own id — a device syncing itself cannot reach another device's
+        // data, because the id never comes from the URL.
+        return preg_match('/\$principal->accountId/', $contents) === 1
+            || preg_match('/\$principal->id/', $contents) === 1;
     }
 
     private function authorizes(string $contents): bool

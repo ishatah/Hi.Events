@@ -325,6 +325,37 @@ use HiEvents\Http\Actions\Session\RecordSessionAttendanceAction;
 use HiEvents\Http\Actions\Session\RegisterForSessionAction;
 use HiEvents\Http\Actions\Accreditation\ApproveAccreditationAction;
 use HiEvents\Http\Actions\V1\GetV1EventAttendeesAction;
+use HiEvents\Http\Actions\Exhibitor\AssignBoothAction;
+use HiEvents\Http\Actions\Exhibitor\CaptureLeadAction;
+use HiEvents\Http\Actions\Exhibitor\GetEventExhibitorsAction;
+use HiEvents\Http\Actions\Exhibitor\GetLeadCaptureStatsAction;
+use HiEvents\Http\Actions\Exhibitor\GetLeadsAction;
+use HiEvents\Http\Actions\Exhibitor\NameExhibitorStaffAction;
+use HiEvents\Http\Actions\Exhibitor\ReleaseBoothAction;
+use HiEvents\Http\Actions\Exhibitor\UpdateLeadAction;
+use HiEvents\Http\Actions\Exhibitor\UpsertEventExhibitorAction;
+use HiEvents\Http\Actions\Exhibitor\WithdrawExhibitorStaffAction;
+use HiEvents\Http\Actions\Operations\AssignShiftAction;
+use HiEvents\Http\Actions\Operations\DecideReadinessReviewAction;
+use HiEvents\Http\Actions\Operations\GetIncidentSummaryAction;
+use HiEvents\Http\Actions\Operations\GetOutstandingBlockersAction;
+use HiEvents\Http\Actions\Operations\GetStaffingGapsAction;
+use HiEvents\Http\Actions\Operations\InstantiateTaskTemplateAction;
+use HiEvents\Http\Actions\Operations\OpenReadinessReviewAction;
+use HiEvents\Http\Actions\Operations\ReportIncidentAction;
+use HiEvents\Http\Actions\Operations\TransitionIncidentAction;
+use HiEvents\Http\Actions\Analytics\GetAttendanceReportAction;
+use HiEvents\Http\Actions\Analytics\GetDemographicsAction;
+use HiEvents\Http\Actions\Analytics\GetSessionAnalyticsAction;
+use HiEvents\Http\Actions\Analytics\GetZoneDwellTimeAction;
+use HiEvents\Http\Actions\Device\GetFleetStatusAction;
+use HiEvents\Http\Actions\Device\GetReconciliationFindingsAction;
+use HiEvents\Http\Actions\Device\HeartbeatDeviceAction;
+use HiEvents\Http\Actions\Device\PairDeviceAction;
+use HiEvents\Http\Actions\Device\RegisterDeviceAction;
+use HiEvents\Http\Actions\Device\ReviewReconciliationFindingAction;
+use HiEvents\Http\Actions\Device\SuspendDeviceAction;
+use HiEvents\Http\Actions\Device\SyncDeviceAction;
 use HiEvents\Http\Actions\ApiKey\CreateApiKeyAction;
 use HiEvents\Http\Actions\ApiKey\GetApiKeysAction;
 use HiEvents\Http\Actions\ApiKey\RevokeApiKeyAction;
@@ -667,6 +698,41 @@ $router->middleware(['auth:api'])->group(
         $router->get('/api-keys', GetApiKeysAction::class);
         $router->post('/api-keys', CreateApiKeyAction::class);
         $router->delete('/api-keys/{api_key_id}', RevokeApiKeyAction::class);
+        // Exhibitors, booths and leads
+        $router->get('/events/{event_id}/exhibitors', GetEventExhibitorsAction::class);
+        $router->post('/events/{event_id}/exhibitors', UpsertEventExhibitorAction::class);
+        $router->post('/events/{event_id}/exhibitors/{event_exhibitor_id}/staff', NameExhibitorStaffAction::class);
+        $router->delete('/events/{event_id}/exhibitor-staff/{exhibitor_staff_id}', WithdrawExhibitorStaffAction::class);
+        $router->post('/events/{event_id}/booth-assignments', AssignBoothAction::class);
+        $router->delete('/events/{event_id}/booth-assignments/{assignment_id}', ReleaseBoothAction::class);
+        $router->get('/events/{event_id}/exhibitors/{event_exhibitor_id}/leads', GetLeadsAction::class);
+        $router->post('/events/{event_id}/exhibitors/{event_exhibitor_id}/leads', CaptureLeadAction::class);
+        $router->patch('/events/{event_id}/exhibitors/{event_exhibitor_id}/leads/{lead_id}', UpdateLeadAction::class);
+        $router->get('/events/{event_id}/exhibitors/{event_exhibitor_id}/lead-stats', GetLeadCaptureStatsAction::class);
+
+        // Operations: staffing, tasks, incidents, readiness
+        $router->get('/events/{event_id}/staffing-gaps', GetStaffingGapsAction::class);
+        $router->post('/events/{event_id}/shifts/{shift_id}/assignments', AssignShiftAction::class);
+        $router->post('/events/{event_id}/task-templates/{template_id}/instantiate', InstantiateTaskTemplateAction::class);
+        $router->get('/events/{event_id}/task-blockers', GetOutstandingBlockersAction::class);
+        $router->post('/events/{event_id}/incidents', ReportIncidentAction::class);
+        $router->post('/events/{event_id}/incidents/{incident_id}/transition', TransitionIncidentAction::class);
+        $router->get('/events/{event_id}/incidents/summary', GetIncidentSummaryAction::class);
+        $router->post('/events/{event_id}/readiness-reviews', OpenReadinessReviewAction::class);
+        $router->post('/events/{event_id}/readiness-reviews/{review_id}/decide', DecideReadinessReviewAction::class);
+
+        // Analytics
+        $router->get('/events/{event_id}/analytics/attendance', GetAttendanceReportAction::class);
+        $router->get('/events/{event_id}/analytics/sessions', GetSessionAnalyticsAction::class);
+        $router->get('/events/{event_id}/analytics/demographics', GetDemographicsAction::class);
+        $router->get('/events/{event_id}/analytics/zones/{zone_id}/dwell', GetZoneDwellTimeAction::class);
+
+        // Device fleet
+        $router->post('/events/{event_id}/devices', RegisterDeviceAction::class);
+        $router->get('/events/{event_id}/devices/fleet-status', GetFleetStatusAction::class);
+        $router->delete('/events/{event_id}/devices/{device_id}', SuspendDeviceAction::class);
+        $router->get('/events/{event_id}/reconciliation-findings', GetReconciliationFindingsAction::class);
+        $router->post('/events/{event_id}/reconciliation-findings/{finding_id}/review', ReviewReconciliationFindingAction::class);
 
         // Credentials
         $router->get('/events/{event_id}/credentials', GetCredentialsAction::class);
@@ -865,6 +931,26 @@ $router->prefix('/public')->group(
  * dashboard's own endpoints change shape, which the unversioned routes above do not
  * promise.
  */
+/*
+ * Device endpoints.
+ *
+ * Authenticated by the device's own key. A device syncs itself — the id comes from the
+ * resolved principal, never the URL, so one tablet cannot pull another's roster.
+ *
+ * Pairing is necessarily unauthenticated: the device has no credential yet, which is
+ * what pairing is for. The code is short, single-use and expiring, and the route is
+ * throttled so it cannot be brute-forced.
+ */
+$router->prefix('device')->group(function (Router $router): void {
+    $router->post('/pair', PairDeviceAction::class)->middleware('throttle:10,1');
+
+    $router->middleware(['api-key', 'api-key-throttle'])->group(function (Router $router): void {
+        $router->post('/sync', SyncDeviceAction::class)
+            ->middleware('api-scope:device.submit_scan');
+        $router->post('/heartbeat', HeartbeatDeviceAction::class);
+    });
+});
+
 $router->prefix('v1')
     ->middleware(['api-key', 'api-key-throttle'])
     ->group(function (Router $router): void {

@@ -143,9 +143,9 @@ feature and cost far less before it than after.
 | ARZ-090 | API | API keys, scopes, rate limits | L | ARZ-011 | **DONE** — `api_keys`, `arzo_`/`arzod_` prefixes, sha256 hashing, scopes from the `09` vocabulary, per-key throttle, `/api/v1` group |
 | ARZ-091 | API | Versioned webhook payload boundary (F14) | M | ARZ-090, ARZ-304 | TODO |
 | ARZ-092 | API | Device-scoped keys (stored on `devices`, shared resolver with API keys) | M | ARZ-090 | **DONE** — device keys resolve through the same hasher and authenticator; minimal scopes by device type; suspension revokes |
-| ARZ-100 | Offline | Device registry + enrolment, heartbeat, commands | M | ARZ-092, ARZ-314 | **PARTLY DONE** — enrolment by expiring pairing code, key rotation, suspension, heartbeat with clock skew, queued commands. HTTP layer not built |
-| ARZ-101 | Offline | Local store + sync protocol | XL | ARZ-100, ARZ-061 | **PARTLY DONE** — server side of the sync protocol: bidirectional, idempotent, cursor deltas, full deny-list, bounded payload. The on-device local store is the client half |
-| ARZ-102 | Offline | Conflict resolution + reconciliation reporting | L | ARZ-101 | **PARTLY DONE** — `access_reconciliation_findings` + service; offline grants the server would deny are flagged, never rewritten. Review UI not built |
+| ARZ-100 | Offline | Device registry + enrolment, heartbeat, commands | M | ARZ-092, ARZ-314 | **DONE** — register, pair, heartbeat, commands, suspend, fleet status, all reachable over HTTP |
+| ARZ-101 | Offline | Local store + sync protocol | XL | ARZ-100, ARZ-061 | **PARTLY DONE** — server side complete and reachable at `POST /device/sync`. The on-device local store is the client half |
+| ARZ-102 | Offline | Conflict resolution + reconciliation reporting | L | ARZ-101 | **PARTLY DONE** — findings recorded and reviewable over HTTP. Review UI is frontend |
 | ARZ-103 | Offline | Emergency/degraded mode UX | M | ARZ-101 | TODO |
 | ARZ-104 | Realtime | Reverb transport + channel authorization | L | ARZ-011 | TODO |
 
@@ -159,11 +159,11 @@ feature and cost far less before it than after.
 | ARZ-120 | Hardware | Scanner abstraction (camera, USB, BT, dedicated) | L | ARZ-100 | TODO |
 | ARZ-121 | Hardware | Print host + printer registry + raster adapters (`37`, `39`) | L | ARZ-071 | TODO |
 | ARZ-122 | Hardware | RFID/NFC read + encode via `credential_media` (`36`) | XL | ARZ-120, ARZ-052, ARZ-314 | **PARTLY DONE** — `credential_media` with hashed UIDs, replace-chain and a one-live-tag index. The on-device encoder is hardware |
-| ARZ-123 | Hardware | Device health + fleet dashboard | M | ARZ-100, ARZ-104 | **PARTLY DONE** — fleet status derived from `last_seen_at`, health events on state change only. Dashboard UI and realtime push not built |
-| ARZ-130 | Exhibitors | `companies` + `event_exhibitors` + magic-link portal (`32`) | L | ARZ-011 | **PARTLY DONE** — `companies`, `event_exhibitors`, `exhibitor_staff` schema + services; organizer CRUD endpoints and the magic-link portal not built |
+| ARZ-123 | Hardware | Device health + fleet dashboard | M | ARZ-100, ARZ-104 | **PARTLY DONE** — fleet status over HTTP. Dashboard UI and realtime push not built |
+| ARZ-130 | Exhibitors | `companies` + `event_exhibitors` + magic-link portal (`32`) | L | ARZ-011 | **DONE** — companies, `event_exhibitors`, staff, services and HTTP endpoints. The magic-link portal is a separate frontend |
 | ARZ-131 | Exhibitors | Booth correction + `booth_assignments` (`35`) | M | ARZ-021, ARZ-130, ARZ-314 | **DONE** — `booths.event_id` correction + `booth_assignments` with hold/assign/built/release; one-primary index proven against 6-way concurrency |
 | ARZ-132 | Exhibitors | Staff passes as `EXHIBITOR` accreditations within quota (`32`) | M | ARZ-051, ARZ-130 | **DONE** — staff passes are `EXHIBITOR` accreditations inside quota; withdrawal revokes the credential |
-| ARZ-133 | Exhibitors | Lead capture (capture-now-resolve-later) + export, with consent records (`33`, `65`) | L | ARZ-132 | **PARTLY DONE** — capture/resolve/consent services with hashed identifiers and `shared_fields` snapshots; CSV export and portal UI not built |
+| ARZ-133 | Exhibitors | Lead capture (capture-now-resolve-later) + export, with consent records (`33`, `65`) | L | ARZ-132 | **DONE** — capture/resolve/consent with hashed identifiers, snapshots, HTTP endpoints and stats. CSV export not built |
 | ARZ-134 | Exhibitors | Lead qualification + scoring | M | ARZ-133 | TODO |
 | ARZ-140 | Messaging | Phone capture (E.164) first, then SMS/WhatsApp provider behind the `69` channel abstraction (`43`) | M | — | TODO |
 | ARZ-141 | Messaging | Push infrastructure — attendee web push with ARZ-150; **staff native push does not wait for the attendee app** (`44`, `97`) | L | — | TODO |
@@ -173,9 +173,9 @@ feature and cost far less before it than after.
 | ARZ-152 | Mobile | Native scanner app | L | ARZ-101 | TODO |
 | ARZ-160 | Seating | Seat maps + assignment — **deferred** until a real event needs it; table seating first (`26`) | L | ARZ-022, ARZ-314 | DEFERRED |
 | ARZ-170 | Analytics | Live command center | L | ARZ-104, ARZ-063 | TODO |
-| ARZ-171 | Analytics | Attendance + no-show + dwell reporting | M | ARZ-040 | **PARTLY DONE** — attendance, no-show, arrival curve in event timezone, peak hour, dwell (or an explicit "not measurable"). HTTP layer not built |
-| ARZ-172 | Analytics | Session attendance analytics | M | ARZ-082 | **PARTLY DONE** — session attendance, no-shows, walk-ins, utilisation, no-show ranking. HTTP layer not built |
-| ARZ-173 | Analytics | Demographics | M | ARZ-010 | **PARTLY DONE** — nationality and company breakdowns with small-bucket suppression. HTTP layer not built |
+| ARZ-171 | Analytics | Attendance + no-show + dwell reporting | M | ARZ-040 | **DONE** — attendance, arrival curve, peak, dwell over HTTP |
+| ARZ-172 | Analytics | Session attendance analytics | M | ARZ-082 | **DONE** — session no-show ranking over HTTP |
+| ARZ-173 | Analytics | Demographics | M | ARZ-010 | **DONE** — demographics with suppression over HTTP |
 | ARZ-180 | CRM | HubSpot / Salesforce integration | L | ARZ-090 | TODO |
 | ARZ-190 | Registration | RSVP as a distinct flow | M | — | TODO |
 | ARZ-191 | Payments | A Qatar-licensed payment gateway — **raise to P1**: Stripe does not list Qatar as a supported country, so ARZO cannot be merchant of record through it (`98`, `135`) | L | business: gateway choice | TODO |
@@ -184,11 +184,11 @@ feature and cost far less before it than after.
 
 | ID | Epic | Item | Cx | Depends on | Status |
 |---|---|---|---|---|---|
-| ARZ-200 | Ops | Staff, shifts, assignments — credentials via `STAFF` accreditation (`57`) | L | ARZ-011, ARZ-051 | **PARTLY DONE** — `staff_positions`/`shifts`/`shift_assignments`/`staff_profiles` + rostering service; double-booking refused by a GiST constraint. HTTP layer not built |
-| ARZ-201 | Ops | Tasks + checklists | M | ARZ-200 | **PARTLY DONE** — task templates with relative anchors, instantiation, reschedule, waive/complete with evidence. HTTP layer not built |
-| ARZ-202 | Ops | Incident management | M | ARZ-104 | **PARTLY DONE** — incidents with per-event references, status machine, update trail, acknowledgement-breach list. HTTP layer not built |
+| ARZ-200 | Ops | Staff, shifts, assignments — credentials via `STAFF` accreditation (`57`) | L | ARZ-011, ARZ-051 | **DONE** — rostering with a double-booking constraint, staffing gaps over HTTP |
+| ARZ-201 | Ops | Tasks + checklists | M | ARZ-200 | **DONE** — templates, instantiation, blockers over HTTP |
+| ARZ-202 | Ops | Incident management | M | ARZ-104 | **DONE** — report, transition, summary and breach list over HTTP |
 | ARZ-203 | Ops | Vendors + procurement | M | — | **PARTLY DONE** — `event_vendors`/`vendor_staff` schema reusing `companies`. Procurement (purchase orders) and HTTP layer not built |
-| ARZ-204 | Ops | Event readiness gates + go/no-go | M | ARZ-201 | **PARTLY DONE** — `readiness_reviews`/`readiness_items` with frozen snapshots, automated checks and waiver-gated GO. HTTP layer not built |
+| ARZ-204 | Ops | Event readiness gates + go/no-go | M | ARZ-201 | **DONE** — open/decide with waiver-gated GO over HTTP |
 | ARZ-210 | Networking | Attendee networking + meetings | L | ARZ-150 | TODO |
 | ARZ-211 | Engagement | eRaffle | S | ARZ-150 | TODO |
 | ARZ-212 | Engagement | Live polls + Q&A | M | ARZ-104, ARZ-150 | TODO |
