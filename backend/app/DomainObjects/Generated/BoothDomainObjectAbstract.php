@@ -14,6 +14,7 @@ abstract class BoothDomainObjectAbstract extends \HiEvents\DomainObjects\Abstrac
     final public const VENUE_ID = 'venue_id';
     final public const ZONE_ID = 'zone_id';
     final public const FLOOR_ID = 'floor_id';
+    final public const EVENT_ID = 'event_id';
     final public const SHORT_ID = 'short_id';
     final public const CODE = 'code';
     final public const NAME = 'name';
@@ -30,6 +31,7 @@ abstract class BoothDomainObjectAbstract extends \HiEvents\DomainObjects\Abstrac
     protected int $venue_id;
     protected ?int $zone_id = null;
     protected ?int $floor_id = null;
+    protected ?int $event_id = null;
     protected string $short_id;
     protected string $code;
     protected ?string $name = null;
@@ -49,6 +51,7 @@ abstract class BoothDomainObjectAbstract extends \HiEvents\DomainObjects\Abstrac
                     'venue_id' => $this->venue_id ?? null,
                     'zone_id' => $this->zone_id ?? null,
                     'floor_id' => $this->floor_id ?? null,
+                    'event_id' => $this->event_id ?? null,
                     'short_id' => $this->short_id ?? null,
                     'code' => $this->code ?? null,
                     'name' => $this->name ?? null,
@@ -105,6 +108,17 @@ abstract class BoothDomainObjectAbstract extends \HiEvents\DomainObjects\Abstrac
     public function getFloorId(): ?int
     {
         return $this->floor_id;
+    }
+
+    public function setEventId(?int $event_id): self
+    {
+        $this->event_id = $event_id;
+        return $this;
+    }
+
+    public function getEventId(): ?int
+    {
+        return $this->event_id;
     }
 
     public function setShortId(string $short_id): self

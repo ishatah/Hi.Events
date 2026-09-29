@@ -20,19 +20,23 @@ use HiEvents\Repository\Eloquent\AccreditationTypeRuleRepository;
 use HiEvents\Repository\Eloquent\AffiliateRepository;
 use HiEvents\Repository\Eloquent\AnnouncementRepository;
 use HiEvents\Repository\Eloquent\AnnouncementUserRepository;
+use HiEvents\Repository\Eloquent\ApiKeyRepository;
 use HiEvents\Repository\Eloquent\AttendeeCheckInRepository;
 use HiEvents\Repository\Eloquent\AttendeeRepository;
 use HiEvents\Repository\Eloquent\BadgePrintJobRepository;
 use HiEvents\Repository\Eloquent\BadgeRepository;
 use HiEvents\Repository\Eloquent\BadgeTemplateRepository;
+use HiEvents\Repository\Eloquent\BoothAssignmentRepository;
 use HiEvents\Repository\Eloquent\BoothRepository;
 use HiEvents\Repository\Eloquent\BuildingRepository;
 use HiEvents\Repository\Eloquent\CapacityAssignmentRepository;
 use HiEvents\Repository\Eloquent\CheckInListRepository;
+use HiEvents\Repository\Eloquent\CompanyRepository;
 use HiEvents\Repository\Eloquent\CredentialRepository;
 use HiEvents\Repository\Eloquent\DeviceRepository;
 use HiEvents\Repository\Eloquent\EmailTemplateRepository;
 use HiEvents\Repository\Eloquent\EventDailyStatisticRepository;
+use HiEvents\Repository\Eloquent\EventExhibitorRepository;
 use HiEvents\Repository\Eloquent\EventLocationRepository;
 use HiEvents\Repository\Eloquent\EventOccurrenceDailyStatisticRepository;
 use HiEvents\Repository\Eloquent\EventOccurrenceRepository;
@@ -43,10 +47,14 @@ use HiEvents\Repository\Eloquent\EventSpamCheckRepository;
 use HiEvents\Repository\Eloquent\EventStatisticRepository;
 use HiEvents\Repository\Eloquent\EventUserRepository;
 use HiEvents\Repository\Eloquent\EventVenueRepository;
+use HiEvents\Repository\Eloquent\ExhibitorStaffRepository;
 use HiEvents\Repository\Eloquent\FloorRepository;
 use HiEvents\Repository\Eloquent\ImageRepository;
 use HiEvents\Repository\Eloquent\InvitationRepository;
 use HiEvents\Repository\Eloquent\InvoiceRepository;
+use HiEvents\Repository\Eloquent\LeadCaptureRepository;
+use HiEvents\Repository\Eloquent\LeadConsentRepository;
+use HiEvents\Repository\Eloquent\LeadRepository;
 use HiEvents\Repository\Eloquent\LocationRepository;
 use HiEvents\Repository\Eloquent\MessageRepository;
 use HiEvents\Repository\Eloquent\OrderApplicationFeeRepository;
@@ -114,19 +122,23 @@ use HiEvents\Repository\Interfaces\AccreditationTypeRuleRepositoryInterface;
 use HiEvents\Repository\Interfaces\AffiliateRepositoryInterface;
 use HiEvents\Repository\Interfaces\AnnouncementRepositoryInterface;
 use HiEvents\Repository\Interfaces\AnnouncementUserRepositoryInterface;
+use HiEvents\Repository\Interfaces\ApiKeyRepositoryInterface;
 use HiEvents\Repository\Interfaces\AttendeeCheckInRepositoryInterface;
 use HiEvents\Repository\Interfaces\AttendeeRepositoryInterface;
 use HiEvents\Repository\Interfaces\BadgePrintJobRepositoryInterface;
 use HiEvents\Repository\Interfaces\BadgeRepositoryInterface;
 use HiEvents\Repository\Interfaces\BadgeTemplateRepositoryInterface;
+use HiEvents\Repository\Interfaces\BoothAssignmentRepositoryInterface;
 use HiEvents\Repository\Interfaces\BoothRepositoryInterface;
 use HiEvents\Repository\Interfaces\BuildingRepositoryInterface;
 use HiEvents\Repository\Interfaces\CapacityAssignmentRepositoryInterface;
 use HiEvents\Repository\Interfaces\CheckInListRepositoryInterface;
+use HiEvents\Repository\Interfaces\CompanyRepositoryInterface;
 use HiEvents\Repository\Interfaces\CredentialRepositoryInterface;
 use HiEvents\Repository\Interfaces\DeviceRepositoryInterface;
 use HiEvents\Repository\Interfaces\EmailTemplateRepositoryInterface;
 use HiEvents\Repository\Interfaces\EventDailyStatisticRepositoryInterface;
+use HiEvents\Repository\Interfaces\EventExhibitorRepositoryInterface;
 use HiEvents\Repository\Interfaces\EventLocationRepositoryInterface;
 use HiEvents\Repository\Interfaces\EventOccurrenceDailyStatisticRepositoryInterface;
 use HiEvents\Repository\Interfaces\EventOccurrenceRepositoryInterface;
@@ -137,10 +149,14 @@ use HiEvents\Repository\Interfaces\EventSpamCheckRepositoryInterface;
 use HiEvents\Repository\Interfaces\EventStatisticRepositoryInterface;
 use HiEvents\Repository\Interfaces\EventUserRepositoryInterface;
 use HiEvents\Repository\Interfaces\EventVenueRepositoryInterface;
+use HiEvents\Repository\Interfaces\ExhibitorStaffRepositoryInterface;
 use HiEvents\Repository\Interfaces\FloorRepositoryInterface;
 use HiEvents\Repository\Interfaces\ImageRepositoryInterface;
 use HiEvents\Repository\Interfaces\InvitationRepositoryInterface;
 use HiEvents\Repository\Interfaces\InvoiceRepositoryInterface;
+use HiEvents\Repository\Interfaces\LeadCaptureRepositoryInterface;
+use HiEvents\Repository\Interfaces\LeadConsentRepositoryInterface;
+use HiEvents\Repository\Interfaces\LeadRepositoryInterface;
 use HiEvents\Repository\Interfaces\LocationRepositoryInterface;
 use HiEvents\Repository\Interfaces\MessageRepositoryInterface;
 use HiEvents\Repository\Interfaces\OrderApplicationFeeRepositoryInterface;
@@ -268,6 +284,14 @@ class RepositoryServiceProvider extends ServiceProvider
         SeatRepositoryInterface::class => SeatRepository::class,
         BoothRepositoryInterface::class => BoothRepository::class,
         EventVenueRepositoryInterface::class => EventVenueRepository::class,
+        ApiKeyRepositoryInterface::class => ApiKeyRepository::class,
+        CompanyRepositoryInterface::class => CompanyRepository::class,
+        EventExhibitorRepositoryInterface::class => EventExhibitorRepository::class,
+        ExhibitorStaffRepositoryInterface::class => ExhibitorStaffRepository::class,
+        BoothAssignmentRepositoryInterface::class => BoothAssignmentRepository::class,
+        LeadRepositoryInterface::class => LeadRepository::class,
+        LeadCaptureRepositoryInterface::class => LeadCaptureRepository::class,
+        LeadConsentRepositoryInterface::class => LeadConsentRepository::class,
         PermissionRepositoryInterface::class => PermissionRepository::class,
         PermissionRoleRepositoryInterface::class => PermissionRoleRepository::class,
         PermissionRolePermissionRepositoryInterface::class => PermissionRolePermissionRepository::class,

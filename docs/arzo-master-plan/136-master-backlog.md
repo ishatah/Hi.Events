@@ -160,10 +160,10 @@ feature and cost far less before it than after.
 | ARZ-121 | Hardware | Print host + printer registry + raster adapters (`37`, `39`) | L | ARZ-071 | TODO |
 | ARZ-122 | Hardware | RFID/NFC read + encode via `credential_media` (`36`) | XL | ARZ-120, ARZ-052, ARZ-314 | TODO |
 | ARZ-123 | Hardware | Device health + fleet dashboard | M | ARZ-100, ARZ-104 | TODO |
-| ARZ-130 | Exhibitors | `companies` + `event_exhibitors` + magic-link portal (`32`) | L | ARZ-011 | TODO — approach changed |
-| ARZ-131 | Exhibitors | Booth correction + `booth_assignments` (`35`) | M | ARZ-021, ARZ-130, ARZ-314 | TODO — approach changed |
-| ARZ-132 | Exhibitors | Staff passes as `EXHIBITOR` accreditations within quota (`32`) | M | ARZ-051, ARZ-130 | TODO — approach changed |
-| ARZ-133 | Exhibitors | Lead capture (capture-now-resolve-later) + export, with consent records (`33`, `65`) | L | ARZ-132 | TODO |
+| ARZ-130 | Exhibitors | `companies` + `event_exhibitors` + magic-link portal (`32`) | L | ARZ-011 | **PARTLY DONE** — `companies`, `event_exhibitors`, `exhibitor_staff` schema + services; organizer CRUD endpoints and the magic-link portal not built |
+| ARZ-131 | Exhibitors | Booth correction + `booth_assignments` (`35`) | M | ARZ-021, ARZ-130, ARZ-314 | **DONE** — `booths.event_id` correction + `booth_assignments` with hold/assign/built/release; one-primary index proven against 6-way concurrency |
+| ARZ-132 | Exhibitors | Staff passes as `EXHIBITOR` accreditations within quota (`32`) | M | ARZ-051, ARZ-130 | **DONE** — staff passes are `EXHIBITOR` accreditations inside quota; withdrawal revokes the credential |
+| ARZ-133 | Exhibitors | Lead capture (capture-now-resolve-later) + export, with consent records (`33`, `65`) | L | ARZ-132 | **PARTLY DONE** — capture/resolve/consent services with hashed identifiers and `shared_fields` snapshots; CSV export and portal UI not built |
 | ARZ-134 | Exhibitors | Lead qualification + scoring | M | ARZ-133 | TODO |
 | ARZ-140 | Messaging | Phone capture (E.164) first, then SMS/WhatsApp provider behind the `69` channel abstraction (`43`) | M | — | TODO |
 | ARZ-141 | Messaging | Push infrastructure — attendee web push with ARZ-150; **staff native push does not wait for the attendee app** (`44`, `97`) | L | — | TODO |
