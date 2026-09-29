@@ -158,7 +158,13 @@ export const safeLocalStorageRemove = (key: string): void => {
  * If you wish to remove this notice, a commercial license is available at: https://hi.events/licensing
  */
 export const iHavePurchasedALicence = () => {
-    return getConfig('VITE_I_HAVE_PURCHASED_A_LICENCE');
+    const value = getConfig('VITE_I_HAVE_PURCHASED_A_LICENCE');
+
+    // Env values arrive as strings, so the documented VITE_I_HAVE_PURCHASED_A_LICENCE=false
+    // was truthy and suppressed the attribution the AGPL requires. Only an explicit
+    // affirmative counts, and anything unrecognised keeps the notice: the failure mode of
+    // this check has to be compliance, not silence.
+    return value === 'true' || value === '1';
 }
 
 export const isHiEvents = () => {
