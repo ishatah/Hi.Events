@@ -184,11 +184,11 @@ feature and cost far less before it than after.
 
 | ID | Epic | Item | Cx | Depends on | Status |
 |---|---|---|---|---|---|
-| ARZ-200 | Ops | Staff, shifts, assignments — credentials via `STAFF` accreditation (`57`) | L | ARZ-011, ARZ-051 | TODO |
-| ARZ-201 | Ops | Tasks + checklists | M | ARZ-200 | TODO |
-| ARZ-202 | Ops | Incident management | M | ARZ-104 | TODO |
-| ARZ-203 | Ops | Vendors + procurement | M | — | TODO |
-| ARZ-204 | Ops | Event readiness gates + go/no-go | M | ARZ-201 | TODO |
+| ARZ-200 | Ops | Staff, shifts, assignments — credentials via `STAFF` accreditation (`57`) | L | ARZ-011, ARZ-051 | **PARTLY DONE** — `staff_positions`/`shifts`/`shift_assignments`/`staff_profiles` + rostering service; double-booking refused by a GiST constraint. HTTP layer not built |
+| ARZ-201 | Ops | Tasks + checklists | M | ARZ-200 | **PARTLY DONE** — task templates with relative anchors, instantiation, reschedule, waive/complete with evidence. HTTP layer not built |
+| ARZ-202 | Ops | Incident management | M | ARZ-104 | **PARTLY DONE** — incidents with per-event references, status machine, update trail, acknowledgement-breach list. HTTP layer not built |
+| ARZ-203 | Ops | Vendors + procurement | M | — | **PARTLY DONE** — `event_vendors`/`vendor_staff` schema reusing `companies`. Procurement (purchase orders) and HTTP layer not built |
+| ARZ-204 | Ops | Event readiness gates + go/no-go | M | ARZ-201 | **PARTLY DONE** — `readiness_reviews`/`readiness_items` with frozen snapshots, automated checks and waiver-gated GO. HTTP layer not built |
 | ARZ-210 | Networking | Attendee networking + meetings | L | ARZ-150 | TODO |
 | ARZ-211 | Engagement | eRaffle | S | ARZ-150 | TODO |
 | ARZ-212 | Engagement | Live polls + Q&A | M | ARZ-104, ARZ-150 | TODO |
