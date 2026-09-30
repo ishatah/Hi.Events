@@ -50,6 +50,7 @@ enum Permission: string
     case GUEST_LIST_MANAGE = 'guest_list.manage';
     case SPONSOR_MANAGE = 'sponsor.manage';
     case RAFFLE_MANAGE = 'raffle.manage';
+    case NETWORKING_MANAGE = 'networking.manage';
 
     case DEVICE_MANAGE = 'device.manage';
     case DEVICE_SUBMIT_SCAN = 'device.submit_scan';

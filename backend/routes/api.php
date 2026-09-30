@@ -209,6 +209,11 @@ use HiEvents\Http\Actions\Messages\CancelMessageAction;
 use HiEvents\Http\Actions\Messages\GetMessageRecipientsAction;
 use HiEvents\Http\Actions\Messages\GetMessagesAction;
 use HiEvents\Http\Actions\Messages\SendMessageAction;
+use HiEvents\Http\Actions\Networking\CancelMeetingAction;
+use HiEvents\Http\Actions\Networking\GetNetworkingDirectoryAction;
+use HiEvents\Http\Actions\Networking\GetPersonMeetingsAction;
+use HiEvents\Http\Actions\Networking\RequestMeetingAction;
+use HiEvents\Http\Actions\Networking\RespondToMeetingAction;
 use HiEvents\Http\Actions\Operations\AssignShiftAction;
 use HiEvents\Http\Actions\Operations\DecideReadinessReviewAction;
 use HiEvents\Http\Actions\Operations\GetIncidentSummaryAction;
@@ -744,6 +749,13 @@ $router->middleware(['auth:api'])->group(
         $router->get('/events/{event_id}/sponsorships/{sponsorship_id}/fulfilment', GetSponsorshipFulfilmentAction::class);
         $router->post('/events/{event_id}/sponsorships/{sponsorship_id}/entitlements', AddSponsorshipEntitlementAction::class);
         $router->post('/events/{event_id}/sponsorship-entitlements/{entitlement_id}/fulfilment', RecordEntitlementFulfilmentAction::class);
+
+        // Networking and meetings, arranged by the event team
+        $router->get('/events/{event_id}/networking/{person_id}/directory', GetNetworkingDirectoryAction::class);
+        $router->get('/events/{event_id}/networking/{person_id}/meetings', GetPersonMeetingsAction::class);
+        $router->post('/events/{event_id}/meetings', RequestMeetingAction::class);
+        $router->post('/events/{event_id}/meetings/{meeting_id}/respond', RespondToMeetingAction::class);
+        $router->delete('/events/{event_id}/meetings/{meeting_id}', CancelMeetingAction::class);
 
         // Raffles, drawn from the access log and auditable by construction
         $router->get('/events/{event_id}/raffles', GetRafflesAction::class);
