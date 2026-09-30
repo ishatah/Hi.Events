@@ -218,7 +218,7 @@ class SpaceAndProgrammeApiTest extends TestCase
 
         $id = $this->postJson("/events/{$this->eventId}/credentials", [
             'attendee_id' => $attendeeId,
-        ], $this->authHeaders($this->token))->json('data.id');
+        ], $this->authHeaders($this->token))->assertCreated()->json('data.id');
 
         $this->postJson("/events/{$this->eventId}/credentials/{$id}/revoke", [], $this->authHeaders($this->token))
             ->assertStatus(422);
