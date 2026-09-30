@@ -4,6 +4,7 @@ namespace Tests\Feature\Services\Domain\Device;
 
 use HiEvents\Exceptions\ResourceConflictException;
 use HiEvents\Models\User;
+use HiEvents\Services\Domain\Credential\CredentialIdentifierService;
 use HiEvents\Services\Domain\Device\AccessReconciliationService;
 use HiEvents\Services\Domain\Device\DeviceEnrolmentService;
 use HiEvents\Services\Domain\Device\DeviceSyncService;
@@ -502,7 +503,7 @@ class DeviceSyncServiceTest extends TestCase
             'updated_at' => now(),
         ]);
 
-        $identifier = Str::lower(Str::random(40));
+        $identifier = app(CredentialIdentifierService::class)->generate();
 
         return (int) DB::table('credentials')->insertGetId([
             'short_id' => 'cr_'.Str::lower(Str::random(20)),
@@ -512,7 +513,7 @@ class DeviceSyncServiceTest extends TestCase
             'credential_type' => 'STAFF',
             'status' => 'ACTIVE',
             'identifier' => $identifier,
-            'identifier_hash' => hash('sha256', $identifier),
+            'identifier_hash' => app(CredentialIdentifierService::class)->hash($identifier),
             'issued_at' => now(),
             'created_at' => now(),
             'updated_at' => now(),

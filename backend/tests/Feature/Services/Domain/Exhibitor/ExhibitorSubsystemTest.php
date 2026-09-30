@@ -6,6 +6,7 @@ use HiEvents\DomainObjects\Enums\LeadCaptureResolution;
 use HiEvents\DomainObjects\Status\ExhibitorStatus;
 use HiEvents\Exceptions\ResourceConflictException;
 use HiEvents\Models\User;
+use HiEvents\Services\Domain\Credential\CredentialIdentifierService;
 use HiEvents\Services\Domain\Exhibitor\BoothAssignmentService;
 use HiEvents\Services\Domain\Exhibitor\ExhibitorStaffService;
 use HiEvents\Services\Domain\Exhibitor\LeadCaptureService;
@@ -494,7 +495,12 @@ class ExhibitorSubsystemTest extends TestCase
     {
         $eventId ??= $this->eventId;
         $personId = $this->makePerson();
-        $identifier = Str::lower(Str::random(40));
+
+        // Through the service, so the fixture cannot drift from the format the resolver
+        // expects: a hand-rolled identifier that hashes differently reads as an unknown
+        // credential and the test then proves nothing about consent.
+        $identifierService = app(CredentialIdentifierService::class);
+        $identifier = $identifierService->generate();
 
         DB::table('credentials')->insert([
             'short_id' => 'cr_'.Str::lower(Str::random(20)),
@@ -504,7 +510,7 @@ class ExhibitorSubsystemTest extends TestCase
             'credential_type' => 'ATTENDEE',
             'status' => 'ACTIVE',
             'identifier' => $identifier,
-            'identifier_hash' => hash('sha256', $identifier),
+            'identifier_hash' => $identifierService->hash($identifier),
             'issued_at' => now(),
             'created_at' => now(),
             'updated_at' => now(),
@@ -544,7 +550,8 @@ class ExhibitorSubsystemTest extends TestCase
 
     private function makeCredentialFor(int $accreditationId, int $personId): int
     {
-        $identifier = Str::lower(Str::random(40));
+        $identifierService = app(CredentialIdentifierService::class);
+        $identifier = $identifierService->generate();
 
         return (int) DB::table('credentials')->insertGetId([
             'short_id' => 'cr_'.Str::lower(Str::random(20)),
@@ -554,7 +561,7 @@ class ExhibitorSubsystemTest extends TestCase
             'credential_type' => 'EXHIBITOR',
             'status' => 'ACTIVE',
             'identifier' => $identifier,
-            'identifier_hash' => hash('sha256', $identifier),
+            'identifier_hash' => $identifierService->hash($identifier),
             'issued_at' => now(),
             'created_at' => now(),
             'updated_at' => now(),

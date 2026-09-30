@@ -8,6 +8,7 @@ use HiEvents\Models\User;
 use HiEvents\Services\Domain\Badge\BadgeIssuanceService;
 use HiEvents\Services\Domain\Badge\BadgePrintJobService;
 use HiEvents\Services\Domain\Badge\BadgeTemplatePresetService;
+use HiEvents\Services\Domain\Credential\CredentialIdentifierService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -343,7 +344,7 @@ class BadgeLifecycleTest extends TestCase
             'updated_at' => now(),
         ]);
 
-        $identifier = Str::lower(Str::random(40));
+        $identifier = app(CredentialIdentifierService::class)->generate();
 
         return (int) DB::table('credentials')->insertGetId([
             'short_id' => 'cr_'.Str::lower(Str::random(20)),
@@ -353,7 +354,7 @@ class BadgeLifecycleTest extends TestCase
             'credential_type' => 'STAFF',
             'status' => 'ACTIVE',
             'identifier' => $identifier,
-            'identifier_hash' => hash('sha256', $identifier),
+            'identifier_hash' => app(CredentialIdentifierService::class)->hash($identifier),
             'issued_at' => now(),
             'created_at' => now(),
             'updated_at' => now(),

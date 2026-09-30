@@ -7,6 +7,7 @@ use HiEvents\DomainObjects\Enums\AccessDirection;
 use HiEvents\DomainObjects\Enums\AccessResult;
 use HiEvents\Models\User;
 use HiEvents\Services\Domain\Analytics\AttendanceAnalyticsService;
+use HiEvents\Services\Domain\Credential\CredentialIdentifierService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -482,7 +483,7 @@ class AttendanceAnalyticsServiceTest extends TestCase
             'updated_at' => now(),
         ]);
 
-        $identifier = Str::lower(Str::random(40));
+        $identifier = app(CredentialIdentifierService::class)->generate();
 
         return (int) DB::table('credentials')->insertGetId([
             'short_id' => 'cr_'.Str::lower(Str::random(20)),
@@ -492,7 +493,7 @@ class AttendanceAnalyticsServiceTest extends TestCase
             'credential_type' => 'ATTENDEE',
             'status' => 'ACTIVE',
             'identifier' => $identifier,
-            'identifier_hash' => hash('sha256', $identifier),
+            'identifier_hash' => app(CredentialIdentifierService::class)->hash($identifier),
             'issued_at' => now(),
             'created_at' => now(),
             'updated_at' => now(),

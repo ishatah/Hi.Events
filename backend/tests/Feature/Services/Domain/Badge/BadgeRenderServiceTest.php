@@ -8,6 +8,7 @@ use HiEvents\Models\User;
 use HiEvents\Services\Domain\Badge\BadgeQrCodeService;
 use HiEvents\Services\Domain\Badge\BadgeRenderService;
 use HiEvents\Services\Domain\Badge\BadgeTemplatePresetService;
+use HiEvents\Services\Domain\Credential\CredentialIdentifierService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -109,10 +110,20 @@ class BadgeRenderServiceTest extends TestCase
     {
         $matrix = Encoder::encode($this->identifier, ErrorCorrectionLevel::H(), 'UTF-8')->getMatrix();
 
+        // A version-4 symbol, not the version-5 the same 40 characters needed in lower case.
+        // Upper-case lets the encoder use alphanumeric mode instead of byte mode, so the
+        // printed code has fewer, larger modules and reads faster on a phone camera. This is
+        // the payoff ARZ-313 predicted, measured rather than assumed.
         $this->assertSame(
+            33,
+            $matrix->getWidth(),
+            'An upper-case 40-character identifier at ECC H should fit a version 4 symbol.'
+        );
+
+        $this->assertLessThan(
             37,
             $matrix->getWidth(),
-            'A 40-character identifier at ECC H should fit a version 5 symbol.'
+            'A denser symbol than the lower-case format would be a regression, not a change.'
         );
 
         $png = $this->qrService->png($this->identifier);
@@ -234,7 +245,7 @@ class BadgeRenderServiceTest extends TestCase
             'updated_at' => now(),
         ]);
 
-        $identifier = Str::lower(Str::random(40));
+        $identifier = app(CredentialIdentifierService::class)->generate();
 
         $credentialId = (int) DB::table('credentials')->insertGetId([
             'short_id' => 'cr_'.Str::lower(Str::random(20)),
@@ -244,7 +255,7 @@ class BadgeRenderServiceTest extends TestCase
             'credential_type' => 'MEDIA',
             'status' => 'ACTIVE',
             'identifier' => $identifier,
-            'identifier_hash' => hash('sha256', $identifier),
+            'identifier_hash' => app(CredentialIdentifierService::class)->hash($identifier),
             'issued_at' => now(),
             'created_at' => now(),
             'updated_at' => now(),

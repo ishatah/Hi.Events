@@ -3,6 +3,7 @@
 namespace Tests\Feature\Database\Migrations;
 
 use HiEvents\Models\User;
+use HiEvents\Services\Domain\Credential\CredentialIdentifierService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -289,7 +290,7 @@ class Phase2AccreditationSchemaTest extends TestCase
             'credential_type' => 'ATTENDEE',
             'status' => 'ACTIVE',
             'identifier' => $identifier,
-            'identifier_hash' => hash('sha256', $identifier),
+            'identifier_hash' => app(CredentialIdentifierService::class)->hash($identifier),
             'created_at' => now(),
             'updated_at' => now(),
         ], $source));

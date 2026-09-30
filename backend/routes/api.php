@@ -215,6 +215,9 @@ use HiEvents\Http\Actions\Networking\GetNetworkingDirectoryAction;
 use HiEvents\Http\Actions\Networking\GetPersonMeetingsAction;
 use HiEvents\Http\Actions\Networking\RequestMeetingAction;
 use HiEvents\Http\Actions\Networking\RespondToMeetingAction;
+use HiEvents\Http\Actions\Notification\GetPushHealthAction;
+use HiEvents\Http\Actions\Notification\RegisterPushSubscriptionAction;
+use HiEvents\Http\Actions\Notification\RevokePushSubscriptionAction;
 use HiEvents\Http\Actions\Operations\AssignShiftAction;
 use HiEvents\Http\Actions\Operations\DecideReadinessReviewAction;
 use HiEvents\Http\Actions\Operations\GetIncidentSummaryAction;
@@ -750,6 +753,11 @@ $router->middleware(['auth:api'])->group(
         $router->get('/events/{event_id}/sponsorships/{sponsorship_id}/fulfilment', GetSponsorshipFulfilmentAction::class);
         $router->post('/events/{event_id}/sponsorships/{sponsorship_id}/entitlements', AddSponsorshipEntitlementAction::class);
         $router->post('/events/{event_id}/sponsorship-entitlements/{entitlement_id}/fulfilment', RecordEntitlementFulfilmentAction::class);
+
+        // Push subscriptions, scoped to the caller so nobody can silence another person
+        $router->post('/push-subscriptions', RegisterPushSubscriptionAction::class);
+        $router->delete('/push-subscriptions', RevokePushSubscriptionAction::class);
+        $router->get('/events/{event_id}/push-health', GetPushHealthAction::class);
 
         // The event-day dashboard, in one response so every figure shares an instant
         $router->get('/events/{event_id}/command-centre', GetCommandCentreSnapshotAction::class);

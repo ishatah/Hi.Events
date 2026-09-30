@@ -6,6 +6,7 @@ use HiEvents\DomainObjects\Enums\AccessDirection;
 use HiEvents\DomainObjects\Enums\AccessResult;
 use HiEvents\Models\User;
 use HiEvents\Services\Domain\Access\ZoneOccupancyService;
+use HiEvents\Services\Domain\Credential\CredentialIdentifierService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -207,7 +208,7 @@ class ZoneOccupancyServiceTest extends TestCase
      */
     private function makeCredential(): int
     {
-        $identifier = Str::lower(Str::random(40));
+        $identifier = app(CredentialIdentifierService::class)->generate();
         $personId = $this->makePerson();
 
         return (int) DB::table('credentials')->insertGetId([
@@ -218,7 +219,7 @@ class ZoneOccupancyServiceTest extends TestCase
             'credential_type' => 'STAFF',
             'status' => 'ACTIVE',
             'identifier' => $identifier,
-            'identifier_hash' => hash('sha256', $identifier),
+            'identifier_hash' => app(CredentialIdentifierService::class)->hash($identifier),
             'issued_at' => now(),
             'created_at' => now(),
             'updated_at' => now(),
