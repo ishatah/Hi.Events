@@ -103,6 +103,74 @@ class AccountDeletionExecutionTest extends TestCase
         $this->assertContains('orders', array_column($manifest, 'entity'));
     }
 
+    public function test_anonymization_erases_the_identity_records_accreditation_holds(): void
+    {
+        $personId = $this->seedIdentityGraph();
+
+        $this->app->make(AccountAnonymizationService::class)->anonymizeAccount($this->account->id);
+
+        $person = DB::table('persons')->where('id', $personId)->first();
+
+        $this->assertSame('Anonymized', $person->first_name);
+        $this->assertStringContainsString('@anonymized.invalid', $person->email);
+        $this->assertNull($person->phone);
+        $this->assertNull(
+            $person->id_document_number,
+            'An identity document number outliving the account it belonged to is the most '
+            .'sensitive data on the platform surviving the deletion meant to remove it.'
+        );
+        $this->assertNull($person->date_of_birth);
+        $this->assertNull($person->nationality);
+
+        $invitation = DB::table('invitations')->where('event_id', $this->event->id)->first();
+        $this->assertSame('Anonymized', $invitation->first_name);
+        $this->assertNull(
+            $invitation->token_hash,
+            'Whoever holds the token can still answer for the invitee, so it goes with the rest.'
+        );
+
+        $lead = DB::table('leads')->where('event_id', $this->event->id)->first();
+        $this->assertSame(
+            '{}',
+            $lead->shared_fields,
+            'The capture-time snapshot is a copy of the person, so scrubbing the person alone '
+            .'would leave their details readable here.'
+        );
+    }
+
+    public function test_anonymization_leaves_the_access_log_intact(): void
+    {
+        $personId = $this->seedIdentityGraph();
+
+        DB::table('access_logs')->insert([
+            'short_id' => 'al_anonymisationtest01',
+            'event_id' => $this->event->id,
+            'person_id' => $personId,
+            'occurred_at' => now()->subHour(),
+            'recorded_at' => now()->subHour(),
+            'direction' => 'ENTRY',
+            'result' => 'GRANTED',
+            'raw_identifier' => 'IDENTIFIERTEST',
+            'identifier_type' => 'QR',
+            'source' => 'SCANNER',
+            'created_at' => now(),
+        ]);
+
+        $this->app->make(AccountAnonymizationService::class)->anonymizeAccount($this->account->id);
+
+        $this->assertDatabaseHas('access_logs', [
+            'short_id' => 'al_anonymisationtest01',
+            'result' => 'GRANTED',
+        ]);
+        $this->assertSame(
+            'Anonymized',
+            DB::table('persons')->where('id', $personId)->value('first_name'),
+            'The link to a named individual is severed by scrubbing the person, not by '
+            .'rewriting the log: a log with rows removed can no longer be reconciled, and '
+            .'reconciliation is the reason it exists.'
+        );
+    }
+
     public function test_hard_deletion_removes_account_graph_and_preserves_shared_users(): void
     {
         $this->app->make(AccountHardDeletionService::class)
@@ -119,6 +187,78 @@ class AccountDeletionExecutionTest extends TestCase
         $this->assertDatabaseHas('users', ['id' => $this->sharedUser->id]);
         $this->assertDatabaseHas('accounts', ['id' => $this->otherAccount->id]);
         $this->assertDatabaseCount('question_answers', 1);
+    }
+
+    /**
+     * A person with the identity fields accreditation collects, plus the records that copy
+     * them: an invitation with a live token and a lead carrying a capture-time snapshot.
+     */
+    private function seedIdentityGraph(): int
+    {
+        $personId = (int) DB::table('persons')->insertGetId([
+            'short_id' => 'pe_anonymisationtest01',
+            'account_id' => $this->account->id,
+            'first_name' => 'Layla',
+            'last_name' => 'Rahman',
+            'email' => 'layla@example.com',
+            'phone' => '+97433123456',
+            'company' => 'Acme Corp',
+            'job_title' => 'Director',
+            'id_document_type' => 'PASSPORT',
+            'id_document_number' => 'A1234567',
+            'date_of_birth' => '1990-04-01',
+            'nationality' => 'QA',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        DB::table('invitations')->insert([
+            'short_id' => 'iv_anonymisationtest01',
+            'event_id' => $this->event->id,
+            'person_id' => $personId,
+            'first_name' => 'Layla',
+            'last_name' => 'Rahman',
+            'email' => 'layla@example.com',
+            'phone' => '+97433123456',
+            'token_hash' => hash('sha256', 'a-live-token'),
+            'max_party_size' => 2,
+            'status' => 'SENT',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $companyId = (int) DB::table('companies')->insertGetId([
+            'short_id' => 'co_anonymisationtest01',
+            'account_id' => $this->account->id,
+            'name' => 'Acme Corp',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $exhibitorId = (int) DB::table('event_exhibitors')->insertGetId([
+            'short_id' => 'ee_anonymisationtest01',
+            'event_id' => $this->event->id,
+            'company_id' => $companyId,
+            'status' => 'ACTIVE',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        DB::table('leads')->insert([
+            'short_id' => 'ld_anonymisationtest01',
+            'event_id' => $this->event->id,
+            'event_exhibitor_id' => $exhibitorId,
+            'person_id' => $personId,
+            'shared_fields' => json_encode(['first_name' => 'Layla', 'email' => 'layla@example.com']),
+            'first_captured_at' => now(),
+            'last_captured_at' => now(),
+            'capture_count' => 1,
+            'status' => 'NEW',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        return $personId;
     }
 
     private function seedAccountGraph(): void

@@ -120,6 +120,7 @@ use HiEvents\Http\Actions\CheckInLists\Public\GetCheckInListAttendeesPublicActio
 use HiEvents\Http\Actions\CheckInLists\Public\GetCheckInListPublicAction;
 use HiEvents\Http\Actions\CheckInLists\Public\GetCheckInListStatsPublicAction;
 use HiEvents\Http\Actions\CheckInLists\UpdateCheckInListAction;
+use HiEvents\Http\Actions\CommandCentre\GetCommandCentreSnapshotAction;
 use HiEvents\Http\Actions\Common\GetColorThemesAction;
 use HiEvents\Http\Actions\Common\Webhooks\StripeIncomingWebhookAction;
 use HiEvents\Http\Actions\Credential\GetCredentialsAction;
@@ -749,6 +750,9 @@ $router->middleware(['auth:api'])->group(
         $router->get('/events/{event_id}/sponsorships/{sponsorship_id}/fulfilment', GetSponsorshipFulfilmentAction::class);
         $router->post('/events/{event_id}/sponsorships/{sponsorship_id}/entitlements', AddSponsorshipEntitlementAction::class);
         $router->post('/events/{event_id}/sponsorship-entitlements/{entitlement_id}/fulfilment', RecordEntitlementFulfilmentAction::class);
+
+        // The event-day dashboard, in one response so every figure shares an instant
+        $router->get('/events/{event_id}/command-centre', GetCommandCentreSnapshotAction::class);
 
         // Networking and meetings, arranged by the event team
         $router->get('/events/{event_id}/networking/{person_id}/directory', GetNetworkingDirectoryAction::class);

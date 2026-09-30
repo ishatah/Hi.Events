@@ -6,6 +6,7 @@ use HiEvents\Services\Domain\Account\Anonymization\AccountDataResolver;
 use HiEvents\Services\Domain\Account\Anonymization\Anonymizers\AccountAnonymizer;
 use HiEvents\Services\Domain\Account\Anonymization\Anonymizers\ActivityLogAnonymizer;
 use HiEvents\Services\Domain\Account\Anonymization\Anonymizers\EventContentAnonymizer;
+use HiEvents\Services\Domain\Account\Anonymization\Anonymizers\IdentityAnonymizer;
 use HiEvents\Services\Domain\Account\Anonymization\Anonymizers\ImageAnonymizer;
 use HiEvents\Services\Domain\Account\Anonymization\Anonymizers\OrderAnonymizer;
 use HiEvents\Services\Domain\Account\Anonymization\Anonymizers\OrganizerAnonymizer;
@@ -27,6 +28,7 @@ class AccountAnonymizationService
         private readonly PartnerAnonymizer $partnerAnonymizer,
         private readonly UserAnonymizer $userAnonymizer,
         private readonly OrganizerAnonymizer $organizerAnonymizer,
+        private readonly IdentityAnonymizer $identityAnonymizer,
         private readonly ImageAnonymizer $imageAnonymizer,
         private readonly AccountAnonymizer $accountAnonymizer,
         private readonly DatabaseManager $databaseManager,
@@ -53,6 +55,7 @@ class AccountAnonymizationService
                 $this->partnerAnonymizer,
                 $this->userAnonymizer,
                 $this->organizerAnonymizer,
+                $this->identityAnonymizer,
                 $this->imageAnonymizer,
                 $this->accountAnonymizer,
             ];
