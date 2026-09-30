@@ -57,6 +57,7 @@ use HiEvents\Http\Actions\Admin\GetMessagingTiersAction;
 use HiEvents\Http\Actions\Admin\GetSystemInfoAction;
 use HiEvents\Http\Actions\Admin\Messages\ApproveMessageAction;
 use HiEvents\Http\Actions\Admin\Messages\GetAllMessagesAction as GetAllAdminMessagesAction;
+use HiEvents\Http\Actions\Admin\Messages\RejectMessageAction;
 use HiEvents\Http\Actions\Admin\Orders\GetAllOrdersAction;
 use HiEvents\Http\Actions\Admin\Organizers\AssignOrganizerConfigurationAction;
 use HiEvents\Http\Actions\Admin\Organizers\UpdateOrganizerConfigurationAction;
@@ -883,6 +884,7 @@ $router->prefix('/admin')->middleware(['auth:api'])->group(
         // Messages
         $router->get('/messages', GetAllAdminMessagesAction::class);
         $router->post('/messages/{message_id}/approve', ApproveMessageAction::class);
+        $router->post('/messages/{message_id}/reject', RejectMessageAction::class);
 
         // Spam Events
         $router->get('/spam-events', GetAllSpamEventsAction::class);

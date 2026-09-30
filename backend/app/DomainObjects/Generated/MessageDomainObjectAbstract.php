@@ -51,6 +51,8 @@ abstract class MessageDomainObjectAbstract extends AbstractDomainObject
 
     final public const SCHEDULED_AT = 'scheduled_at';
 
+    final public const REJECTION_REASON = 'rejection_reason';
+
     protected int $id;
 
     protected int $event_id;
@@ -89,6 +91,8 @@ abstract class MessageDomainObjectAbstract extends AbstractDomainObject
 
     protected ?string $scheduled_at = null;
 
+    protected ?string $rejection_reason = null;
+
     public function toArray(): array
     {
         return [
@@ -111,6 +115,7 @@ abstract class MessageDomainObjectAbstract extends AbstractDomainObject
             'deleted_at' => $this->deleted_at ?? null,
             'eligibility_failures' => $this->eligibility_failures ?? null,
             'scheduled_at' => $this->scheduled_at ?? null,
+            'rejection_reason' => $this->rejection_reason ?? null,
         ];
     }
 
@@ -340,5 +345,17 @@ abstract class MessageDomainObjectAbstract extends AbstractDomainObject
     public function getScheduledAt(): ?string
     {
         return $this->scheduled_at;
+    }
+
+    public function setRejectionReason(?string $rejection_reason): self
+    {
+        $this->rejection_reason = $rejection_reason;
+
+        return $this;
+    }
+
+    public function getRejectionReason(): ?string
+    {
+        return $this->rejection_reason;
     }
 }
