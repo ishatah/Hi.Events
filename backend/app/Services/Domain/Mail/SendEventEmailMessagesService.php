@@ -123,6 +123,12 @@ class SendEventEmailMessagesService
     ): void {
         $this->sendEmailToMessageSender($messageData, $event);
 
+        // A test send goes to the sender and stops there. Without this an organizer checking
+        // their wording emailed the real customer, which cannot be taken back.
+        if ($messageData->is_test) {
+            return;
+        }
+
         $this->sendMessage(
             emailAddress: $order->getEmail(),
             fullName: $order->getFullName(),
@@ -238,6 +244,10 @@ class SendEventEmailMessagesService
         }
 
         $this->sendEmailToMessageSender($messageData, $event);
+
+        if ($messageData->is_test) {
+            return;
+        }
 
         $orders->each(function (OrderDomainObject $order) use ($messageData, $event) {
             $this->sendMessage(
