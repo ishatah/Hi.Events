@@ -291,6 +291,12 @@ use HiEvents\Http\Actions\Questions\GetQuestionsPublicAction;
 use HiEvents\Http\Actions\Questions\SortQuestionsAction;
 use HiEvents\Http\Actions\Queue\GetAccessPointQueueAction;
 use HiEvents\Http\Actions\Queue\GetEventQueuesAction;
+use HiEvents\Http\Actions\Raffle\CreateRaffleAction;
+use HiEvents\Http\Actions\Raffle\DrawRaffleAction;
+use HiEvents\Http\Actions\Raffle\GetRafflePoolAction;
+use HiEvents\Http\Actions\Raffle\GetRafflesAction;
+use HiEvents\Http\Actions\Raffle\RecordRaffleClaimAction;
+use HiEvents\Http\Actions\Raffle\VerifyRaffleDrawAction;
 use HiEvents\Http\Actions\Reports\ExportOrganizerReportAction;
 use HiEvents\Http\Actions\Reports\GetOrganizerReportAction;
 use HiEvents\Http\Actions\Reports\GetReportAction;
@@ -738,6 +744,14 @@ $router->middleware(['auth:api'])->group(
         $router->get('/events/{event_id}/sponsorships/{sponsorship_id}/fulfilment', GetSponsorshipFulfilmentAction::class);
         $router->post('/events/{event_id}/sponsorships/{sponsorship_id}/entitlements', AddSponsorshipEntitlementAction::class);
         $router->post('/events/{event_id}/sponsorship-entitlements/{entitlement_id}/fulfilment', RecordEntitlementFulfilmentAction::class);
+
+        // Raffles, drawn from the access log and auditable by construction
+        $router->get('/events/{event_id}/raffles', GetRafflesAction::class);
+        $router->post('/events/{event_id}/raffles', CreateRaffleAction::class);
+        $router->get('/events/{event_id}/raffles/{raffle_id}/pool', GetRafflePoolAction::class);
+        $router->post('/events/{event_id}/raffles/{raffle_id}/draw', DrawRaffleAction::class);
+        $router->get('/events/{event_id}/raffles/{raffle_id}/draws/{draw_id}/verify', VerifyRaffleDrawAction::class);
+        $router->post('/events/{event_id}/raffles/{raffle_id}/winners/{winner_id}/claim', RecordRaffleClaimAction::class);
 
         // Guest list (RSVP)
         $router->get('/events/{event_id}/invitations', GetGuestListAction::class);
