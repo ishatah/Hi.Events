@@ -52,11 +52,11 @@ waits for it. Each item's evidence is in the cited document.
 | ARZ-302 | **P0** | Access time windows evaluate in UTC, not venue time | S | Before any rule UI and before golden vectors | `115`, `94` | **DONE** — daily and day-of-week windows convert to venue time; absolute windows stay instants |
 | ARZ-303 | **P0** | `persons` ID document and date-of-birth fields stored in plaintext | S | Before any ID-collecting accreditation type | `65`, `115` | **DONE** — `id_document_number`, `id_document_type` and `date_of_birth` cast to `encrypted` on the model, so no write path can bypass it; verified the raw column holds ciphertext and that a plain `where` cannot match it |
 | ARZ-307 | **P0** | Scan-path occupancy: computed every scan, cost grows with the zone's history — make conditional, aggregate in SQL, read snapshots | M | Before any live access scanning | `74`, `75`, `125` | **DONE** — aggregated in SQL, skipped entirely unless the zone or a rule enforces capacity, snapshot-backed |
-| ARZ-313 | **P0** | Credential identifier format: versioned prefix, upper-case, case-insensitive resolution | S | Before the first printed badge | `38` | TODO |
-| ARZ-314 | **P0** | Schema corrections while tables are empty: `booths.event_id` + `booth_assignments`; `credential_media`; `session_attendance` direction; `device_id` columns | M | Before the first writer of each table | `35`, `36`, `40`, `54` | TODO |
+| ARZ-313 | **P0** | Credential identifier format: versioned prefix, upper-case, case-insensitive resolution | S | Before the first printed badge | `38` | **DONE** — `C1` prefix, 40 upper-case alphanumeric chars (QR alphanumeric mode, not byte mode), generation and normalisation in one service. The live bug was case-sensitive hashing: a Caps-Lock wedge scan read as an unknown credential. Four call sites hashed independently, including booth lead capture |
+| ARZ-314 | **P0** | Schema corrections while tables are empty: `booths.event_id` + `booth_assignments`; `credential_media`; `session_attendance` direction; `device_id` columns | M | Before the first writer of each table | `35`, `36`, `40`, `54` | **DONE** — all four landed with their subsystems (ARZ-131, ARZ-122, ARZ-082, ARZ-100); verified present against the live schema |
 | ARZ-320 | **P0** | Access rules ignore `subject_type`/`subject_id` — a DENY for one badge closes the zone to all; every ALLOW is copied to every credential | M | Before the rule CRUD merges and before golden vectors | `124` ST1, `115` | **DONE** — both paths match subject; absent subject type ≠ null |
 | ARZ-321 | **P0** | Scan endpoint trust: access point not checked against the event or `is_active`; replay lookup crosses tenants; client `occurred_at` and `direction` trusted; `device_id` dropped; concurrent replay → 500 | M | Before the scan route merges | `94`, `107`, `124`, `125` | **DONE** — point checked via `event_venues` + `is_active`; replay scoped per event (unique index now `(event_id, client_generated_id)`); device clock clamped to +5min/-7d; `device_id` recorded and exposed; concurrent replay caught |
-| ARZ-323 | **P0** | Account deletion leaves names and emails in `persons` and never touches credentials, badges, access logs, invitations | M | Before any data-bearing deploy | `108`, `65` | TODO |
+| ARZ-323 | **P0** | Account deletion leaves names and emails in `persons` and never touches credentials, badges, access logs, invitations | M | Before any data-bearing deploy | `108`, `65` | **DONE** — `IdentityAnonymizer` scrubs `persons` (including the encrypted document number, date of birth and nationality), invitations with their live token hash, lead snapshots, networking profiles and connection notes. Access logs are deliberately retained: the link to a named individual is severed by scrubbing the person, because a log with rows removed can no longer be reconciled |
 | ARZ-304 | P1 | Webhook retries never run (`dispatchSync`); head-of-line blocking; job untested; `DispatchOccurrenceWebhookJob` runs synchronously | S | Soon | `49`, `70` | TODO |
 | ARZ-306 | P1 | Stripe webhook accepts before verifying; raw payloads logged on failure | S | Soon | `50`, `124` | TODO |
 | ARZ-308 | P1 | Exports cap silently at 10,000 rows; event-report CSV built in the browser without escaping | M | Soon | `51`, `107` | TODO |
@@ -155,7 +155,7 @@ feature and cost far less before it than after.
 |---|---|---|---|---|---|
 | ARZ-110 | On-site | Kiosk app: self check-in | L | ARZ-101 | TODO |
 | ARZ-111 | On-site | Walk-in registration at the door | M | ARZ-110 | TODO |
-| ARZ-112 | On-site | Queue management + wait estimates | M | ARZ-063 | TODO |
+| ARZ-112 | On-site | Queue management + wait estimates | M | ARZ-063 | **DONE** — derived from the scan stream, no sensors. Denials count toward arrival rate (a denying gate is slower, not faster) and a clustered-denial door is flagged as a probable rule rather than a crowd. Waits are a range with a one-hour ceiling plus a qualitative state; snapshots every 60s give the arrival curve |
 | ARZ-120 | Hardware | Scanner abstraction (camera, USB, BT, dedicated) | L | ARZ-100 | TODO |
 | ARZ-121 | Hardware | Print host + printer registry + raster adapters (`37`, `39`) | L | ARZ-071 | TODO |
 | ARZ-122 | Hardware | RFID/NFC read + encode via `credential_media` (`36`) | XL | ARZ-120, ARZ-052, ARZ-314 | **PARTLY DONE** — `credential_media` with hashed UIDs, replace-chain and a one-live-tag index. The on-device encoder is hardware |
@@ -164,20 +164,22 @@ feature and cost far less before it than after.
 | ARZ-131 | Exhibitors | Booth correction + `booth_assignments` (`35`) | M | ARZ-021, ARZ-130, ARZ-314 | **DONE** — `booths.event_id` correction + `booth_assignments` with hold/assign/built/release; one-primary index proven against 6-way concurrency |
 | ARZ-132 | Exhibitors | Staff passes as `EXHIBITOR` accreditations within quota (`32`) | M | ARZ-051, ARZ-130 | **DONE** — staff passes are `EXHIBITOR` accreditations inside quota; withdrawal revokes the credential |
 | ARZ-133 | Exhibitors | Lead capture (capture-now-resolve-later) + export, with consent records (`33`, `65`) | L | ARZ-132 | **DONE** — capture/resolve/consent with hashed identifiers, snapshots, HTTP endpoints and stats. CSV export not built |
-| ARZ-134 | Exhibitors | Lead qualification + scoring | M | ARZ-133 | TODO |
-| ARZ-140 | Messaging | Phone capture (E.164) first, then SMS/WhatsApp provider behind the `69` channel abstraction (`43`) | M | — | TODO |
+| ARZ-134 | Exhibitors | Lead qualification + scoring | M | ARZ-133 | **DONE** — transparent arithmetic with a per-component breakdown, not a model. Unrated scores above cold (a busy booth rates nobody), revisit points saturate, and profile points read the capture-time snapshot rather than the live person row |
+| ARZ-135 | Sponsors | Sponsorships, packages and fulfilment evidence (`34`) | M | ARZ-130 | **DONE** — a separate participation from exhibiting, sharing only the company, because most sponsors have no booth and most exhibitors never sponsor. Packages are a price list; each sponsorship instantiates its own entitlements, since real deals are negotiated away from the list. Evidence accumulates, waived entitlements stop counting as owed, and cancelling removes the sponsor from the public page in the same operation. The public strip carries no contract value |
+| ARZ-139 | Messaging | Notification bus: delivery log, suppression, quiet hours, fallback (`69`) | L | — | **DONE** — deliberately not Laravel Notifications, since most recipients are attendees, persons and staff rather than users, and routing was never the missing part. Recipients frozen as delivery rows at queue time; addresses hashed and masked; `SENDING` written before the provider call so a retry on a metered channel records `UNKNOWN` rather than paying to interrupt somebody twice. Quiet hours in venue time, bypassed for critical and account messages. Escalation never repeats a channel or reuses a failed address |
+| ARZ-140 | Messaging | Phone capture (E.164) first, then SMS/WhatsApp provider behind the `69` channel abstraction (`43`) | M | — | **PARTLY DONE** — E.164 normalisation with a Qatar default and per-calling-code length checks, plus the SMS segment counter (an Arabic character forces UCS-2, so 140 Arabic characters are three billed segments where the English equivalent is one). **The provider is not chosen**: that needs quotes and a delivery test to real Qatari numbers, which is a commercial decision |
 | ARZ-141 | Messaging | Push infrastructure — attendee web push with ARZ-150; **staff native push does not wait for the attendee app** (`44`, `97`) | L | — | TODO |
 | ARZ-142 | Messaging | Email segmentation / filter builder | L | — | TODO |
 | ARZ-150 | Mobile | Attendee app: ticket, agenda, notifications | XL | ARZ-083 | TODO |
 | ARZ-151 | Mobile | Venue map | L | ARZ-021, ARZ-150 | TODO |
 | ARZ-152 | Mobile | Native scanner app | L | ARZ-101 | TODO |
 | ARZ-160 | Seating | Seat maps + assignment — **deferred** until a real event needs it; table seating first (`26`) | L | ARZ-022, ARZ-314 | DEFERRED |
-| ARZ-170 | Analytics | Live command center | L | ARZ-104, ARZ-063 | TODO |
+| ARZ-170 | Analytics | Live command center | L | ARZ-104, ARZ-063 | **DONE** (API) — counters derive from the access log, never stored totals that drift under offline replay. Denials broken out by reason; the screen reports its own staleness, so a gate whose device has not synced is marked provisional. Alerts cover what attendees feel, and a quiet event produces none. UI not built |
 | ARZ-171 | Analytics | Attendance + no-show + dwell reporting | M | ARZ-040 | **DONE** — attendance, arrival curve, peak, dwell over HTTP |
 | ARZ-172 | Analytics | Session attendance analytics | M | ARZ-082 | **DONE** — session no-show ranking over HTTP |
 | ARZ-173 | Analytics | Demographics | M | ARZ-010 | **DONE** — demographics with suppression over HTTP |
 | ARZ-180 | CRM | HubSpot / Salesforce integration | L | ARZ-090 | TODO |
-| ARZ-190 | Registration | RSVP as a distinct flow | M | — | TODO |
+| ARZ-190 | Registration | RSVP as a distinct flow | M | — | **DONE** — invitation tokens stored hashed and returned once; revoking nulls the hash so the link dies immediately. Over-quota acceptances refused rather than trimmed, declining forces party 0, and tentative guests counted apart from expected so catering is not planned against maybes |
 | ARZ-191 | Payments | A Qatar-licensed payment gateway — **raise to P1**: Stripe does not list Qatar as a supported country, so ARZO cannot be merchant of record through it (`98`, `135`) | L | business: gateway choice | TODO |
 
 ## P3 — Differentiation
@@ -189,8 +191,8 @@ feature and cost far less before it than after.
 | ARZ-202 | Ops | Incident management | M | ARZ-104 | **DONE** — report, transition, summary and breach list over HTTP |
 | ARZ-203 | Ops | Vendors + procurement | M | — | **PARTLY DONE** — `event_vendors`/`vendor_staff` schema reusing `companies`. Procurement (purchase orders) and HTTP layer not built |
 | ARZ-204 | Ops | Event readiness gates + go/no-go | M | ARZ-201 | **DONE** — open/decide with waiver-gated GO over HTTP |
-| ARZ-210 | Networking | Attendee networking + meetings | L | ARZ-150 | TODO |
-| ARZ-211 | Engagement | eRaffle | S | ARZ-150 | TODO |
+| ARZ-210 | Networking | Attendee networking + meetings | L | ARZ-150 | **PARTLY DONE** — connections keyed on the unordered person pair, two-way blocking, contact shared only where offered; meetings warn on a clash at request and refuse it at confirmation. HTTP surface is organizer-side: the attendee-facing one needs an attendee identity, and `30` leaves accounts-versus-magic-links open |
+| ARZ-211 | Engagement | eRaffle | S | ARZ-150 | **DONE** — pool from the access log, so a ticket holder who stayed home cannot win. Seeded hash sort rather than shuffle(), so the recorded seed reproduces the winners and a contested prize is settled by re-running; verify reports whether the pool has since changed. Staff and exhibitors excluded by default |
 | ARZ-212 | Engagement | Live polls + Q&A | M | ARZ-104, ARZ-150 | TODO |
 | ARZ-220 | Intelligence | Predictive attendance | L | ARZ-171 | TODO |
 | ARZ-221 | Intelligence | Predictive queues | M | ARZ-112 | TODO |
