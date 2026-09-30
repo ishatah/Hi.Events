@@ -2,6 +2,7 @@
 
 namespace HiEvents\Services\Application\Handlers\Auth;
 
+use HiEvents\DomainObjects\Enums\InvitedUserPassword;
 use HiEvents\DomainObjects\Status\UserStatus;
 use HiEvents\Exceptions\ResourceConflictException;
 use HiEvents\Repository\Interfaces\AccountUserRepositoryInterface;
@@ -57,15 +58,30 @@ class AcceptInvitationHandler
             throw new ResourceConflictException(__('The invitation has already been accepted'));
         }
 
-        $this->userRepository->updateWhere(
-            attributes: [
+        // Users are global and can belong to several accounts, so the invitation must not
+        // touch credentials that already exist. Overwriting them meant anyone who could
+        // invite an email address could reset that person's password on the account they
+        // already had, and rename them while doing it.
+        $isNewUser = InvitedUserPassword::isUnset($user->getPassword());
+
+        $attributes = [
+            'email_verified_at' => $user->getEmailVerifiedAt() ?? now(),
+        ];
+
+        if ($isNewUser) {
+            $attributes += [
                 'first_name' => $invitationData->first_name,
                 'last_name' => $invitationData->last_name,
                 'password' => $this->hasher->make($invitationData->password),
                 'timezone' => $invitationData->timezone,
-                'email_verified_at' => now(),
-                'marketing_opted_in_at' => $invitationData->marketing_opt_in ? now()->toDateTimeString() : null,
-            ],
+                'marketing_opted_in_at' => $invitationData->marketing_opt_in
+                    ? now()->toDateTimeString()
+                    : null,
+            ];
+        }
+
+        $this->userRepository->updateWhere(
+            attributes: $attributes,
             where: [
                 'id' => $userId,
             ]

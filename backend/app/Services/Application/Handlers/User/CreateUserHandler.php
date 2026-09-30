@@ -3,6 +3,7 @@
 namespace HiEvents\Services\Application\Handlers\User;
 
 use HiEvents\DomainObjects\AccountDomainObject;
+use HiEvents\DomainObjects\Enums\InvitedUserPassword;
 use HiEvents\DomainObjects\Enums\Role;
 use HiEvents\DomainObjects\Status\UserStatus;
 use HiEvents\DomainObjects\UserDomainObject;
@@ -68,7 +69,7 @@ readonly class CreateUserHandler
                 'first_name' => $userData->first_name,
                 'last_name' => $userData->last_name,
                 'email' => strtolower($userData->email),
-                'password' => 'invited', // initially, a user is in an invited state, so they don't have a password
+                'password' => InvitedUserPassword::SENTINEL,
                 'timezone' => $authenticatedAccount->getTimezone(),
             ]);
     }
