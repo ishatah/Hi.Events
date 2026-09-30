@@ -16,13 +16,4 @@ class QueuedNotificationDTO extends BaseDataObject
         public readonly int $skipped,
     ) {}
 
-    /**
-     * Recipients the platform could not reach on any channel the category allows. Reported
-     * rather than swallowed: a gate change that reached nobody is an operational fact
-     * somebody needs to know before the gate opens.
-     */
-    public function hasUnreachableRecipients(): bool
-    {
-        return $this->skipped > 0;
-    }
 }

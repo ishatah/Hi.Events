@@ -22,8 +22,4 @@ class OperationalAlertDTO extends BaseDataObject
         public readonly string $detail,
     ) {}
 
-    public function isHigh(): bool
-    {
-        return $this->severity === 'HIGH';
-    }
 }

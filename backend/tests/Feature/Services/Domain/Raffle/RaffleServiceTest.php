@@ -269,9 +269,9 @@ class RaffleServiceTest extends TestCase
 
         $draw = $this->service->draw($this->makeRaffle(winnerCount: 5));
 
-        $this->assertCount(2, $draw->winnerPersonIds);
-        $this->assertTrue(
-            $draw->wasPoolExhausted(5),
+        $this->assertCount(
+            2,
+            $draw->winnerPersonIds,
             'Announcing five winners when only two exist is worse than announcing two.'
         );
     }

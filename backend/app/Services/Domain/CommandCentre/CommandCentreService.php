@@ -208,10 +208,25 @@ class CommandCentreService
             return [];
         }
 
-        $latest = $this->databaseManager->table('zone_occupancy_snapshots')
-            ->whereIn('zone_id', $zones->pluck('id'))
-            ->orderByDesc('captured_at')
-            ->get(['zone_id', 'occupancy', 'captured_at'])
+        $zoneIds = $zones->pluck('id');
+
+        // One row per zone from the database rather than every snapshot ever taken: the
+        // occupancy job writes every thirty seconds, so a multi-day event would otherwise load
+        // tens of thousands of rows to keep a handful.
+        //
+        // Keyed on the latest captured_at rather than the highest id, because a backfill or a
+        // replayed sync can insert an older measurement afterwards, and the dashboard must
+        // show the most recent reading rather than the most recently written row.
+        $latest = $this->databaseManager->table('zone_occupancy_snapshots as s')
+            ->whereIn('s.zone_id', $zoneIds)
+            ->whereRaw(
+                's.captured_at = (
+                    select max(latest.captured_at)
+                    from zone_occupancy_snapshots latest
+                    where latest.zone_id = s.zone_id
+                )'
+            )
+            ->get(['s.zone_id', 's.occupancy', 's.captured_at'])
             ->unique('zone_id')
             ->keyBy('zone_id');
 

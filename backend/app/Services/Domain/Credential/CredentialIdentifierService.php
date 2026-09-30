@@ -60,19 +60,4 @@ class CredentialIdentifierService
     {
         return hash('sha256', $this->normalise($scanned));
     }
-
-    /**
-     * Whether a scanned token looks like one of ours at all.
-     *
-     * Lets a scanner tell a credential from a ticket code or a random barcode without a
-     * database round trip, which matters on a device that may be offline.
-     */
-    public function looksLikeCredential(string $scanned): bool
-    {
-        $normalised = $this->normalise($scanned);
-
-        return strlen($normalised) === strlen(self::VERSION_PREFIX) + self::RANDOM_LENGTH
-            && str_starts_with($normalised, self::VERSION_PREFIX)
-            && ctype_alnum($normalised);
-    }
 }

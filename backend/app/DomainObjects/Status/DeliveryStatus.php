@@ -25,14 +25,6 @@ enum DeliveryStatus: string
     case EXPIRED = 'EXPIRED';
     case UNKNOWN = 'UNKNOWN';
 
-    public function isTerminal(): bool
-    {
-        return match ($this) {
-            self::PENDING, self::DEFERRED, self::SENDING => false,
-            default => true,
-        };
-    }
-
     /**
      * Whether the message reached the recipient as far as the channel can tell. UNKNOWN is
      * deliberately excluded: it means a paid send may or may not have happened, and treating

@@ -120,12 +120,13 @@ class NotificationServiceTest extends TestCase
             now: $this->daytime,
         );
 
-        $this->assertSame(1, $result->skipped);
-        $this->assertTrue(
-            $result->hasUnreachableRecipients(),
+        $this->assertSame(
+            1,
+            $result->skipped,
             'A gate change that reached nobody is an operational fact somebody needs before '
-            .'the gate opens.'
+            .'the gate opens, so it is counted rather than swallowed.'
         );
+        $this->assertSame(0, $result->queued);
     }
 
     public function test_an_invalid_address_is_skipped_rather_than_queued(): void

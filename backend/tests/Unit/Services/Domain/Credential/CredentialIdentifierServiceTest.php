@@ -111,42 +111,16 @@ class CredentialIdentifierServiceTest extends TestCase
         );
     }
 
-    // ---------------------------------------------------------------- recognition
+    // ---------------------------------------------------------------- legacy codes
 
-    public function test_a_generated_identifier_is_recognised(): void
-    {
-        $this->assertTrue($this->service->looksLikeCredential($this->service->generate()));
-    }
-
-    public function test_a_lower_case_or_padded_scan_is_still_recognised(): void
+    public function test_the_format_stays_distinguishable_from_a_legacy_ticket_code(): void
     {
         $identifier = $this->service->generate();
 
-        $this->assertTrue($this->service->looksLikeCredential(strtolower($identifier)));
-        $this->assertTrue($this->service->looksLikeCredential(" {$identifier} "));
-    }
-
-    public function test_a_legacy_ticket_code_is_not_mistaken_for_a_credential(): void
-    {
-        $this->assertFalse(
-            $this->service->looksLikeCredential('A-ABC123XYZ'),
-            'Tickets already emailed carry A- codes and cannot be recalled, so the two shapes '
-            .'have to stay distinguishable.'
-        );
-    }
-
-    public function test_a_random_barcode_is_not_mistaken_for_a_credential(): void
-    {
-        foreach (['', '12345', 'C1', 'C1SHORT', str_repeat('X', 40), 'C1'.str_repeat('X', 37)] as $candidate) {
-            $this->assertFalse(
-                $this->service->looksLikeCredential($candidate),
-                sprintf('%s should not be recognised as a credential.', var_export($candidate, true))
-            );
-        }
-    }
-
-    public function test_a_token_with_punctuation_is_not_recognised(): void
-    {
-        $this->assertFalse($this->service->looksLikeCredential('C1'.str_repeat('A', 36).'-!'));
+        // Tickets already emailed carry A- codes and cannot be recalled, so a scanner has to
+        // be able to tell the two shapes apart. Asserted on the format rather than through a
+        // recogniser, because recognising a scan is the device's job.
+        $this->assertStringStartsNotWith('A-', $identifier);
+        $this->assertStringNotContainsString('-', $identifier);
     }
 }

@@ -208,6 +208,21 @@ class CommandCentreServiceTest extends TestCase
         $this->assertFalse($occupancy[0]['at_capacity']);
     }
 
+    public function test_the_newest_snapshot_wins_even_when_rows_arrive_out_of_order(): void
+    {
+        // A backfill or a replayed sync can write an older measurement after a newer one.
+        // The dashboard has to show the most recent reading, not the most recently written
+        // row, or it silently reports a stale number as current.
+        $this->snapshot(90, $this->now->subSeconds(20));
+        $this->snapshot(30, $this->now->subMinutes(10));
+
+        $this->assertSame(
+            90,
+            $this->service->occupancy($this->eventId)[0]['occupancy'],
+            'The newest measurement wins, whatever order the rows were inserted in.'
+        );
+    }
+
     public function test_a_zone_with_no_snapshot_reads_as_unknown_rather_than_empty(): void
     {
         $occupancy = $this->service->occupancy($this->eventId);

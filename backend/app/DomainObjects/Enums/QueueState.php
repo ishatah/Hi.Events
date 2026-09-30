@@ -15,8 +15,4 @@ enum QueueState: string
     case BUSY = 'BUSY';
     case CONGESTED = 'CONGESTED';
 
-    public function needsAttention(): bool
-    {
-        return $this === self::BUSY || $this === self::CONGESTED;
-    }
 }

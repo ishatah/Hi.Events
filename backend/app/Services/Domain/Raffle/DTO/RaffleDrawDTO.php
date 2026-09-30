@@ -19,12 +19,4 @@ class RaffleDrawDTO extends BaseDataObject
         public readonly array $winnerPersonIds,
     ) {}
 
-    /**
-     * Fewer winners than the prize count means the pool ran out, which the organizer needs to
-     * know before announcing three winners of which only two exist.
-     */
-    public function wasPoolExhausted(int $requestedWinnerCount): bool
-    {
-        return count($this->winnerPersonIds) < $requestedWinnerCount;
-    }
 }

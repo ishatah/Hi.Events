@@ -21,15 +21,6 @@ enum NotificationChannel: string
         return $this === self::SMS || $this === self::WHATSAPP;
     }
 
-    /**
-     * Whether the channel reports that a human actually read it. Email opens are not
-     * tracked, and web push has no delivery receipt at all.
-     */
-    public function reportsRead(): bool
-    {
-        return $this === self::WHATSAPP || $this === self::PUSH || $this === self::IN_APP;
-    }
-
     public function usesPhoneNumber(): bool
     {
         return $this === self::SMS || $this === self::WHATSAPP;
