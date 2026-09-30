@@ -20,9 +20,13 @@ readonly class LoginHandler
             email: $loginCredentials->email,
             password: $loginCredentials->password,
             requestedAccountId: $loginCredentials->accountId,
+            mfaCode: $loginCredentials->mfaCode,
         );
 
-        if ($loginResponse->accountId !== null) {
+        // Only a login that produced a token happened. A second factor still owed, or an
+        // account yet to be chosen, would otherwise stamp last_login_at for a session that
+        // was never issued.
+        if ($loginResponse->accountId !== null && $loginResponse->token !== null) {
             $this->accountUserRepository->updateWhere(
                 attributes: [
                     'last_login_at' => now(),

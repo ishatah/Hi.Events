@@ -211,6 +211,10 @@ use HiEvents\Http\Actions\Messages\CancelMessageAction;
 use HiEvents\Http\Actions\Messages\GetMessageRecipientsAction;
 use HiEvents\Http\Actions\Messages\GetMessagesAction;
 use HiEvents\Http\Actions\Messages\SendMessageAction;
+use HiEvents\Http\Actions\Mfa\BeginMfaEnrolmentAction;
+use HiEvents\Http\Actions\Mfa\ConfirmMfaEnrolmentAction;
+use HiEvents\Http\Actions\Mfa\DisableMfaAction;
+use HiEvents\Http\Actions\Mfa\GetMfaStatusAction;
 use HiEvents\Http\Actions\Networking\CancelMeetingAction;
 use HiEvents\Http\Actions\Networking\GetNetworkingDirectoryAction;
 use HiEvents\Http\Actions\Networking\GetPersonMeetingsAction;
@@ -754,6 +758,12 @@ $router->middleware(['auth:api'])->group(
         $router->get('/events/{event_id}/sponsorships/{sponsorship_id}/fulfilment', GetSponsorshipFulfilmentAction::class);
         $router->post('/events/{event_id}/sponsorships/{sponsorship_id}/entitlements', AddSponsorshipEntitlementAction::class);
         $router->post('/events/{event_id}/sponsorship-entitlements/{entitlement_id}/fulfilment', RecordEntitlementFulfilmentAction::class);
+
+        // Two-factor authentication, scoped to the caller
+        $router->get('/auth/mfa', GetMfaStatusAction::class);
+        $router->post('/auth/mfa', BeginMfaEnrolmentAction::class);
+        $router->post('/auth/mfa/confirm', ConfirmMfaEnrolmentAction::class);
+        $router->delete('/auth/mfa', DisableMfaAction::class);
 
         // Push subscriptions, scoped to the caller so nobody can silence another person
         $router->post('/push-subscriptions', RegisterPushSubscriptionAction::class);

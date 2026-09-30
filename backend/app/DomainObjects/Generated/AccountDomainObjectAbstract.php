@@ -47,6 +47,8 @@ abstract class AccountDomainObjectAbstract extends AbstractDomainObject
 
     final public const COUNTRY = 'country';
 
+    final public const REQUIRE_MFA = 'require_mfa';
+
     protected int $id;
 
     protected ?int $account_configuration_id = null;
@@ -81,6 +83,8 @@ abstract class AccountDomainObjectAbstract extends AbstractDomainObject
 
     protected ?string $country = null;
 
+    protected bool $require_mfa = false;
+
     public function toArray(): array
     {
         return [
@@ -101,6 +105,7 @@ abstract class AccountDomainObjectAbstract extends AbstractDomainObject
             'stripe_connect_account_type' => $this->stripe_connect_account_type ?? null,
             'is_manually_verified' => $this->is_manually_verified ?? null,
             'country' => $this->country ?? null,
+            'require_mfa' => $this->require_mfa ?? null,
         ];
     }
 
@@ -306,5 +311,17 @@ abstract class AccountDomainObjectAbstract extends AbstractDomainObject
     public function getCountry(): ?string
     {
         return $this->country;
+    }
+
+    public function setRequireMfa(bool $require_mfa): self
+    {
+        $this->require_mfa = $require_mfa;
+
+        return $this;
+    }
+
+    public function getRequireMfa(): bool
+    {
+        return $this->require_mfa;
     }
 }

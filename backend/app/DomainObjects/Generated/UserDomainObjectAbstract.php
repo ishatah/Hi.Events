@@ -41,6 +41,12 @@ abstract class UserDomainObjectAbstract extends AbstractDomainObject
 
     final public const MARKETING_OPTED_IN_AT = 'marketing_opted_in_at';
 
+    final public const MFA_SECRET_ENCRYPTED = 'mfa_secret_encrypted';
+
+    final public const MFA_CONFIRMED_AT = 'mfa_confirmed_at';
+
+    final public const MFA_LAST_USED_TIMESTEP = 'mfa_last_used_timestep';
+
     protected int $id;
 
     protected string $email;
@@ -69,6 +75,12 @@ abstract class UserDomainObjectAbstract extends AbstractDomainObject
 
     protected ?string $marketing_opted_in_at = null;
 
+    protected ?string $mfa_secret_encrypted = null;
+
+    protected ?string $mfa_confirmed_at = null;
+
+    protected ?int $mfa_last_used_timestep = null;
+
     public function toArray(): array
     {
         return [
@@ -86,6 +98,9 @@ abstract class UserDomainObjectAbstract extends AbstractDomainObject
             'timezone' => $this->timezone ?? null,
             'locale' => $this->locale ?? null,
             'marketing_opted_in_at' => $this->marketing_opted_in_at ?? null,
+            'mfa_secret_encrypted' => $this->mfa_secret_encrypted ?? null,
+            'mfa_confirmed_at' => $this->mfa_confirmed_at ?? null,
+            'mfa_last_used_timestep' => $this->mfa_last_used_timestep ?? null,
         ];
     }
 
@@ -255,5 +270,41 @@ abstract class UserDomainObjectAbstract extends AbstractDomainObject
     public function getMarketingOptedInAt(): ?string
     {
         return $this->marketing_opted_in_at;
+    }
+
+    public function setMfaSecretEncrypted(?string $mfa_secret_encrypted): self
+    {
+        $this->mfa_secret_encrypted = $mfa_secret_encrypted;
+
+        return $this;
+    }
+
+    public function getMfaSecretEncrypted(): ?string
+    {
+        return $this->mfa_secret_encrypted;
+    }
+
+    public function setMfaConfirmedAt(?string $mfa_confirmed_at): self
+    {
+        $this->mfa_confirmed_at = $mfa_confirmed_at;
+
+        return $this;
+    }
+
+    public function getMfaConfirmedAt(): ?string
+    {
+        return $this->mfa_confirmed_at;
+    }
+
+    public function setMfaLastUsedTimestep(?int $mfa_last_used_timestep): self
+    {
+        $this->mfa_last_used_timestep = $mfa_last_used_timestep;
+
+        return $this;
+    }
+
+    public function getMfaLastUsedTimestep(): ?int
+    {
+        return $this->mfa_last_used_timestep;
     }
 }

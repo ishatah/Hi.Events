@@ -21,13 +21,18 @@ readonly class LoginService
         private JWTAuth $jwtAuth,
         private LoggerInterface $logger,
         private AccountUserRepositoryInterface $accountUserRepository,
+        private MfaService $mfaService,
     ) {}
 
     /**
      * @throws UnauthorizedException
      */
-    public function authenticate(string $email, string $password, ?int $requestedAccountId): LoginResponse
-    {
+    public function authenticate(
+        string $email,
+        string $password,
+        ?int $requestedAccountId,
+        ?string $mfaCode = null,
+    ): LoginResponse {
         // todo - refactor this so we don't have to call the jwtAuth twice
         $token = $this->jwtAuth->attempt([
             'email' => strtolower($email),
@@ -56,6 +61,38 @@ readonly class LoginService
         }
 
         $userRole = $this->getUserRole($accountId, $userAccounts);
+
+        // The password was right, but a second factor may still be owed. Interposed here
+        // rather than after the token is minted, because a token issued first is a completed
+        // login whatever the client does with the challenge afterwards.
+        $userId = $user->getId();
+
+        if ($this->mfaService->isEnabled($userId)) {
+            if ($mfaCode === null) {
+                return new LoginResponse(
+                    accounts: $accounts,
+                    token: null,
+                    user: $user,
+                    accountId: $accountId,
+                    mfaRequired: true,
+                );
+            }
+
+            if (! $this->mfaService->verify($userId, $mfaCode)) {
+                throw new UnauthorizedException(__('That two-factor code is not valid'));
+            }
+        } elseif ($this->mfaService->isRequiredFor($userId)) {
+            // An account insists on a factor this user has not set up. Refusing the login
+            // outright would lock them out with no way back, so they are sent to enrol —
+            // still with no token, so nothing else is reachable until they do.
+            return new LoginResponse(
+                accounts: $accounts,
+                token: null,
+                user: $user,
+                accountId: $accountId,
+                mfaEnrolmentRequired: true,
+            );
+        }
 
         return new LoginResponse(
             accounts: $accounts,
