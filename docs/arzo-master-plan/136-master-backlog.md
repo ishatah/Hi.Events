@@ -63,7 +63,7 @@ waits for it. Each item's evidence is in the cited document.
 | ARZ-309 | P1 | Scanner and public check-in: Arabic keyboard layout breaks the wedge; per-IP limit shared by a venue's scanners; email matched in public search; link can undo check-ins, even on expired lists; camera defects | M | Soon | `38`, `75`, `103` | TODO |
 | ARZ-310 | P1 | Consent and SEO: pixels without consent by default; event pages ignore noindex; JSON-LD status; `lang="en"` for every locale; Bunny Fonts as an undisclosed processor | S | Soon | `41`, `81`, `84` | TODO |
 | ARZ-311 | P1 | Publish rules server-side; status transition rules; restore statuses on cancelled account deletion | S | Soon | `56` | TODO |
-| ARZ-312 | P1 | Accounts: invitation acceptance overwrites global password and name; deactivated SUPERADMIN keeps `/admin` for up to 7 days; impersonation tokens last 7 days, start/stop unlogged, request payloads logged in full | M | Soon | `57`, `89`, `65`, `67` | TODO |
+| ARZ-312 | P1 | Accounts: invitation acceptance overwrites global password and name; deactivated SUPERADMIN keeps `/admin` for up to 7 days; impersonation tokens last 7 days, start/stop unlogged, request payloads logged in full | M | Soon | `57`, `89`, `65`, `67` | **PARTLY DONE** — the password overwrite is fixed, and it was worse than recorded: users are global, so accepting an invitation to a second account reset the password and renamed the person on the account they already had. Acceptance now sets credentials only for a user who has none. **Still open:** `validateUserRole()` checks the role but never the account-user status, so a deactivated SUPERADMIN keeps `/admin` until their JWT expires; impersonation TTL and payload logging unchanged |
 | ARZ-319 | P1 | Audit spine: `audit_events`; retire `event_logs`; actor on order audit | M | Before ARZ-051 | `67` | TODO |
 | ARZ-322 | P1 | Self-host defaults let strangers register, auto-verify and take card payments into the installation's Stripe | S | Before any deployment | `100` | TODO |
 | ARZ-324 | P1 | Sentry receives organizer email, name and IP on every exception; no browser Sentry SDK | S | Soon | `78`, `86` | TODO |
@@ -145,7 +145,7 @@ feature and cost far less before it than after.
 | ARZ-092 | API | Device-scoped keys (stored on `devices`, shared resolver with API keys) | M | ARZ-090 | **DONE** — device keys resolve through the same hasher and authenticator; minimal scopes by device type; suspension revokes |
 | ARZ-100 | Offline | Device registry + enrolment, heartbeat, commands | M | ARZ-092, ARZ-314 | **DONE** — register, pair, heartbeat, commands, suspend, fleet status, all reachable over HTTP |
 | ARZ-101 | Offline | Local store + sync protocol | XL | ARZ-100, ARZ-061 | **PARTLY DONE** — server side complete and reachable at `POST /device/sync`. The on-device local store is the client half |
-| ARZ-102 | Offline | Conflict resolution + reconciliation reporting | L | ARZ-101 | **PARTLY DONE** — findings recorded and reviewable over HTTP. Review UI is frontend |
+| ARZ-102 | Offline | Conflict resolution + reconciliation reporting | L | ARZ-101 | **PARTLY DONE** — findings recorded and reviewable over HTTP. `108` C2 also fixed: `is_offline_replay` was inferred from a two-minute clock heuristic, so a slow online retry was flagged as an offline decision and a fast offline replay was not flagged at all — reconciliation was reading a field that did not mean what it said. Now declared by the caller. Review UI is frontend |
 | ARZ-103 | Offline | Emergency/degraded mode UX | M | ARZ-101 | TODO |
 | ARZ-104 | Realtime | Reverb transport + channel authorization | L | ARZ-011 | **DONE** — Reverb v1.12 verified under Laravel 13 (the spike the plan asked for), container added, channels gated on the RBAC permissions, 4 broadcast events wired |
 
@@ -198,6 +198,7 @@ feature and cost far less before it than after.
 | ARZ-221 | Intelligence | Predictive queues | M | ARZ-112 | TODO |
 | ARZ-222 | Intelligence | Automated post-event reports | M | ARZ-171 | TODO |
 | ARZ-223 | Intelligence | Venue heatmaps | M | ARZ-151, ARZ-040 | TODO |
+| ARZ-229 | Enterprise | MFA (TOTP) — **not** on demand; gates any external SaaS (`101`, `98` gate 5) | M | — | **DONE** — RFC 6238 verified against all five published test vectors, so authenticator apps interoperate. One step of skew (90s ceiling), the accepted step recorded under the same row lock so a code cannot be replayed inside its window, secret encrypted at rest, hashed single-use recovery codes issued at confirmation. Enforced between password check and token issuance: a password-only login returns 202 with only `mfa_required` — no token, user, accounts or Set-Cookie, verified over HTTP |
 | ARZ-230 | Enterprise | SSO — SAML/OIDC | L | ARZ-011 | TODO |
 | ARZ-231 | Enterprise | SCIM provisioning | M | ARZ-230 | TODO |
 
