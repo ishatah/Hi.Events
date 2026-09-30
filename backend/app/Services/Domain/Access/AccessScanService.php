@@ -7,6 +7,7 @@ namespace HiEvents\Services\Domain\Access;
 use Carbon\Carbon;
 use HiEvents\DomainObjects\Enums\AccessDirection;
 use HiEvents\DomainObjects\Enums\AccessResult;
+use HiEvents\Events\Realtime\AccessScanRecorded;
 use HiEvents\Services\Domain\Access\DTO\AccessContextDTO;
 use HiEvents\Services\Domain\Access\DTO\AccessDecisionDTO;
 use Illuminate\Database\DatabaseManager;
@@ -99,6 +100,18 @@ class AccessScanService
             occurredAt: $occurredAt,
             source: $source,
             isOfflineReplay: $clientGeneratedId !== null && $occurredAt->lt(Carbon::now()->subMinutes(2)),
+        );
+
+        // A live board wants the verdict and the place, not the holder. Pushing personal
+        // data down a channel several operators watch would put it on more screens than the
+        // decision needs.
+        AccessScanRecorded::dispatch(
+            $eventId,
+            $zoneId,
+            $accessPointId,
+            $decision->result->value,
+            $decision->isGranted(),
+            $occurredAt->toIso8601String(),
         );
 
         return $decision;

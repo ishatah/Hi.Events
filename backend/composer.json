@@ -19,6 +19,7 @@
         "lab404/laravel-impersonate": "^1.7",
         "laravel/ai": "^0.11.0",
         "laravel/framework": "^13.0",
+        "laravel/reverb": "^1.12",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^3.0",
         "laravel/vapor-core": "^2.37",

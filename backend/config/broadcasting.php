@@ -30,6 +30,27 @@ return [
 
     'connections' => [
 
+        // Reverb speaks the Pusher protocol, so the client libraries are unchanged — only
+        // the host it points at differs. Self-hosted, so there is no per-message cost at
+        // scan volume and attendee data never leaves the perimeter.
+        'reverb' => [
+            'driver' => 'reverb',
+            'key' => env('REVERB_APP_KEY'),
+            'secret' => env('REVERB_APP_SECRET'),
+            'app_id' => env('REVERB_APP_ID'),
+            'options' => [
+                'host' => env('REVERB_HOST', 'reverb'),
+                'port' => (int) env('REVERB_PORT', 8080),
+                'scheme' => env('REVERB_SCHEME', 'http'),
+                'useTLS' => env('REVERB_SCHEME', 'http') === 'https',
+            ],
+            'client_options' => [
+                // A door scan must not wait on a websocket server. If Reverb is slow or
+                // down the broadcast fails fast rather than holding the request.
+                'timeout' => 3,
+            ],
+        ],
+
         'pusher' => [
             'driver' => 'pusher',
             'key' => env('PUSHER_APP_KEY'),

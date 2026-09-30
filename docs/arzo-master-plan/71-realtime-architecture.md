@@ -1,6 +1,6 @@
 # Realtime & Offline-First Architecture
 
-**Status:** WRITTEN · **Authority:** Authoritative for sync and realtime · **Audit date:** 2026-09-28
+**Status:** WRITTEN · **Authority:** Authoritative for sync and realtime · **Audit date:** 2026-09-29 (refreshed; first written 2026-09-28) · **Baseline:** `develop` @ `e7228c1d`
 **Classification:** New subsystem + Infrastructure
 **Depends on:** `24-access-control.md`, `37-hardware-integration.md`
 **Blocks:** `19-kiosk-system.md`, `53-live-event-command-center.md`, `94-mobile-scanner.md`, `96-kiosk-application.md`
@@ -43,6 +43,21 @@ network round-trip. `UNVERIFIED` exactly what its failure UX is mid-scan — pen
 
 **Conclusion: a network drop stops check-in entirely today.**
 
+### What has landed since the first revision — `e7228c1d`
+
+| Piece | State |
+|---|---|
+| `access_logs.client_generated_id` UNIQUE, `occurred_at` / `recorded_at`, `is_offline_replay` | **In the schema** — the idempotency and replay foundations exist |
+| `AccessDecisionService` | **Pure function**, 35 table-driven tests — the thing a device must reproduce |
+| `devices` | Table + model + repository; **no guard, no pairing, heartbeat or sync endpoint** (`40`) |
+| `access_logs.device_id` | **Missing** — add before any device writes (`40`) |
+| Realtime transport | Still none |
+
+One refinement to this document's design: "the same decision function compiles to both" cannot be
+literal — the server is PHP, devices are TypeScript or native. Parity is achieved by exporting the
+server's table-driven cases as **language-neutral golden vectors** run against every device build in
+CI (`37`).
+
 ## Two distinct problems
 
 Routinely conflated; they need different solutions.
@@ -70,7 +85,7 @@ Routinely conflated; they need different solutions.
 | Polling | What exists. Fine for 30 s dashboards; useless for door events. |
 
 **Decision: Reverb**, with SSE acceptable as an interim for the command center if Reverb slips.
-`UNVERIFIED`: Reverb's behaviour under Laravel 13 in this codebase — needs a spike before commitment.
+`VERIFIED` (2026-09-30, ARZ-104): Reverb v1.12 resolves and runs under Laravel 13 in this codebase. A broadcast reaches it over the Pusher protocol. Two things the spike found: `config/reverb.php` must be published or the process starts and exits 0 with no apps to serve, and the base image's nginx healthcheck reports a WebSocket container unhealthy forever.
 
 ### Channels
 
@@ -166,7 +181,7 @@ Genuine conflicts and their rules:
 |---|---|
 | Same scan submitted twice | Idempotency key — no-op |
 | Two devices admit the same credential to a capacity-1 zone | Both logged. Server flags a violation for review. Not silently corrected. |
-| Offline scan of a revoked credential | Logged `GRANTED`, then flagged `retrospective_violation` |
+| Offline scan of a revoked credential | Logged `GRANTED`, then flagged as a retrospective violation — recorded beside the log in `access_reconciliation_findings` (`108`), never by editing the log. No such column or table exists yet. |
 | Offline walk-in duplicates an existing person | Server flags for merge; never auto-merges |
 | Device clock skew | Store both `occurred_at` and `recorded_at`; detect skew from heartbeats and warn |
 
@@ -235,7 +250,7 @@ this; it must include:
 - **PWA or native for scanners?** PWA is one codebase; native gives encrypted-at-rest storage, background sync, and hardware scanner access. Leaning native for scanner/kiosk, PWA for the attendee app. Decide in `94`/`96`.
 - **Peer-to-peer deny-list gossip.** Devices on the same venue LAN could share revocations without the internet. Valuable at high-security events, meaningful complexity. Phase 4+.
 - **Retention on device.** How long does a device keep synced logs? Shorter is better for breach exposure; longer helps field debugging.
-- **Reverb under Laravel 13.** `UNVERIFIED`. Needs a spike.
+- **Reverb under Laravel 13.** `VERIFIED` — see the transport section.
 
 ## Related
 

@@ -21,6 +21,41 @@ services:
         networks:
             - app
 
+    # Reverb is the WebSocket transport for live operational data. Self-hosted rather than
+    # Pusher or Ably: there is no per-message cost at scan volume, and attendee data never
+    # leaves the perimeter.
+    reverb:
+        # Reuses the backend image rather than rebuilding: the build context trips over
+        # public/storage, a symlink to an absolute container path that does not resolve on
+        # the host. Same code, same dependencies, one fewer image to keep in step.
+        image: development-backend:latest
+        container_name: reverb
+        ports:
+            - "${REVERB_HOST_PORT:-8091}:8080"
+        volumes:
+            - ./../../backend:/var/www/html
+            - ./../../backend/storage:/var/www/html/storage
+        # --host 0.0.0.0 so the port is reachable from outside the container; the default
+        # binds to localhost and the published port would refuse connections.
+        command: php artisan reverb:start --host=0.0.0.0 --port=8080
+        environment:
+            APP_ENV: '${APP_ENV:-local}'
+            APP_KEY: '${APP_KEY}'
+        depends_on:
+            - redis
+            - pgsql
+        networks:
+            - app
+        # The base image inherits an nginx healthcheck that curls an HTTP path. A WebSocket
+        # process serves no such path, so the container reported unhealthy forever. This
+        # checks the thing that actually matters: is something listening on the port.
+        healthcheck:
+            test: ["CMD", "sh", "-c", "php -r 'exit(@fsockopen(\"127.0.0.1\", 8080) ? 0 : 1);'"]
+            interval: 15s
+            timeout: 5s
+            retries: 3
+            start_period: 20s
+
     frontend-csr:
         build:
             context: ./../../frontend

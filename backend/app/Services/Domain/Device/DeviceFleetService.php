@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace HiEvents\Services\Domain\Device;
 
 use Carbon\Carbon;
+use HiEvents\Events\Realtime\DeviceStateChanged;
 use HiEvents\Exceptions\ResourceConflictException;
 use Illuminate\Database\DatabaseManager;
 use Illuminate\Support\Str;
@@ -234,5 +235,17 @@ class DeviceFleetService
             'occurred_at' => now(),
             'created_at' => now(),
         ]);
+
+        $device = $this->databaseManager->table('devices')->where('id', $deviceId)->first();
+
+        if ($device !== null && $device->event_id !== null) {
+            DeviceStateChanged::dispatch(
+                (int) $device->event_id,
+                $deviceId,
+                (string) $device->name,
+                $state,
+                $reason,
+            );
+        }
     }
 }

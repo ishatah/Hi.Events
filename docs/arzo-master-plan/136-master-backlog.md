@@ -147,7 +147,7 @@ feature and cost far less before it than after.
 | ARZ-101 | Offline | Local store + sync protocol | XL | ARZ-100, ARZ-061 | **PARTLY DONE** — server side complete and reachable at `POST /device/sync`. The on-device local store is the client half |
 | ARZ-102 | Offline | Conflict resolution + reconciliation reporting | L | ARZ-101 | **PARTLY DONE** — findings recorded and reviewable over HTTP. Review UI is frontend |
 | ARZ-103 | Offline | Emergency/degraded mode UX | M | ARZ-101 | TODO |
-| ARZ-104 | Realtime | Reverb transport + channel authorization | L | ARZ-011 | TODO |
+| ARZ-104 | Realtime | Reverb transport + channel authorization | L | ARZ-011 | **DONE** — Reverb v1.12 verified under Laravel 13 (the spike the plan asked for), container added, channels gated on the RBAC permissions, 4 broadcast events wired |
 
 ## P2 — Competitive parity
 

@@ -7,6 +7,7 @@ namespace HiEvents\Services\Domain\Operations;
 use Carbon\Carbon;
 use HiEvents\DomainObjects\Status\IncidentSeverity;
 use HiEvents\DomainObjects\Status\IncidentStatus;
+use HiEvents\Events\Realtime\IncidentRaised;
 use HiEvents\Exceptions\ResourceConflictException;
 use Illuminate\Database\DatabaseManager;
 use Illuminate\Support\Str;
@@ -77,6 +78,16 @@ class IncidentService
                 fromStatus: null,
                 toStatus: IncidentStatus::OPEN,
                 note: __('Reported'),
+            );
+
+            IncidentRaised::dispatch(
+                $eventId,
+                $incidentId,
+                (string) $this->databaseManager->table('incidents')->where('id', $incidentId)->value('reference'),
+                $title,
+                $severity->value,
+                IncidentStatus::OPEN->value,
+                $zoneId,
             );
 
             return $incidentId;

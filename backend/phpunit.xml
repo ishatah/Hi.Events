@@ -25,6 +25,10 @@
         <env name="DB_DATABASE" value="hievents_test" force="true"/>
         <env name="MAIL_MAILER" value="array"/>
         <env name="QUEUE_CONNECTION" value="sync"/>
+        <!-- Never a real transport in tests: a broadcast must not depend on a running
+             websocket server, and a suite that makes outbound HTTP calls is slow and
+             fails for reasons unrelated to the code. -->
+        <env name="BROADCAST_DRIVER" value="log"/>
         <env name="SESSION_DRIVER" value="array"/>
         <env name="TELESCOPE_ENABLED" value="false"/>
         <ini name="memory_limit" value="1G"/>
