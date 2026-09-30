@@ -250,6 +250,44 @@ class SpaceAndProgrammeApiTest extends TestCase
         $this->assertNotEmpty($logs->json('data'));
     }
 
+    public function test_a_credential_resolves_however_the_scanner_mangled_its_case(): void
+    {
+        $venueId = $this->createVenue();
+        $this->linkVenueToEvent($venueId, $this->eventId);
+        $zoneId = $this->createZone($venueId);
+
+        $accessPointId = $this->postJson("/zones/{$zoneId}/access-points", [
+            'name' => 'Wedge Door',
+            'code' => 'WEDGE',
+            'direction' => 'ENTRY',
+        ], $this->authHeaders($this->token))->json('data.id');
+
+        $attendeeId = $this->makeAttendee($this->eventId);
+
+        $issued = $this->postJson("/events/{$this->eventId}/credentials", [
+            'attendee_id' => $attendeeId,
+        ], $this->authHeaders($this->token))->assertCreated();
+
+        $identifier = (string) DB::table('credentials')
+            ->where('id', $issued->json('data.id'))
+            ->value('identifier');
+
+        // A keyboard-wedge scanner on a host with Caps Lock on inverts the case of everything
+        // it types, and appends a terminator. Either one failing to resolve is a badge that
+        // reads as an unknown credential at the gate.
+        foreach ([$identifier, strtolower($identifier), "  {$identifier}\r\n"] as $scanned) {
+            $this->postJson("/events/{$this->eventId}/access-scans", [
+                'identifier' => $scanned,
+                'access_point_id' => $accessPointId,
+            ], $this->authHeaders($this->token))
+                ->assertOk()
+                ->assertJsonPath(
+                    'result',
+                    fn (string $result): bool => $result !== 'DENIED_NO_CREDENTIAL'
+                );
+        }
+    }
+
     public function test_a_simulated_scan_returns_a_verdict_without_writing_a_log(): void
     {
         $venueId = $this->createVenue();

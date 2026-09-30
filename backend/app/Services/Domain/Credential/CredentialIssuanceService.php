@@ -27,6 +27,7 @@ class CredentialIssuanceService
     public function __construct(
         private readonly CredentialRepositoryInterface $credentialRepository,
         private readonly GrantMaterializationService $grantMaterializationService,
+        private readonly CredentialIdentifierService $identifierService,
         private readonly DatabaseManager $databaseManager,
     ) {}
 
@@ -87,16 +88,14 @@ class CredentialIssuanceService
         array $subjects = [],
     ): CredentialDomainObject {
         return $this->databaseManager->transaction(function () use ($eventId, $source, $accreditationTypeId, $approvedZoneIds, $subjects) {
-            // Opaque and random. A sequential or email-derived identifier would be a
-            // forgery vector, since the identifier is what a scanner reads.
-            $identifier = Str::lower(Str::random(40));
+            $identifier = $this->identifierService->generate();
 
             $credential = $this->credentialRepository->create(array_merge([
                 CredentialDomainObjectAbstract::SHORT_ID => 'cr_'.Str::lower(Str::random(20)),
                 CredentialDomainObjectAbstract::EVENT_ID => $eventId,
                 CredentialDomainObjectAbstract::STATUS => CredentialStatus::ACTIVE->value,
                 CredentialDomainObjectAbstract::IDENTIFIER => $identifier,
-                CredentialDomainObjectAbstract::IDENTIFIER_HASH => hash('sha256', $identifier),
+                CredentialDomainObjectAbstract::IDENTIFIER_HASH => $this->identifierService->hash($identifier),
                 CredentialDomainObjectAbstract::ISSUED_AT => now()->toDateTimeString(),
             ], array_filter($source, static fn ($value): bool => $value !== null)));
 

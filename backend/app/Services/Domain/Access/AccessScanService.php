@@ -10,6 +10,7 @@ use HiEvents\DomainObjects\Enums\AccessResult;
 use HiEvents\Events\Realtime\AccessScanRecorded;
 use HiEvents\Services\Domain\Access\DTO\AccessContextDTO;
 use HiEvents\Services\Domain\Access\DTO\AccessDecisionDTO;
+use HiEvents\Services\Domain\Credential\CredentialIdentifierService;
 use Illuminate\Database\DatabaseManager;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Str;
@@ -33,6 +34,7 @@ class AccessScanService
     public function __construct(
         private readonly AccessDecisionService $accessDecisionService,
         private readonly ZoneOccupancyService $zoneOccupancyService,
+        private readonly CredentialIdentifierService $identifierService,
         private readonly DatabaseManager $databaseManager,
     ) {}
 
@@ -200,7 +202,7 @@ class AccessScanService
 
         $credential = $this->databaseManager->table('credentials')
             ->where('event_id', $eventId)
-            ->where('identifier_hash', hash('sha256', $identifier))
+            ->where('identifier_hash', $this->identifierService->hash($identifier))
             ->first();
 
         return new AccessContextDTO(

@@ -8,6 +8,7 @@ use Carbon\Carbon;
 use HiEvents\DomainObjects\Enums\LeadCaptureResolution;
 use HiEvents\DomainObjects\Status\LeadStatus;
 use HiEvents\Exceptions\ResourceConflictException;
+use HiEvents\Services\Domain\Credential\CredentialIdentifierService;
 use HiEvents\Services\Domain\Exhibitor\DTO\LeadCaptureResultDTO;
 use Illuminate\Database\DatabaseManager;
 use Illuminate\Database\UniqueConstraintViolationException;
@@ -36,6 +37,7 @@ class LeadCaptureService
 
     public function __construct(
         private readonly DatabaseManager $databaseManager,
+        private readonly CredentialIdentifierService $identifierService,
     ) {}
 
     /**
@@ -76,7 +78,7 @@ class LeadCaptureService
             }
         }
 
-        $identifierHash = hash('sha256', $identifier);
+        $identifierHash = $this->identifierService->hash($identifier);
         $credential = $this->resolveCredential($identifierHash);
 
         [$resolution, $leadId] = $this->resolve($credential, $eventId, $eventExhibitorId, $capturedAt);

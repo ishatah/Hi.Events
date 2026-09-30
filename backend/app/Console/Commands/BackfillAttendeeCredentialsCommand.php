@@ -6,6 +6,7 @@ namespace HiEvents\Console\Commands;
 
 use HiEvents\DomainObjects\Status\CredentialStatus;
 use HiEvents\Services\Domain\Access\GrantMaterializationService;
+use HiEvents\Services\Domain\Credential\CredentialIdentifierService;
 use Illuminate\Console\Command;
 use Illuminate\Database\DatabaseManager;
 use Illuminate\Support\Str;
@@ -36,6 +37,7 @@ class BackfillAttendeeCredentialsCommand extends Command
     public function handle(
         DatabaseManager $databaseManager,
         GrantMaterializationService $grantMaterializationService,
+        CredentialIdentifierService $identifierService,
     ): int {
         $chunkSize = max(1, (int) $this->option('chunk'));
         $dryRun = (bool) $this->option('dry-run');
@@ -93,7 +95,7 @@ class BackfillAttendeeCredentialsCommand extends Command
             $now = now();
 
             foreach ($attendees as $attendee) {
-                $identifier = Str::lower(Str::random(40));
+                $identifier = $identifierService->generate();
 
                 $rows[] = [
                     'short_id' => 'cr_'.Str::lower(Str::random(20)),
@@ -102,7 +104,7 @@ class BackfillAttendeeCredentialsCommand extends Command
                     'credential_type' => 'ATTENDEE',
                     'status' => CredentialStatus::ACTIVE->value,
                     'identifier' => $identifier,
-                    'identifier_hash' => hash('sha256', $identifier),
+                    'identifier_hash' => $identifierService->hash($identifier),
                     'issued_at' => $now,
                     'created_at' => $now,
                     'updated_at' => $now,
