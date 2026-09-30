@@ -2,6 +2,4 @@
 
 namespace HiEvents\DomainObjects;
 
-class PermissionRoleDomainObject extends Generated\PermissionRoleDomainObjectAbstract
-{
-}
+class PermissionRoleDomainObject extends Generated\PermissionRoleDomainObjectAbstract {}

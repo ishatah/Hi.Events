@@ -2,6 +2,4 @@
 
 namespace HiEvents\DomainObjects;
 
-class VenueDomainObject extends Generated\VenueDomainObjectAbstract
-{
-}
+class VenueDomainObject extends Generated\VenueDomainObjectAbstract {}

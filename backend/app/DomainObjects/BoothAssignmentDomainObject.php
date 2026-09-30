@@ -2,6 +2,4 @@
 
 namespace HiEvents\DomainObjects;
 
-class BoothAssignmentDomainObject extends Generated\BoothAssignmentDomainObjectAbstract
-{
-}
+class BoothAssignmentDomainObject extends Generated\BoothAssignmentDomainObjectAbstract {}

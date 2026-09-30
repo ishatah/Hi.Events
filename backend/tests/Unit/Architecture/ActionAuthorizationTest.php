@@ -109,6 +109,17 @@ class ActionAuthorizationTest extends TestCase
         // code is the credential: short, single-use, expiring, and the route is
         // throttled so it cannot be brute-forced.
         'Device/PairDeviceAction.php',
+
+        // A guest has no account, and requiring one to answer an invitation would defeat
+        // the point of a guest list. The emailed token is the credential: 48 random
+        // characters, stored only as a hash, killed by revocation, and the route is
+        // throttled. It reveals nothing on a wrong token beyond "not found".
+        'Rsvp/RespondToInvitationPublicAction.php',
+
+        // Part of the public event page, like the event title. The service returns only
+        // signed sponsors the organizer chose to show, and the resource carries no contract
+        // value, payment status or fulfilment detail.
+        'Sponsor/GetPublicSponsorsAction.php',
     ];
 
     public function test_every_action_authorizes_or_is_declared_public(): void

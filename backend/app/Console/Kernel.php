@@ -5,6 +5,7 @@ namespace HiEvents\Console;
 use HiEvents\Jobs\Access\CaptureZoneOccupancySnapshotsJob;
 use HiEvents\Jobs\Account\ProcessScheduledAccountDeletionsJob;
 use HiEvents\Jobs\Message\SendScheduledMessagesJob;
+use HiEvents\Jobs\Queue\CaptureThroughputSnapshotsJob;
 use HiEvents\Jobs\Waitlist\ProcessExpiredWaitlistOffersJob;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
@@ -19,6 +20,7 @@ class Kernel extends ConsoleKernel
         $schedule->job(new ProcessExpiredWaitlistOffersJob)->everyMinute()->withoutOverlapping();
         $schedule->job(new ProcessScheduledAccountDeletionsJob)->hourly()->withoutOverlapping();
         $schedule->job(new CaptureZoneOccupancySnapshotsJob)->everyThirtySeconds()->withoutOverlapping();
+        $schedule->job(new CaptureThroughputSnapshotsJob)->everyMinute()->withoutOverlapping();
 
         $schedule->call(function (): void {
             $count = DB::table('failed_jobs')->count();

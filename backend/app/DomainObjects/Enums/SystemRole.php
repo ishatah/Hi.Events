@@ -62,6 +62,7 @@ enum SystemRole: string
                 Permission::ZONE_MANAGE, Permission::VENUE_MANAGE,
                 Permission::SESSION_MANAGE, Permission::SPEAKER_MANAGE,
                 Permission::EXHIBITOR_MANAGE, Permission::LEAD_VIEW,
+                Permission::GUEST_LIST_MANAGE, Permission::SPONSOR_MANAGE,
                 Permission::DEVICE_MANAGE,
                 Permission::REPORT_VIEW, Permission::REPORT_EXPORT,
                 Permission::STAFF_MANAGE, Permission::INCIDENT_MANAGE,

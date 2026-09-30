@@ -2,6 +2,4 @@
 
 namespace HiEvents\DomainObjects;
 
-class LeadConsentDomainObject extends Generated\LeadConsentDomainObjectAbstract
-{
-}
+class LeadConsentDomainObject extends Generated\LeadConsentDomainObjectAbstract {}

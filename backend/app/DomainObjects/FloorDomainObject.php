@@ -2,6 +2,4 @@
 
 namespace HiEvents\DomainObjects;
 
-class FloorDomainObject extends Generated\FloorDomainObjectAbstract
-{
-}
+class FloorDomainObject extends Generated\FloorDomainObjectAbstract {}

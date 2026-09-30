@@ -2,6 +2,4 @@
 
 namespace HiEvents\DomainObjects;
 
-class CompanyDomainObject extends Generated\CompanyDomainObjectAbstract
-{
-}
+class CompanyDomainObject extends Generated\CompanyDomainObjectAbstract {}

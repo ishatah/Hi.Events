@@ -2,6 +2,4 @@
 
 namespace HiEvents\DomainObjects;
 
-class PersonDomainObject extends Generated\PersonDomainObjectAbstract
-{
-}
+class PersonDomainObject extends Generated\PersonDomainObjectAbstract {}

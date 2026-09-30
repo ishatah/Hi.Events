@@ -2,6 +2,4 @@
 
 namespace HiEvents\DomainObjects;
 
-class SpeakerDomainObject extends Generated\SpeakerDomainObjectAbstract
-{
-}
+class SpeakerDomainObject extends Generated\SpeakerDomainObjectAbstract {}

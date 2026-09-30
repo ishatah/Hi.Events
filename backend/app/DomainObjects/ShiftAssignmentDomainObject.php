@@ -2,6 +2,4 @@
 
 namespace HiEvents\DomainObjects;
 
-class ShiftAssignmentDomainObject extends Generated\ShiftAssignmentDomainObjectAbstract
-{
-}
+class ShiftAssignmentDomainObject extends Generated\ShiftAssignmentDomainObjectAbstract {}

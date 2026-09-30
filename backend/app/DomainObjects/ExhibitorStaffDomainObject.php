@@ -2,6 +2,4 @@
 
 namespace HiEvents\DomainObjects;
 
-class ExhibitorStaffDomainObject extends Generated\ExhibitorStaffDomainObjectAbstract
-{
-}
+class ExhibitorStaffDomainObject extends Generated\ExhibitorStaffDomainObjectAbstract {}

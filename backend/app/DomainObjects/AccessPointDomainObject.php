@@ -2,6 +2,4 @@
 
 namespace HiEvents\DomainObjects;
 
-class AccessPointDomainObject extends Generated\AccessPointDomainObjectAbstract
-{
-}
+class AccessPointDomainObject extends Generated\AccessPointDomainObjectAbstract {}

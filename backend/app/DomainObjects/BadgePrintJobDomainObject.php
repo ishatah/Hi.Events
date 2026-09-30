@@ -2,6 +2,4 @@
 
 namespace HiEvents\DomainObjects;
 
-class BadgePrintJobDomainObject extends Generated\BadgePrintJobDomainObjectAbstract
-{
-}
+class BadgePrintJobDomainObject extends Generated\BadgePrintJobDomainObjectAbstract {}

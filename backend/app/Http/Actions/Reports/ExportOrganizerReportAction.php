@@ -85,7 +85,7 @@ class ExportOrganizerReportAction extends BaseAction
                 'Payment Date',
                 'Order Reference',
                 'Amount Paid',
-                'Hi.Events Fee',
+                'ARZO Fee',
                 'VAT Rate',
                 'VAT on Fee',
                 'Total Fee',

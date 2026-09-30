@@ -1,0 +1,7 @@
+<?php
+
+namespace HiEvents\DomainObjects;
+
+class SponsorshipEntitlementDomainObject extends Generated${n}DomainObjectAbstract
+{
+}

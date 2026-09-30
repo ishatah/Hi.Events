@@ -2,6 +2,4 @@
 
 namespace HiEvents\DomainObjects;
 
-class LeadDomainObject extends Generated\LeadDomainObjectAbstract
-{
-}
+class LeadDomainObject extends Generated\LeadDomainObjectAbstract {}

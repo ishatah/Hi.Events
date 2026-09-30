@@ -2,6 +2,4 @@
 
 namespace HiEvents\DomainObjects;
 
-class CredentialDomainObject extends Generated\CredentialDomainObjectAbstract
-{
-}
+class CredentialDomainObject extends Generated\CredentialDomainObjectAbstract {}

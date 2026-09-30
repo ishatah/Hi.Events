@@ -2,6 +2,4 @@
 
 namespace HiEvents\DomainObjects;
 
-class AccreditationAuditLogDomainObject extends Generated\AccreditationAuditLogDomainObjectAbstract
-{
-}
+class AccreditationAuditLogDomainObject extends Generated\AccreditationAuditLogDomainObjectAbstract {}

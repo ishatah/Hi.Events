@@ -2,6 +2,4 @@
 
 namespace HiEvents\DomainObjects;
 
-class StaffPositionDomainObject extends Generated\StaffPositionDomainObjectAbstract
-{
-}
+class StaffPositionDomainObject extends Generated\StaffPositionDomainObjectAbstract {}

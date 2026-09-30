@@ -2,6 +2,4 @@
 
 namespace HiEvents\DomainObjects;
 
-class DeviceDomainObject extends Generated\DeviceDomainObjectAbstract
-{
-}
+class DeviceDomainObject extends Generated\DeviceDomainObjectAbstract {}

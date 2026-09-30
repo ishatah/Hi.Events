@@ -2,6 +2,4 @@
 
 namespace HiEvents\DomainObjects;
 
-class AccessLogDomainObject extends Generated\AccessLogDomainObjectAbstract
-{
-}
+class AccessLogDomainObject extends Generated\AccessLogDomainObjectAbstract {}

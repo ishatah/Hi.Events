@@ -2,6 +2,4 @@
 
 namespace HiEvents\DomainObjects;
 
-class ApiKeyDomainObject extends Generated\ApiKeyDomainObjectAbstract
-{
-}
+class ApiKeyDomainObject extends Generated\ApiKeyDomainObjectAbstract {}

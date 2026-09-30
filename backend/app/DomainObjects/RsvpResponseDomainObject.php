@@ -2,6 +2,4 @@
 
 namespace HiEvents\DomainObjects;
 
-class RsvpResponseDomainObject extends Generated\RsvpResponseDomainObjectAbstract
-{
-}
+class RsvpResponseDomainObject extends Generated\RsvpResponseDomainObjectAbstract {}

@@ -2,6 +2,4 @@
 
 namespace HiEvents\DomainObjects;
 
-class VendorStaffDomainObject extends Generated\VendorStaffDomainObjectAbstract
-{
-}
+class VendorStaffDomainObject extends Generated\VendorStaffDomainObjectAbstract {}

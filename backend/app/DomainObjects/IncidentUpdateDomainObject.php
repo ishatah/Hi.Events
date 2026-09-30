@@ -2,6 +2,4 @@
 
 namespace HiEvents\DomainObjects;
 
-class IncidentUpdateDomainObject extends Generated\IncidentUpdateDomainObjectAbstract
-{
-}
+class IncidentUpdateDomainObject extends Generated\IncidentUpdateDomainObjectAbstract {}

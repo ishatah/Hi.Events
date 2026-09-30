@@ -2,6 +2,4 @@
 
 namespace HiEvents\DomainObjects;
 
-class SessionWaitlistEntryDomainObject extends Generated\SessionWaitlistEntryDomainObjectAbstract
-{
-}
+class SessionWaitlistEntryDomainObject extends Generated\SessionWaitlistEntryDomainObjectAbstract {}

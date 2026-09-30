@@ -2,6 +2,4 @@
 
 namespace HiEvents\DomainObjects;
 
-class ReadinessReviewDomainObject extends Generated\ReadinessReviewDomainObjectAbstract
-{
-}
+class ReadinessReviewDomainObject extends Generated\ReadinessReviewDomainObjectAbstract {}

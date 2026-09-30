@@ -190,6 +190,7 @@ use HiEvents\Http\Actions\Exhibitor\CaptureLeadAction;
 use HiEvents\Http\Actions\Exhibitor\GetEventExhibitorsAction;
 use HiEvents\Http\Actions\Exhibitor\GetLeadCaptureStatsAction;
 use HiEvents\Http\Actions\Exhibitor\GetLeadsAction;
+use HiEvents\Http\Actions\Exhibitor\GetLeadScoresAction;
 use HiEvents\Http\Actions\Exhibitor\NameExhibitorStaffAction;
 use HiEvents\Http\Actions\Exhibitor\ReleaseBoothAction;
 use HiEvents\Http\Actions\Exhibitor\UpdateLeadAction;
@@ -288,6 +289,8 @@ use HiEvents\Http\Actions\Questions\GetQuestionAction;
 use HiEvents\Http\Actions\Questions\GetQuestionsAction;
 use HiEvents\Http\Actions\Questions\GetQuestionsPublicAction;
 use HiEvents\Http\Actions\Questions\SortQuestionsAction;
+use HiEvents\Http\Actions\Queue\GetAccessPointQueueAction;
+use HiEvents\Http\Actions\Queue\GetEventQueuesAction;
 use HiEvents\Http\Actions\Reports\ExportOrganizerReportAction;
 use HiEvents\Http\Actions\Reports\GetOrganizerReportAction;
 use HiEvents\Http\Actions\Reports\GetReportAction;
@@ -296,6 +299,10 @@ use HiEvents\Http\Actions\Room\DeleteRoomAction;
 use HiEvents\Http\Actions\Room\GetRoomAction;
 use HiEvents\Http\Actions\Room\GetRoomsAction;
 use HiEvents\Http\Actions\Room\UpdateRoomAction;
+use HiEvents\Http\Actions\Rsvp\CreateInvitationAction;
+use HiEvents\Http\Actions\Rsvp\GetGuestListAction;
+use HiEvents\Http\Actions\Rsvp\RespondToInvitationPublicAction;
+use HiEvents\Http\Actions\Rsvp\RevokeInvitationAction;
 use HiEvents\Http\Actions\SelfService\EditAttendeePublicAction;
 use HiEvents\Http\Actions\SelfService\EditOrderPublicAction;
 use HiEvents\Http\Actions\SelfService\ResendAttendeeTicketPublicAction;
@@ -321,6 +328,14 @@ use HiEvents\Http\Actions\Speaker\DeleteSpeakerAction;
 use HiEvents\Http\Actions\Speaker\GetSpeakerAction;
 use HiEvents\Http\Actions\Speaker\GetSpeakersAction;
 use HiEvents\Http\Actions\Speaker\UpdateSpeakerAction;
+use HiEvents\Http\Actions\Sponsor\AddSponsorshipEntitlementAction;
+use HiEvents\Http\Actions\Sponsor\CreateSponsorshipAction;
+use HiEvents\Http\Actions\Sponsor\CreateSponsorshipPackageAction;
+use HiEvents\Http\Actions\Sponsor\GetPublicSponsorsAction;
+use HiEvents\Http\Actions\Sponsor\GetSponsorshipFulfilmentAction;
+use HiEvents\Http\Actions\Sponsor\GetSponsorshipsAction;
+use HiEvents\Http\Actions\Sponsor\RecordEntitlementFulfilmentAction;
+use HiEvents\Http\Actions\Sponsor\UpdateSponsorshipAction;
 use HiEvents\Http\Actions\TaxesAndFees\CreateTaxOrFeeAction;
 use HiEvents\Http\Actions\TaxesAndFees\DeleteTaxOrFeeAction;
 use HiEvents\Http\Actions\TaxesAndFees\EditTaxOrFeeAction;
@@ -709,6 +724,25 @@ $router->middleware(['auth:api'])->group(
         $router->post('/events/{event_id}/exhibitors/{event_exhibitor_id}/leads', CaptureLeadAction::class);
         $router->patch('/events/{event_id}/exhibitors/{event_exhibitor_id}/leads/{lead_id}', UpdateLeadAction::class);
         $router->get('/events/{event_id}/exhibitors/{event_exhibitor_id}/lead-stats', GetLeadCaptureStatsAction::class);
+        $router->get('/events/{event_id}/exhibitors/{event_exhibitor_id}/lead-scores', GetLeadScoresAction::class);
+
+        // Queues, derived from the scan stream
+        $router->get('/events/{event_id}/queues', GetEventQueuesAction::class);
+        $router->get('/events/{event_id}/access-points/{access_point_id}/queue', GetAccessPointQueueAction::class);
+
+        // Sponsors: a separate participation from exhibiting, sharing only the company
+        $router->get('/events/{event_id}/sponsorships', GetSponsorshipsAction::class);
+        $router->post('/events/{event_id}/sponsorships', CreateSponsorshipAction::class);
+        $router->patch('/events/{event_id}/sponsorships/{sponsorship_id}', UpdateSponsorshipAction::class);
+        $router->post('/events/{event_id}/sponsorship-packages', CreateSponsorshipPackageAction::class);
+        $router->get('/events/{event_id}/sponsorships/{sponsorship_id}/fulfilment', GetSponsorshipFulfilmentAction::class);
+        $router->post('/events/{event_id}/sponsorships/{sponsorship_id}/entitlements', AddSponsorshipEntitlementAction::class);
+        $router->post('/events/{event_id}/sponsorship-entitlements/{entitlement_id}/fulfilment', RecordEntitlementFulfilmentAction::class);
+
+        // Guest list (RSVP)
+        $router->get('/events/{event_id}/invitations', GetGuestListAction::class);
+        $router->post('/events/{event_id}/invitations', CreateInvitationAction::class);
+        $router->delete('/events/{event_id}/invitations/{invitation_id}', RevokeInvitationAction::class);
 
         // Operations: staffing, tasks, incidents, readiness
         $router->get('/events/{event_id}/staffing-gaps', GetStaffingGapsAction::class);
@@ -916,6 +950,13 @@ $router->prefix('/public')->group(
             $router->patch('/attendees/{attendee_short_id}', EditAttendeePublicAction::class)->middleware('throttle:self-service-edit');
             $router->post('/attendees/{attendee_short_id}/resend-ticket', ResendAttendeeTicketPublicAction::class)->middleware('throttle:self-service-email');
         });
+
+        // Sponsors
+        $router->get('/events/{event_id}/sponsors', GetPublicSponsorsAction::class);
+
+        // RSVP
+        $router->post('/rsvp/{token}', RespondToInvitationPublicAction::class)
+            ->middleware('throttle:10,1');
 
         // Sitemap
         $router->get('/sitemap.xml', GetSitemapIndexAction::class);

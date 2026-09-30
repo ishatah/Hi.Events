@@ -2,6 +2,4 @@
 
 namespace HiEvents\DomainObjects;
 
-class AccessPointThroughputSnapshotDomainObject extends Generated\AccessPointThroughputSnapshotDomainObjectAbstract
-{
-}
+class AccessPointThroughputSnapshotDomainObject extends Generated\AccessPointThroughputSnapshotDomainObjectAbstract {}

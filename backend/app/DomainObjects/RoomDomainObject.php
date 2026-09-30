@@ -2,6 +2,4 @@
 
 namespace HiEvents\DomainObjects;
 
-class RoomDomainObject extends Generated\RoomDomainObjectAbstract
-{
-}
+class RoomDomainObject extends Generated\RoomDomainObjectAbstract {}

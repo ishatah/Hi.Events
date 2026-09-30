@@ -2,6 +2,4 @@
 
 namespace HiEvents\DomainObjects;
 
-class TaskTemplateItemDomainObject extends Generated\TaskTemplateItemDomainObjectAbstract
-{
-}
+class TaskTemplateItemDomainObject extends Generated\TaskTemplateItemDomainObjectAbstract {}

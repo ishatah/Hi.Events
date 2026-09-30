@@ -2,6 +2,4 @@
 
 namespace HiEvents\DomainObjects;
 
-class StaffProfileDomainObject extends Generated\StaffProfileDomainObjectAbstract
-{
-}
+class StaffProfileDomainObject extends Generated\StaffProfileDomainObjectAbstract {}

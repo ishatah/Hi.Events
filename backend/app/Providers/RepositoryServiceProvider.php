@@ -94,6 +94,9 @@ use HiEvents\Repository\Eloquent\SessionRepository;
 use HiEvents\Repository\Eloquent\SessionSpeakerRepository;
 use HiEvents\Repository\Eloquent\SessionWaitlistEntryRepository;
 use HiEvents\Repository\Eloquent\SpeakerRepository;
+use HiEvents\Repository\Eloquent\SponsorshipEntitlementRepository;
+use HiEvents\Repository\Eloquent\SponsorshipPackageRepository;
+use HiEvents\Repository\Eloquent\SponsorshipRepository;
 use HiEvents\Repository\Eloquent\StripeCustomerRepository;
 use HiEvents\Repository\Eloquent\StripePaymentsRepository;
 use HiEvents\Repository\Eloquent\StripePayoutsRepository;
@@ -196,6 +199,9 @@ use HiEvents\Repository\Interfaces\SessionRepositoryInterface;
 use HiEvents\Repository\Interfaces\SessionSpeakerRepositoryInterface;
 use HiEvents\Repository\Interfaces\SessionWaitlistEntryRepositoryInterface;
 use HiEvents\Repository\Interfaces\SpeakerRepositoryInterface;
+use HiEvents\Repository\Interfaces\SponsorshipEntitlementRepositoryInterface;
+use HiEvents\Repository\Interfaces\SponsorshipPackageRepositoryInterface;
+use HiEvents\Repository\Interfaces\SponsorshipRepositoryInterface;
 use HiEvents\Repository\Interfaces\StripeCustomerRepositoryInterface;
 use HiEvents\Repository\Interfaces\StripePaymentsRepositoryInterface;
 use HiEvents\Repository\Interfaces\StripePayoutsRepositoryInterface;
@@ -317,6 +323,9 @@ class RepositoryServiceProvider extends ServiceProvider
         BadgePrintJobRepositoryInterface::class => BadgePrintJobRepository::class,
         DeviceRepositoryInterface::class => DeviceRepository::class,
         InvitationRepositoryInterface::class => InvitationRepository::class,
+        SponsorshipRepositoryInterface::class => SponsorshipRepository::class,
+        SponsorshipEntitlementRepositoryInterface::class => SponsorshipEntitlementRepository::class,
+        SponsorshipPackageRepositoryInterface::class => SponsorshipPackageRepository::class,
         RsvpResponseRepositoryInterface::class => RsvpResponseRepository::class,
     ];
 

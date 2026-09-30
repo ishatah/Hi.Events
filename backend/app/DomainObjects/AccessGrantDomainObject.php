@@ -2,6 +2,4 @@
 
 namespace HiEvents\DomainObjects;
 
-class AccessGrantDomainObject extends Generated\AccessGrantDomainObjectAbstract
-{
-}
+class AccessGrantDomainObject extends Generated\AccessGrantDomainObjectAbstract {}

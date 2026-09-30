@@ -2,6 +2,4 @@
 
 namespace HiEvents\DomainObjects;
 
-class SessionDomainObject extends Generated\SessionDomainObjectAbstract
-{
-}
+class SessionDomainObject extends Generated\SessionDomainObjectAbstract {}
