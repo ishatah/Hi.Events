@@ -75,6 +75,13 @@ class ActionAuthorizationTest extends TestCase
         'CheckInLists/Public/GetCheckInListAttendeesPublicAction.php',
         'CheckInLists/Public/GetCheckInListPublicAction.php',
         'CheckInLists/Public/GetCheckInListStatsPublicAction.php',
+
+        // Reachable with the same list link as the rest of this group, and it only
+        // ever accepts a ticket code rather than returning one: a scanner already
+        // holds the code it just read, so sending it inward reveals nothing. An
+        // unknown code gets the same 404 as one from another list, so it cannot be
+        // used to guess ticket codes. Throttled.
+        'CheckInLists/Public/ResolveScannedTicketPublicAction.php',
         'SelfService/EditAttendeePublicAction.php',
         'SelfService/EditOrderPublicAction.php',
         'SelfService/ResendAttendeeTicketPublicAction.php',
