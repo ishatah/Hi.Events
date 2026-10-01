@@ -166,7 +166,6 @@ return new class extends Migration
             ->join('events', 'events.id', '=', 'attendees.event_id')
             ->whereNull('attendees.person_id')
             ->whereNull('attendees.deleted_at')
-            ->orderBy('attendees.id')
             ->select([
                 'attendees.id',
                 'attendees.first_name',
@@ -174,34 +173,59 @@ return new class extends Migration
                 'attendees.email',
                 'events.account_id',
             ])
-            ->chunk(self::BATCH_SIZE, function ($attendees): void {
-                foreach ($attendees as $attendee) {
-                    $personId = null;
+            // chunkById, not chunk: the loop sets person_id, which is the column the query
+            // filters on, so each processed row leaves the result set. An OFFSET-paginated
+            // chunk() then steps past the rows that shifted down and skips roughly every
+            // other batch. Keying on the last id seen is immune to the set shrinking.
+            ->chunkById(
+                count: self::BATCH_SIZE,
+                callback: function ($attendees): void {
+                    foreach ($attendees as $attendee) {
+                        $personId = null;
 
-                    if (! empty($attendee->email)) {
-                        $personId = DB::table('persons')
-                            ->where('account_id', $attendee->account_id)
-                            ->whereRaw('lower(email) = ?', [Str::lower($attendee->email)])
-                            ->whereNull('deleted_at')
-                            ->value('id');
+                        if (! empty($attendee->email)) {
+                            $personId = DB::table('persons')
+                                ->where('account_id', $attendee->account_id)
+                                ->whereRaw('lower(email) = ?', [Str::lower($attendee->email)])
+                                ->whereNull('deleted_at')
+                                ->value('id');
+                        }
+
+                        if ($personId === null) {
+                            $personId = DB::table('persons')->insertGetId([
+                                'short_id' => 'pn_'.Str::lower(Str::random(20)),
+                                'account_id' => $attendee->account_id,
+                                'first_name' => $attendee->first_name ?: 'Unknown',
+                                'last_name' => $attendee->last_name,
+                                'email' => $attendee->email,
+                                'created_at' => now(),
+                                'updated_at' => now(),
+                            ]);
+                        }
+
+                        DB::table('attendees')
+                            ->where('id', $attendee->id)
+                            ->update(['person_id' => $personId]);
                     }
+                },
+                // The join makes a bare "id" ambiguous in the keyset comparison, while the
+                // selected column arrives unqualified on each row.
+                column: 'attendees.id',
+                alias: 'id',
+            );
 
-                    if ($personId === null) {
-                        $personId = DB::table('persons')->insertGetId([
-                            'short_id' => 'pn_'.Str::lower(Str::random(20)),
-                            'account_id' => $attendee->account_id,
-                            'first_name' => $attendee->first_name ?: 'Unknown',
-                            'last_name' => $attendee->last_name,
-                            'email' => $attendee->email,
-                            'created_at' => now(),
-                            'updated_at' => now(),
-                        ]);
-                    }
+        $unlinked = DB::table('attendees')
+            ->whereNull('person_id')
+            ->whereNull('deleted_at')
+            ->count();
 
-                    DB::table('attendees')
-                        ->where('id', $attendee->id)
-                        ->update(['person_id' => $personId]);
-                }
-            });
+        // The backfill is the only thing that writes these links, so anything left is a
+        // silent data loss the next migration would build on. Failing here is recoverable;
+        // discovering it after credentials have been issued against half the attendees is not.
+        if ($unlinked > 0) {
+            throw new RuntimeException(
+                'persons backfill left '.$unlinked.' attendee(s) without a person_id.'
+            );
+        }
     }
 };
