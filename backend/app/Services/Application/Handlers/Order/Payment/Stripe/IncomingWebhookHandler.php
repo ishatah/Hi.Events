@@ -10,14 +10,13 @@ use HiEvents\Services\Domain\Payment\Stripe\EventHandlers\ChargeSucceededHandler
 use HiEvents\Services\Domain\Payment\Stripe\EventHandlers\PaymentIntentFailedHandler;
 use HiEvents\Services\Domain\Payment\Stripe\EventHandlers\PaymentIntentSucceededHandler;
 use HiEvents\Services\Domain\Payment\Stripe\EventHandlers\PayoutPaidHandler;
-use HiEvents\Services\Infrastructure\Stripe\StripeConfigurationService;
+use HiEvents\Services\Infrastructure\Stripe\StripeWebhookSignatureVerifier;
 use Illuminate\Cache\Repository;
 use Illuminate\Log\Logger;
 use JsonException;
 use Stripe\Charge;
 use Stripe\Event;
 use Stripe\Exception\SignatureVerificationException;
-use Stripe\Webhook;
 use Throwable;
 use UnexpectedValueException;
 
@@ -45,7 +44,7 @@ class IncomingWebhookHandler
         private readonly PayoutPaidHandler $payoutPaidHandler,
         private readonly Logger $logger,
         private readonly Repository $cache,
-        private readonly StripeConfigurationService $stripeConfigurationService,
+        private readonly StripeWebhookSignatureVerifier $signatureVerifier,
     ) {}
 
     /**
@@ -112,63 +111,43 @@ class IncomingWebhookHandler
         } catch (CannotAcceptPaymentException $exception) {
             $this->logger->error(
                 'Cannot accept payment: '.$exception->getMessage(), [
-                    'payload' => $webhookDTO->payload,
+                    'payload_fingerprint' => $this->payloadFingerprint($webhookDTO),
                 ]
             );
             throw $exception;
         } catch (SignatureVerificationException $exception) {
             $this->logger->error(
                 'Unable to verify Stripe signature: '.$exception->getMessage(), [
-                    'payload' => $webhookDTO->payload,
+                    'payload_fingerprint' => $this->payloadFingerprint($webhookDTO),
                 ]
             );
             throw $exception;
         } catch (UnexpectedValueException $exception) {
             $this->logger->error(
                 'Unexpected value in Stripe payload: '.$exception->getMessage(), [
-                    'payload' => $webhookDTO->payload,
+                    'payload_fingerprint' => $this->payloadFingerprint($webhookDTO),
                 ]
             );
             throw $exception;
         } catch (Throwable $exception) {
             $this->logger->error('Unhandled Stripe error: '.$exception->getMessage(), [
-                'payload' => $webhookDTO->payload,
+                'payload_fingerprint' => $this->payloadFingerprint($webhookDTO),
             ]);
             throw $exception;
         }
     }
 
+    /**
+     * @throws SignatureVerificationException
+     */
     private function constructEventWithValidPlatform(StripeWebhookDTO $webhookDTO): Event
     {
-        $webhookSecrets = $this->stripeConfigurationService->getAllWebhookSecrets();
-        $lastException = null;
+        return $this->signatureVerifier->verify($webhookDTO->payload, $webhookDTO->headerSignature);
+    }
 
-        foreach ($webhookSecrets as $platform => $webhookSecret) {
-            try {
-                if (! $webhookSecret) {
-                    continue;
-                }
-
-                $event = Webhook::constructEvent(
-                    $webhookDTO->payload,
-                    $webhookDTO->headerSignature,
-                    $webhookSecret
-                );
-
-                $this->logger->debug('Webhook validated with platform: '.$platform, [
-                    'event_id' => $event->id,
-                    'platform' => $platform,
-                ]);
-
-                return $event;
-            } catch (SignatureVerificationException $exception) {
-                $lastException = $exception;
-
-                continue;
-            }
-        }
-
-        throw $lastException ?? new SignatureVerificationException(__('Unable to verify Stripe signature with any platform'));
+    private function payloadFingerprint(StripeWebhookDTO $webhookDTO): string
+    {
+        return substr(hash('sha256', $webhookDTO->payload), 0, 16);
     }
 
     private function hasEventBeenHandled(Event $event): bool
