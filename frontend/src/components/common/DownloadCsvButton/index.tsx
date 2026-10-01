@@ -1,6 +1,7 @@
 import {Button, ButtonProps} from '@mantine/core';
 import {IconDownload} from '@tabler/icons-react';
 import {t} from '@lingui/macro';
+import {buildCsv} from '../../../utilites/csv';
 
 interface DownloadCsvButtonProps extends Omit<ButtonProps, 'onClick'> {
     headers: string[];
@@ -15,19 +16,7 @@ export const DownloadCsvButton = ({
                                       ...buttonProps
                                   }: DownloadCsvButtonProps) => {
     const handleDownloadCSV = () => {
-        const csvData = data.map(row =>
-            row.map(cell =>
-                typeof cell === 'string' ? `"${cell}"` : cell
-            ).join(',')
-        );
-
-        const csvContent = [
-            headers.join(','),
-            ...csvData
-        ].join('\n');
-
-        // Create and trigger download
-        const blob = new Blob([csvContent], {type: 'text/csv;charset=utf-8;'});
+        const blob = new Blob(['﻿' + buildCsv(headers, data)], {type: 'text/csv;charset=utf-8;'});
         const link = document.createElement('a');
         const url = URL.createObjectURL(blob);
         link.setAttribute('href', url);
