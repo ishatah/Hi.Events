@@ -27,7 +27,7 @@ class GetCheckInListAttendeeDetailPublicHandler
         private readonly CheckInListActivityValidator $checkInListActivityValidator,
     ) {}
 
-    public function handle(string $shortId, string $attendeePublicId, ?int $staffAccountId): PublicAttendeeDetailDTO
+    public function handle(string $shortId, string $attendeeShortId, ?int $staffAccountId): PublicAttendeeDetailDTO
     {
         $checkInList = $this->checkInListRepository
             ->loadRelation(ProductDomainObject::class)
@@ -49,7 +49,7 @@ class GetCheckInListAttendeeDetailPublicHandler
             ->loadRelation(new Relationship(AttendeeCheckInDomainObject::class, name: 'check_ins'))
             ->loadRelation(new Relationship(EventOccurrenceDomainObject::class, name: 'event_occurrence'))
             ->findFirstWhere([
-                'public_id' => $attendeePublicId,
+                'short_id' => $attendeeShortId,
                 'event_id' => $checkInList->getEventId(),
             ]);
 

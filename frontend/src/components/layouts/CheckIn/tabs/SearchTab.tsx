@@ -14,7 +14,7 @@ interface SearchTabProps {
     searchQuery: string;
     onSearchChange: (value: string) => void;
     onCheckInToggle: (attendee: Attendee) => void;
-    onOpenDetail: (attendeePublicId: string) => void;
+    onOpenDetail: (attendeeShortId: string) => void;
     isLoading: boolean;
     isCheckInPending: boolean;
     isDeletePending: boolean;
@@ -186,9 +186,9 @@ export const SearchTab = ({
                         return (
                             <button
                                 type="button"
-                                key={attendee.public_id}
+                                key={attendee.short_id}
                                 className={`${classes.row} ${isCheckedIn ? classes.rowDone : ""} ${isCancelled ? classes.rowCancelled : ""}`}
-                                onClick={() => onOpenDetail(attendee.public_id)}
+                                onClick={() => onOpenDetail(attendee.short_id)}
                                 aria-label={t`View details for ${attendee.first_name} ${attendee.last_name}`}
                             >
                                 <div className={`${classes.avatar} ${isCheckedIn ? classes.avatarDone : ""}`}>

@@ -20,7 +20,7 @@ import classes from "./AttendeeDetailSheet.module.scss";
 
 interface Props {
     checkInListShortId: string | undefined;
-    attendeePublicId: string | null;
+    attendeeShortId: string | null;
     eventType?: EventType;
     timezone?: string;
     onClose: () => void;
@@ -46,15 +46,15 @@ const DRAG_DISMISS_THRESHOLD_PX = 90;
 
 export const AttendeeDetailSheet = ({
                                         checkInListShortId,
-                                        attendeePublicId,
+                                        attendeeShortId,
                                         eventType,
                                         timezone,
                                         onClose,
                                         onCheckInToggle,
                                         isActionPending,
                                     }: Props) => {
-    const open = attendeePublicId !== null;
-    const detailQuery = useGetCheckInListAttendeeDetailPublic(checkInListShortId, attendeePublicId);
+    const open = attendeeShortId !== null;
+    const detailQuery = useGetCheckInListAttendeeDetailPublic(checkInListShortId, attendeeShortId);
     const meQuery = useGetMe();
     const isLoggedIn = !!meQuery.data?.id;
 
@@ -177,7 +177,7 @@ export const AttendeeDetailSheet = ({
                                     {detail.first_name} {detail.last_name}
                                 </div>
                                 <div className={classes.meta}>
-                                    <span className={classes.code}>{detail.public_id}</span>
+                                    <span className={classes.code}>{detail.short_id}</span>
                                     {detail.product_title && (
                                         <>
                                             <span className={classes.dot}>·</span>

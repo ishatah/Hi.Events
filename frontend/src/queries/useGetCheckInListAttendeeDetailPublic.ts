@@ -6,12 +6,12 @@ export const GET_CHECK_IN_LIST_ATTENDEE_DETAIL_PUBLIC_QUERY_KEY = "getCheckInLis
 
 export const useGetCheckInListAttendeeDetailPublic = (
     checkInListShortId: IdParam,
-    attendeePublicId: IdParam | null,
+    attendeeShortId: IdParam | null,
 ) => {
     return useQuery({
-        queryKey: [GET_CHECK_IN_LIST_ATTENDEE_DETAIL_PUBLIC_QUERY_KEY, checkInListShortId, attendeePublicId],
-        queryFn: () => publicCheckInClient.getCheckInListAttendeeDetail(checkInListShortId, attendeePublicId!),
-        enabled: !!checkInListShortId && !!attendeePublicId,
+        queryKey: [GET_CHECK_IN_LIST_ATTENDEE_DETAIL_PUBLIC_QUERY_KEY, checkInListShortId, attendeeShortId],
+        queryFn: () => publicCheckInClient.getCheckInListAttendeeDetail(checkInListShortId, attendeeShortId!),
+        enabled: !!checkInListShortId && !!attendeeShortId,
         retry: false,
     });
 };

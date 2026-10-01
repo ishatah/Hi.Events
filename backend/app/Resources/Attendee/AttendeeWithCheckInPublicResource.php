@@ -19,7 +19,11 @@ class AttendeeWithCheckInPublicResource extends JsonResource
             'id' => $this->getId(),
             'first_name' => $this->getFirstName(),
             'last_name' => $this->getLastName(),
-            'public_id' => $this->getPublicId(),
+            // Deliberately not public_id: that value is the ticket QR payload, so a list
+            // endpoint returning every attendee's would let anyone holding the link mint
+            // every ticket. short_id identifies an attendee for check-in without proving
+            // anything about ticket ownership.
+            'short_id' => $this->getShortId(),
             'product_id' => $this->getProductId(),
             'product_price_id' => $this->getProductPriceId(),
             'status' => $this->getStatus(),

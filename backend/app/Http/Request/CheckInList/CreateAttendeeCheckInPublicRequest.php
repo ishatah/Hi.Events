@@ -12,7 +12,7 @@ class CreateAttendeeCheckInPublicRequest extends BaseRequest
     {
         return [
             'attendees' => ['required', 'array'],
-            'attendees.*.public_id' => ['required', 'string'],
+            'attendees.*.short_id' => ['required', 'string'],
             'attendees.*.action' => ['required', 'string', Rule::in(AttendeeCheckInActionType::valuesArray())],
         ];
     }

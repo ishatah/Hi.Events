@@ -25,7 +25,10 @@ class AttendeeDetailPublicResource extends JsonResource
 
         $data = [
             'id' => $attendee->getId(),
-            'public_id' => $attendee->getPublicId(),
+            // The operator sees a reference code, not the ticket QR payload. This endpoint
+            // sits behind the same unauthenticated list link, so returning public_id here
+            // would only move the leak from one request to one request per attendee.
+            'short_id' => $attendee->getShortId(),
             'first_name' => $attendee->getFirstName(),
             'last_name' => $attendee->getLastName(),
             'status' => $attendee->getStatus(),

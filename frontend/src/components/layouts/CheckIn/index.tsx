@@ -92,7 +92,7 @@ const CheckIn = () => {
         return storedIsSoundOn === null ? true : JSON.parse(storedIsSoundOn);
     });
     const [selectedAttendee, setSelectedAttendee] = useState<Attendee | null>(null);
-    const [detailAttendeePublicId, setDetailAttendeePublicId] = useState<string | null>(null);
+    const [detailAttendeeShortId, setDetailAttendeeShortId] = useState<string | null>(null);
     const [checkInModalOpen, checkInModalHandlers] = useDisclosure(false);
     const haptic = useHaptics();
     const [infoModalOpen, infoModalHandlers] = useDisclosure(false, {
@@ -231,22 +231,22 @@ const CheckIn = () => {
         return new Promise<boolean>((resolve) => {
             checkInMutation.mutate({
                 checkInListShortId: checkInListShortId,
-                attendeePublicId: attendee.public_id,
+                attendeeShortId: attendee.short_id,
                 action: action,
             }, {
                 onSuccess: (response) => {
                     const {errors, data} = response;
-                    if (errors && errors[attendee.public_id]) {
-                        showError(errors[attendee.public_id]);
+                    if (errors && errors[attendee.short_id]) {
+                        showError(errors[attendee.short_id]);
                         playErrorSound();
                         haptic("error");
-                        recordScan(attendee, attendee.public_id, "error");
+                        recordScan(attendee, attendee.short_id, "error");
                         resolve(false);
                         return;
                     }
                     playSuccessSound();
                     haptic("success");
-                    recordScan(attendee, attendee.public_id, "success");
+                    recordScan(attendee, attendee.short_id, "success");
                     checkInModalHandlers.close();
                     setSelectedAttendee(null);
 
@@ -267,7 +267,7 @@ const CheckIn = () => {
                 onError: (error) => {
                     playErrorSound();
                     haptic("error");
-                    recordScan(attendee, attendee.public_id, "error");
+                    recordScan(attendee, attendee.short_id, "error");
                     if (!networkStatus.online) {
                         showError(t`You are offline. This ticket was not checked in — scan it again once you are back online.`);
                         resolve(false);
@@ -344,27 +344,39 @@ const CheckIn = () => {
         isProcessingRef.current = true;
         lastScanTimeRef.current = now;
 
-        let attendee = attendees?.find(a => a.public_id === attendeePublicId);
+        // The scanned code is the ticket QR, which no endpoint returns any more, so it
+        // cannot be matched against the loaded list. The server exchanges it for the
+        // attendee's lookup key instead.
+        let attendee: Attendee | undefined;
 
-        if (!attendee) {
-            try {
-                const {data} = await publicCheckInClient.getCheckInListAttendee(checkInListShortId, attendeePublicId);
-                attendee = data;
-            } catch (error) {
-                showError(t`Unable to fetch attendee`);
-                playErrorSound();
-                recordScan(null, attendeePublicId, "error");
-                isProcessingRef.current = false;
-                return false;
-            }
+        try {
+            const {data: resolved} = await publicCheckInClient.resolveScannedTicket(
+                checkInListShortId,
+                attendeePublicId,
+            );
+            attendee = attendees?.find(a => a.short_id === resolved.short_id);
 
             if (!attendee) {
-                showError(t`Attendee not found`);
-                playErrorSound();
-                recordScan(null, attendeePublicId, "error");
-                isProcessingRef.current = false;
-                return false;
+                const {data} = await publicCheckInClient.getCheckInListAttendee(
+                    checkInListShortId,
+                    resolved.short_id,
+                );
+                attendee = data;
             }
+        } catch (error) {
+            showError(t`Unable to fetch attendee`);
+            playErrorSound();
+            recordScan(null, attendeePublicId, "error");
+            isProcessingRef.current = false;
+            return false;
+        }
+
+        if (!attendee) {
+            showError(t`Attendee not found`);
+            playErrorSound();
+            recordScan(null, attendeePublicId, "error");
+            isProcessingRef.current = false;
+            return false;
         }
 
         if (attendee.check_in) {
@@ -622,7 +634,7 @@ const CheckIn = () => {
                         isSoundOn={isSoundOn}
                         onSoundToggle={() => setIsSoundOn(!isSoundOn)}
                         onAttendeeScanned={handleQrCheckIn}
-                        onOpenRecentScan={setDetailAttendeePublicId}
+                        onOpenRecentScan={setDetailAttendeeShortId}
                         recentScans={recentScans}
                     />
                 )}
@@ -634,7 +646,7 @@ const CheckIn = () => {
                             searchQuery={searchQuery}
                             onSearchChange={setSearchQuery}
                             onCheckInToggle={handleCheckInToggle}
-                            onOpenDetail={setDetailAttendeePublicId}
+                            onOpenDetail={setDetailAttendeeShortId}
                             isLoading={attendeesQuery.isFetching}
                             isCheckInPending={checkInMutation.isPending}
                             isDeletePending={deleteCheckInMutation.isPending}
@@ -678,10 +690,10 @@ const CheckIn = () => {
             />
             <AttendeeDetailSheet
                 checkInListShortId={checkInListShortId}
-                attendeePublicId={detailAttendeePublicId}
+                attendeeShortId={detailAttendeeShortId}
                 eventType={event?.type}
                 timezone={event?.timezone}
-                onClose={() => setDetailAttendeePublicId(null)}
+                onClose={() => setDetailAttendeeShortId(null)}
                 isActionPending={checkInMutation.isPending || deleteCheckInMutation.isPending}
                 onCheckInToggle={(detail) => {
                     const attendee: Attendee = {
@@ -693,8 +705,7 @@ const CheckIn = () => {
                         first_name: detail.first_name,
                         last_name: detail.last_name,
                         email: detail.email,
-                        public_id: detail.public_id,
-                        short_id: detail.public_id,
+                        short_id: detail.short_id,
                         check_in: detail.check_ins?.[0] ? {
                             id: detail.check_ins[0].id,
                             attendee_id: detail.check_ins[0].attendee_id,

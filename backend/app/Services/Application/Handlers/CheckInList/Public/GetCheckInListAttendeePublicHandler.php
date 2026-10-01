@@ -25,7 +25,29 @@ class GetCheckInListAttendeePublicHandler
     /**
      * @throws CannotCheckInException
      */
-    public function handle(string $shortId, string $attendeePublicId): AttendeeDomainObject
+    public function handle(string $shortId, string $attendeeShortId): AttendeeDomainObject
+    {
+        return $this->resolve($shortId, 'short_id', $attendeeShortId);
+    }
+
+    /**
+     * Resolves a scanned ticket QR to its attendee.
+     *
+     * Separate from handle() because the two identifiers mean different things: short_id is a
+     * lookup key an operator may see, while public_id is the ticket QR and may only travel
+     * inward. Sharing one method would invite a caller to pass the wrong one.
+     *
+     * @throws CannotCheckInException
+     */
+    public function handleByPublicId(string $shortId, string $ticketCode): AttendeeDomainObject
+    {
+        return $this->resolve($shortId, 'public_id', $ticketCode);
+    }
+
+    /**
+     * @throws CannotCheckInException
+     */
+    private function resolve(string $shortId, string $field, string $value): AttendeeDomainObject
     {
         $checkInList = $this->checkInListRepository
             ->loadRelation(ProductDomainObject::class)
@@ -41,7 +63,7 @@ class GetCheckInListAttendeePublicHandler
         $this->checkInListActivityValidator->assertActive($checkInList);
 
         $attendee = $this->attendeeRepository->findFirstWhere([
-            'public_id' => $attendeePublicId,
+            $field => $value,
             'event_id' => $checkInList->getEventId(),
         ]);
 

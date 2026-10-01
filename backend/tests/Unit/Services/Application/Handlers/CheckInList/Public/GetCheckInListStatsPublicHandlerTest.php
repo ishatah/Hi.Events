@@ -92,7 +92,7 @@ class GetCheckInListStatsPublicHandlerTest extends TestCase
 
         $recentCheckIns = collect([
             new CheckInListRecentCheckInDTO(
-                attendeePublicId: 'A-AAAAAAAA',
+                attendeeShortId: 'at-aaaaaaaa',
                 firstName: 'Alice',
                 lastName: 'Smith',
                 productTitle: 'VIP',

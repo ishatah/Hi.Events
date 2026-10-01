@@ -281,7 +281,7 @@ class CheckInListRepository extends BaseRepository implements CheckInListReposit
 
         $sql = <<<SQL
             SELECT
-                a.public_id AS attendee_public_id,
+                a.short_id AS attendee_short_id,
                 a.first_name,
                 a.last_name,
                 p.title AS product_title,
@@ -305,7 +305,7 @@ class CheckInListRepository extends BaseRepository implements CheckInListReposit
 
         return collect($rows)->map(
             static fn ($row) => new CheckInListRecentCheckInDTO(
-                attendeePublicId: $row->attendee_public_id,
+                attendeeShortId: $row->attendee_short_id,
                 firstName: $row->first_name ?? '',
                 lastName: $row->last_name ?? '',
                 productTitle: $row->product_title,

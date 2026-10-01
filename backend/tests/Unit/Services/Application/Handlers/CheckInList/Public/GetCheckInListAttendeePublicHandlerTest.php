@@ -50,7 +50,7 @@ class GetCheckInListAttendeePublicHandlerTest extends TestCase
 
         $this->expectException(ResourceNotFoundException::class);
 
-        $this->handler->handle('short-id', 'attendee-public-id');
+        $this->handler->handle('short-id', 'attendee-short-id');
     }
 
     public function test_handle_throws_cannot_check_in_if_list_expired(): void
@@ -70,7 +70,7 @@ class GetCheckInListAttendeePublicHandlerTest extends TestCase
 
         $this->expectException(CannotCheckInException::class);
 
-        $this->handler->handle('short-id', 'attendee-public-id');
+        $this->handler->handle('short-id', 'attendee-short-id');
     }
 
     public function test_handle_throws_cannot_check_in_if_list_not_active_yet(): void
@@ -91,7 +91,7 @@ class GetCheckInListAttendeePublicHandlerTest extends TestCase
 
         $this->expectException(CannotCheckInException::class);
 
-        $this->handler->handle('short-id', 'attendee-public-id');
+        $this->handler->handle('short-id', 'attendee-short-id');
     }
 
     public function test_handle_returns_attendee_successfully(): void
@@ -119,12 +119,12 @@ class GetCheckInListAttendeePublicHandlerTest extends TestCase
             ->shouldReceive('findFirstWhere')
             ->once()
             ->with([
-                'public_id' => 'attendee-public-id',
+                'short_id' => 'attendee-short-id',
                 'event_id' => 123,
             ])
             ->andReturn($attendee);
 
-        $result = $this->handler->handle('short-id', 'attendee-public-id');
+        $result = $this->handler->handle('short-id', 'attendee-short-id');
 
         $this->assertSame($attendee, $result);
     }

@@ -151,7 +151,7 @@ export const CheckInStatusModal = ({
                                 </Trans>
                             </Text>
                             <Text size="xs" c="dimmed">
-                                {attendee.public_id}
+                                {attendee.short_id}
                             </Text>
                         </Box>
 

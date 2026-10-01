@@ -89,7 +89,7 @@ class CheckInAttendeeHandler
             checkInUserIpAddress: request()->ip() ?? '',
             attendeesAndActions: new Collection([
                 new AttendeeAndActionDTO(
-                    public_id: $attendee->getPublicId(),
+                    short_id: $attendee->getShortId(),
                     action: AttendeeCheckInActionType::CHECK_IN,
                 ),
             ]),

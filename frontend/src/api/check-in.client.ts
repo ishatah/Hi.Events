@@ -25,19 +25,28 @@ export const publicCheckInClient = {
         const response = await publicApi.get<GenericPaginatedResponse<Attendee>>(`/check-in-lists/${checkInListShortId}/attendees` + queryParamsHelper.buildQueryString(pagination));
         return response.data;
     },
-    getCheckInListAttendee: async (checkInListShortId: IdParam, attendeePublicId: IdParam) => {
-        const response = await publicApi.get<GenericDataResponse<Attendee>>(`/check-in-lists/${checkInListShortId}/attendees/${attendeePublicId}`);
+    getCheckInListAttendee: async (checkInListShortId: IdParam, attendeeShortId: IdParam) => {
+        const response = await publicApi.get<GenericDataResponse<Attendee>>(`/check-in-lists/${checkInListShortId}/attendees/${attendeeShortId}`);
         return response.data;
     },
-    getCheckInListAttendeeDetail: async (checkInListShortId: IdParam, attendeePublicId: IdParam) => {
-        const response = await publicApi.get<GenericDataResponse<AttendeeDetailPublic>>(`/check-in-lists/${checkInListShortId}/attendees/${attendeePublicId}/detail`);
+    getCheckInListAttendeeDetail: async (checkInListShortId: IdParam, attendeeShortId: IdParam) => {
+        const response = await publicApi.get<GenericDataResponse<AttendeeDetailPublic>>(`/check-in-lists/${checkInListShortId}/attendees/${attendeeShortId}/detail`);
         return response.data;
     },
-    createCheckIn: async (checkInListShortId: IdParam, attendeePublicId: IdParam, action: 'check-in' | 'check-in-and-mark-order-as-paid') => {
+    // A scanned ticket code goes in and the lookup key comes back. The code is never returned
+    // by any endpoint, so a leaked list link cannot be turned back into working tickets.
+    resolveScannedTicket: async (checkInListShortId: IdParam, ticketCode: string) => {
+        const response = await publicApi.post<GenericDataResponse<{short_id: string}>>(
+            `/check-in-lists/${checkInListShortId}/resolve-ticket`,
+            {ticket_code: ticketCode},
+        );
+        return response.data;
+    },
+    createCheckIn: async (checkInListShortId: IdParam, attendeeShortId: IdParam, action: 'check-in' | 'check-in-and-mark-order-as-paid') => {
         const response = await publicApi.post<GenericDataResponse<PublicCheckIn[]>>(`/check-in-lists/${checkInListShortId}/check-ins`, {
             "attendees": [
                 {
-                    "public_id": attendeePublicId,
+                    "short_id": attendeeShortId,
                     "action": action
                 }
             ]

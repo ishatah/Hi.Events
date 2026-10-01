@@ -20,6 +20,7 @@ class AttendeeWithCheckInPublicResourceTest extends TestCase
             ->setFirstName('Jane')
             ->setLastName('Attendee')
             ->setPublicId('A-12345')
+            ->setShortId('at-12345')
             ->setStatus('ACTIVE');
 
         $resource = (new AttendeeWithCheckInPublicResource($attendee))->toArray(Request::create('/'));
@@ -27,7 +28,13 @@ class AttendeeWithCheckInPublicResourceTest extends TestCase
         $this->assertArrayNotHasKey('email', $resource);
         $this->assertSame('Jane', $resource['first_name']);
         $this->assertSame('Attendee', $resource['last_name']);
-        $this->assertSame('A-12345', $resource['public_id']);
+        $this->assertSame('at-12345', $resource['short_id']);
         $this->assertSame(10, $resource['order_id']);
+        $this->assertArrayNotHasKey(
+            'public_id',
+            $resource,
+            'public_id is the ticket QR payload, so a list endpoint returning every '
+            .'attendee would let anyone holding the link mint every ticket.'
+        );
     }
 }

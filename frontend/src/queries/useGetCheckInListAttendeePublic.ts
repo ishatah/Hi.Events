@@ -4,11 +4,11 @@ import {publicCheckInClient} from "../api/check-in.client";
 
 export const GET_CHECK_IN_LIST_ATTENDEE_PUBLIC_QUERY_KEY = 'getCheckInListAttendee';
 
-export const useGetCheckInListAttendee = (checkInListShortId: IdParam, attendeePublicId: IdParam) => {
+export const useGetCheckInListAttendee = (checkInListShortId: IdParam, attendeeShortId: IdParam) => {
     return useQuery<GenericPaginatedResponse<Attendee>>({
-        queryKey: [GET_CHECK_IN_LIST_ATTENDEE_PUBLIC_QUERY_KEY, checkInListShortId, attendeePublicId],
+        queryKey: [GET_CHECK_IN_LIST_ATTENDEE_PUBLIC_QUERY_KEY, checkInListShortId, attendeeShortId],
         queryFn: async () => {
-            return await publicCheckInClient.getCheckInListAttendee(checkInListShortId, attendeePublicId);
+            return await publicCheckInClient.getCheckInListAttendee(checkInListShortId, attendeeShortId);
         },
     });
 };

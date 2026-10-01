@@ -874,7 +874,7 @@ export interface Attendee {
     email: string;
     notes?: string;
     order?: Order;
-    public_id: string;
+    public_id?: string;
     short_id: string;
     checked_in_at?: string;
     checked_out_by?: number;
@@ -1076,7 +1076,7 @@ export interface AttendeeDetailPublicQuestionAnswer {
 
 export interface AttendeeDetailPublic {
     id: number;
-    public_id: string;
+    short_id: string;
     first_name: string;
     last_name: string;
     email: string;
@@ -1112,7 +1112,7 @@ export interface CheckInListProductStat {
 }
 
 export interface CheckInListRecentCheckIn {
-    attendee_public_id: string;
+    attendee_short_id: string;
     first_name: string;
     last_name: string;
     product_title: string | null;

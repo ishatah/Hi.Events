@@ -28,7 +28,7 @@ class CheckInListStatsPublicResource extends JsonResource
             ),
             'recent_check_ins' => array_map(
                 static fn (CheckInListRecentCheckInDTO $checkIn) => [
-                    'attendee_public_id' => $checkIn->attendeePublicId,
+                    'attendee_short_id' => $checkIn->attendeeShortId,
                     'first_name' => $checkIn->firstName,
                     'last_name' => $checkIn->lastName,
                     'product_title' => $checkIn->productTitle,

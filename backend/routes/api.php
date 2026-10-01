@@ -120,6 +120,7 @@ use HiEvents\Http\Actions\CheckInLists\Public\GetCheckInListAttendeePublicAction
 use HiEvents\Http\Actions\CheckInLists\Public\GetCheckInListAttendeesPublicAction;
 use HiEvents\Http\Actions\CheckInLists\Public\GetCheckInListPublicAction;
 use HiEvents\Http\Actions\CheckInLists\Public\GetCheckInListStatsPublicAction;
+use HiEvents\Http\Actions\CheckInLists\Public\ResolveScannedTicketPublicAction;
 use HiEvents\Http\Actions\CheckInLists\UpdateCheckInListAction;
 use HiEvents\Http\Actions\CommandCentre\GetCommandCentreSnapshotAction;
 use HiEvents\Http\Actions\Common\GetColorThemesAction;
@@ -979,8 +980,12 @@ $router->prefix('/public')->group(
         $router->get('/check-in-lists/{check_in_list_short_id}', GetCheckInListPublicAction::class);
         $router->get('/check-in-lists/{check_in_list_short_id}/stats', GetCheckInListStatsPublicAction::class);
         $router->get('/check-in-lists/{check_in_list_short_id}/attendees', GetCheckInListAttendeesPublicAction::class);
-        $router->get('/check-in-lists/{check_in_list_short_id}/attendees/{attendee_public_id}', GetCheckInListAttendeePublicAction::class);
-        $router->get('/check-in-lists/{check_in_list_short_id}/attendees/{attendee_public_id}/detail', GetCheckInListAttendeeDetailPublicAction::class);
+        $router->get('/check-in-lists/{check_in_list_short_id}/attendees/{attendee_short_id}', GetCheckInListAttendeePublicAction::class);
+        $router->get('/check-in-lists/{check_in_list_short_id}/attendees/{attendee_short_id}/detail', GetCheckInListAttendeeDetailPublicAction::class);
+        // A scanned QR goes in and the lookup key comes back. POST so the ticket code does
+        // not land in access logs, proxy caches or browser history.
+        $router->post('/check-in-lists/{check_in_list_short_id}/resolve-ticket', ResolveScannedTicketPublicAction::class)
+            ->middleware('throttle:60,1');
         $router->post('/check-in-lists/{check_in_list_short_id}/check-ins', CreateAttendeeCheckInPublicAction::class);
         $router->delete('/check-in-lists/{check_in_list_short_id}/check-ins/{check_in_short_id}', DeleteAttendeeCheckInPublicAction::class);
 

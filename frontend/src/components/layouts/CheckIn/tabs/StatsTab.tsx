@@ -157,14 +157,14 @@ export const StatsTab = ({checkInListShortId, enabled, eventOccurrenceId}: Stats
             ) : (
                 <div className={classes.recentList}>
                     {stats.recent_check_ins.map(checkIn => (
-                        <div className={classes.recent} key={`${checkIn.attendee_public_id}-${checkIn.checked_in_at}`}>
+                        <div className={classes.recent} key={`${checkIn.attendee_short_id}-${checkIn.checked_in_at}`}>
                             <div className={classes.recentCheck}><IconCheck size={14} stroke={3}/></div>
                             <div className={classes.recentMain}>
                                 <div className={classes.recentName}>
                                     {checkIn.first_name} {checkIn.last_name}
                                 </div>
                                 <div className={classes.recentCode}>
-                                    {checkIn.attendee_public_id}
+                                    {checkIn.attendee_short_id}
                                     {checkIn.product_title && (
                                         <> · {checkIn.product_title}</>
                                     )}

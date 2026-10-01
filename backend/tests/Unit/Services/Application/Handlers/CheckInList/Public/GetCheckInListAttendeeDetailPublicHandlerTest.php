@@ -66,7 +66,7 @@ class GetCheckInListAttendeeDetailPublicHandlerTest extends TestCase
         $this->attendeeRepository
             ->shouldReceive('findFirstWhere')
             ->once()
-            ->with(['public_id' => 'A-123', 'event_id' => 5])
+            ->with(['short_id' => 'A-123', 'event_id' => 5])
             ->andReturnNull();
 
         $this->expectException(ResourceNotFoundException::class);

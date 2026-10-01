@@ -16,12 +16,12 @@ class GetCheckInListAttendeePublicAction extends BaseAction
         private readonly GetCheckInListAttendeePublicHandler $getCheckInListAttendeePublicHandler,
     ) {}
 
-    public function __invoke(string $shortId, string $attendeePublicId, Request $request): JsonResponse
+    public function __invoke(string $shortId, string $attendeeShortId, Request $request): JsonResponse
     {
         try {
             $attendee = $this->getCheckInListAttendeePublicHandler->handle(
                 shortId: $shortId,
-                attendeePublicId: $attendeePublicId,
+                attendeeShortId: $attendeeShortId,
             );
         } catch (CannotCheckInException $e) {
             return $this->errorResponse(

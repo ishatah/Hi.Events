@@ -10,12 +10,12 @@ export const useCreateCheckInPublic = (pagination: QueryFilters) => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: ({checkInListShortId, attendeePublicId, action}: {
+        mutationFn: ({checkInListShortId, attendeeShortId, action}: {
             checkInListShortId: IdParam,
-            attendeePublicId: IdParam,
+            attendeeShortId: IdParam,
             action: 'check-in' | 'check-in-and-mark-order-as-paid'
         }) =>
-            publicCheckInClient.createCheckIn(checkInListShortId, attendeePublicId, action),
+            publicCheckInClient.createCheckIn(checkInListShortId, attendeeShortId, action),
 
         onSuccess: (data, {checkInListShortId, action}) => {
             const markedAsPaid = action === 'check-in-and-mark-order-as-paid';

@@ -18,12 +18,12 @@ class GetCheckInListAttendeeDetailPublicAction extends BaseAction
         private readonly AuthUserService $authUserService,
     ) {}
 
-    public function __invoke(string $checkInListShortId, string $attendeePublicId): JsonResponse
+    public function __invoke(string $checkInListShortId, string $attendeeShortId): JsonResponse
     {
         try {
             $detail = $this->handler->handle(
                 shortId: $checkInListShortId,
-                attendeePublicId: $attendeePublicId,
+                attendeeShortId: $attendeeShortId,
                 staffAccountId: $this->resolveStaffAccountId(),
             );
         } catch (CannotCheckInException $e) {

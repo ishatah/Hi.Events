@@ -35,7 +35,7 @@ class DeleteAttendeeCheckInPublicHandler
 
             $this->logger->info('Attendee check-in deleted', [
                 'check_in_list_uuid' => $checkInData->checkInListShortId,
-                'attendee_public_id' => $checkInData->checkInShortId,
+                'check_in_short_id' => $checkInData->checkInShortId,
                 'check_in_user_ip_address' => $checkInData->checkInUserIpAddress,
             ]);
 

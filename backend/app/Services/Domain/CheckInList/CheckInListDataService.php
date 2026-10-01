@@ -62,19 +62,19 @@ class CheckInListDataService
      * @throws Exception
      * @throws CannotCheckInException
      */
-    public function getAttendees(Collection $attendeePublicIds): Collection
+    public function getAttendees(Collection $attendeeShortIds): Collection
     {
-        $attendeePublicIds = array_unique($attendeePublicIds->toArray());
+        $attendeeShortIds = array_unique($attendeeShortIds->toArray());
 
         $attendees = $this->attendeeRepository->findWhereIn(
-            field: AttendeeDomainObjectAbstract::PUBLIC_ID,
-            values: $attendeePublicIds
+            field: AttendeeDomainObjectAbstract::SHORT_ID,
+            values: $attendeeShortIds
         );
 
-        if (count($attendees) !== count($attendeePublicIds)) {
+        if (count($attendees) !== count($attendeeShortIds)) {
             throw new CannotCheckInException(__('Invalid attendee code detected: :attendees ', [
                 'attendees' => implode(', ', array_diff(
-                    $attendeePublicIds,
+                    $attendeeShortIds,
                     $attendees->pluck(AttendeeDomainObjectAbstract::PUBLIC_ID)->toArray())
                 ),
             ]));

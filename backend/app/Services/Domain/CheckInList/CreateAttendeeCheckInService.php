@@ -71,11 +71,11 @@ class CreateAttendeeCheckInService
      */
     private function fetchAttendees(Collection $attendeesAndActions): Collection
     {
-        $publicIds = $attendeesAndActions->map(
-            fn (AttendeeAndActionDTO $attendeeAndAction) => $attendeeAndAction->public_id
+        $shortIds = $attendeesAndActions->map(
+            fn (AttendeeAndActionDTO $attendeeAndAction) => $attendeeAndAction->short_id
         );
 
-        return $this->checkInListDataService->getAttendees($publicIds);
+        return $this->checkInListDataService->getAttendees($shortIds);
     }
 
     private function fetchEventSettings(int $eventId): EventSettingDomainObject
@@ -158,7 +158,7 @@ class CreateAttendeeCheckInService
         $this->checkInListDataService->verifyAttendeeBelongsToCheckInList($checkInList, $attendee);
 
         $attendeeAction = $attendeesAndActions->first(
-            fn (AttendeeAndActionDTO $action) => $action->public_id === $attendee->getPublicId()
+            fn (AttendeeAndActionDTO $action) => $action->short_id === $attendee->getShortId()
         );
         $checkInAction = $attendeeAction->action;
 
