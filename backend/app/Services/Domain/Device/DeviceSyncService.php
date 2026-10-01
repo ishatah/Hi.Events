@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace HiEvents\Services\Domain\Device;
 
 use Carbon\Carbon;
+use HiEvents\DomainObjects\Enums\AccessLogSource;
 use HiEvents\Exceptions\ResourceConflictException;
 use HiEvents\Services\Domain\Access\AccessScanService;
 use HiEvents\Services\Domain\Device\DTO\SyncResultDTO;
@@ -141,7 +142,7 @@ class DeviceSyncService
                         ? Carbon::parse((string) $log['occurred_at'])
                         : null,
                     identifierType: (string) ($log['identifier_type'] ?? 'QR'),
-                    source: 'OFFLINE_SYNC',
+                    source: AccessLogSource::OFFLINE_SYNC->value,
                 );
 
                 $accepted++;

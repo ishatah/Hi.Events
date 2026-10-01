@@ -5,6 +5,7 @@ namespace Tests\Feature\Services\Domain\Access;
 use Carbon\Carbon;
 use HiEvents\DomainObjects\CredentialDomainObject;
 use HiEvents\DomainObjects\Enums\AccessDirection;
+use HiEvents\DomainObjects\Enums\AccessLogSource;
 use HiEvents\DomainObjects\Enums\AccessResult;
 use HiEvents\Models\User;
 use HiEvents\Services\Domain\Access\AccessScanService;
@@ -272,6 +273,7 @@ class AccessScanServiceTest extends TestCase
             accessPointId: $this->accessPointId,
             clientGeneratedId: (string) Str::uuid(),
             occurredAt: $scannedAt,
+            source: AccessLogSource::OFFLINE_SYNC->value,
         );
 
         $log = DB::table('access_logs')->where('credential_id', $credential->getId())->first();
@@ -282,6 +284,54 @@ class AccessScanServiceTest extends TestCase
             'recorded_at must be later than occurred_at for a late-submitted offline scan.'
         );
         $this->assertTrue((bool) $log->is_offline_replay);
+    }
+
+    public function test_a_slow_online_scan_is_not_flagged_as_an_offline_replay(): void
+    {
+        $credential = $this->issueAttendeeCredential();
+        $this->grantZone($credential->getId(), $this->zoneId);
+
+        // A retry on a bad network arrives late with a client id, which the old heuristic
+        // read as an offline decision. Reconciliation would then look for a device decision
+        // to compare against and find none.
+        $this->scanService->scan(
+            eventId: $this->eventId,
+            identifier: $this->identifierFor($credential->getId()),
+            accessPointId: $this->accessPointId,
+            clientGeneratedId: (string) Str::uuid(),
+            occurredAt: Carbon::now()->subMinutes(30),
+        );
+
+        $log = DB::table('access_logs')->where('credential_id', $credential->getId())->first();
+
+        $this->assertFalse(
+            (bool) $log->is_offline_replay,
+            'The server decided this one, however long the record took to arrive.'
+        );
+    }
+
+    public function test_a_fast_offline_replay_is_still_flagged(): void
+    {
+        $credential = $this->issueAttendeeCredential();
+        $this->grantZone($credential->getId(), $this->zoneId);
+
+        // A device that reconnects seconds after deciding offline. The old heuristic missed
+        // this entirely, so a genuine offline admission went unreconciled.
+        $this->scanService->scan(
+            eventId: $this->eventId,
+            identifier: $this->identifierFor($credential->getId()),
+            accessPointId: $this->accessPointId,
+            clientGeneratedId: (string) Str::uuid(),
+            occurredAt: Carbon::now()->subSeconds(5),
+            source: AccessLogSource::OFFLINE_SYNC->value,
+        );
+
+        $log = DB::table('access_logs')->where('credential_id', $credential->getId())->first();
+
+        $this->assertTrue(
+            (bool) $log->is_offline_replay,
+            'The device made this decision, however quickly it reported it.'
+        );
     }
 
     private function issueAttendeeCredential(): CredentialDomainObject

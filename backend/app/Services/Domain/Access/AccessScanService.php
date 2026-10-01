@@ -6,6 +6,7 @@ namespace HiEvents\Services\Domain\Access;
 
 use Carbon\Carbon;
 use HiEvents\DomainObjects\Enums\AccessDirection;
+use HiEvents\DomainObjects\Enums\AccessLogSource;
 use HiEvents\DomainObjects\Enums\AccessResult;
 use HiEvents\Events\Realtime\AccessScanRecorded;
 use HiEvents\Services\Domain\Access\DTO\AccessContextDTO;
@@ -48,7 +49,7 @@ class AccessScanService
         ?string $clientGeneratedId = null,
         ?Carbon $occurredAt = null,
         string $identifierType = 'QR',
-        string $source = 'SCAN',
+        string $source = AccessLogSource::SCAN->value,
     ): AccessDecisionDTO {
         $occurredAt = $this->clampDeviceClock($occurredAt);
 
@@ -101,7 +102,7 @@ class AccessScanService
             clientGeneratedId: $clientGeneratedId,
             occurredAt: $occurredAt,
             source: $source,
-            isOfflineReplay: $clientGeneratedId !== null && $occurredAt->lt(Carbon::now()->subMinutes(2)),
+            isOfflineReplay: AccessLogSource::tryFrom($source)?->isOfflineReplay() ?? false,
         );
 
         // A live board wants the verdict and the place, not the holder. Pushing personal

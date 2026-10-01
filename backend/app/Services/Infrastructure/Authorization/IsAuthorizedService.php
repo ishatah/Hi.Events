@@ -37,6 +37,12 @@ readonly class IsAuthorizedService
      */
     public function validateUserRole(Role $minimumRole, UserDomainObject $authUser): void
     {
+        // A role travels in a token that lives for days, so it has to be checked against the
+        // membership's current status rather than trusted. isActionAuthorized() already does
+        // this, but minimumAllowedRole() reached the admin surface without it — so
+        // deactivating a SUPERADMIN left them with all of /admin until their token expired.
+        $this->validateUserStatus($authUser);
+
         if ($minimumRole === Role::ADMIN
             && in_array($authUser->getCurrentAccountUser()->getRole(), [Role::SUPERADMIN->name, Role::ADMIN->name], true) === false
         ) {
@@ -55,7 +61,6 @@ readonly class IsAuthorizedService
         int $authAccountId,
         Role $minimumRole
     ): void {
-        $this->validateUserStatus($authUser);
         $this->validateUserRole($minimumRole, $authUser);
 
         $repository = match ($entityType) {
