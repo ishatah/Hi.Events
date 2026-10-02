@@ -1498,6 +1498,14 @@ msgstr "您在歐盟註冊了增值稅嗎？"
 msgid "Art"
 msgstr "藝術"
 
+#: src/components/routes/organizer/Reports/PlatformFeesReport/index.tsx:75
+msgid "ARZO Fee"
+msgstr "ARZO 費用"
+
+#: src/components/routes/organizer/Reports/index.tsx:42
+msgid "ARZO platform fees and VAT breakdown by transaction"
+msgstr "ARZO 平台費用及每筆交易的增值稅明細"
+
 #: src/components/routes/organizer/Payments/Vat/VatSettings.tsx:28
 msgid "As your business is based in Ireland, Irish VAT at 23% applies automatically to all platform fees."
 msgstr "由於您的業務位於愛爾蘭，愛爾蘭增值稅（23%）將自動套用於所有平台費用。"
@@ -5710,12 +5718,12 @@ msgid "Hi,"
 msgstr "你好，"
 
 #: src/components/routes/organizer/Reports/PlatformFeesReport/index.tsx:75
-msgid "Hi.Events Fee"
-msgstr "Hi.Events 費用"
+#~ msgid "Hi.Events Fee"
+#~ msgstr "Hi.Events 費用"
 
 #: src/components/routes/organizer/Reports/index.tsx:42
-msgid "Hi.Events platform fees and VAT breakdown by transaction"
-msgstr "Hi.Events 平台費用及每筆交易的增值稅明細"
+#~ msgid "Hi.Events platform fees and VAT breakdown by transaction"
+#~ msgstr "Hi.Events 平台費用及每筆交易的增值稅明細"
 
 #: src/components/common/ProductsTable/SortableProduct/index.tsx:100
 #: src/components/common/ProductsTable/SortableProduct/index.tsx:360
@@ -8766,8 +8774,12 @@ msgid "Post Checkout message"
 msgstr "結賬後信息"
 
 #: src/components/common/PoweredByFooter/index.tsx:60
-msgid "Powered by"
-msgstr "技術支援"
+#~ msgid "Powered by"
+#~ msgstr "技術支援"
+
+#: src/components/common/PoweredByFooter/index.tsx:60
+msgid "Powered by ARZO, based on"
+msgstr "由 ARZO 提供支援，基於"
 
 #: src/components/routes/event/Settings/Sections/HomepageAndCheckoutSettings/index.tsx:90
 msgid "Pre Checkout message"
@@ -11814,8 +11826,12 @@ msgid "This recurring event has no dates yet, so there's nothing for attendees t
 msgstr "此重複活動尚未有日期，參加者無法預訂。"
 
 #: src/components/routes/organizer/Reports/PlatformFeesReport/index.tsx:113
-msgid "This report is for informational purposes only. Always consult with a tax professional before using this data for accounting or tax purposes. Please cross-reference with your Stripe dashboard as Hi.Events may be missing historical data."
-msgstr "此報告僅供參考。在將此數據用於會計或稅務目的之前，請務必諮詢稅務專業人士。請與您的Stripe儀表板進行交叉驗證，因為Hi.Events可能缺少歷史數據。"
+msgid "This report is for informational purposes only. Always consult with a tax professional before using this data for accounting or tax purposes. Please cross-reference with your Stripe dashboard as ARZO may be missing historical data."
+msgstr "本報告僅供參考。在將這些數據用於會計或稅務目的之前，請務必諮詢稅務專業人士。請與您的 Stripe 儀表板核對，因為 ARZO 可能缺少歷史數據。"
+
+#: src/components/routes/organizer/Reports/PlatformFeesReport/index.tsx:113
+#~ msgid "This report is for informational purposes only. Always consult with a tax professional before using this data for accounting or tax purposes. Please cross-reference with your Stripe dashboard as Hi.Events may be missing historical data."
+#~ msgstr "此報告僅供參考。在將此數據用於會計或稅務目的之前，請務必諮詢稅務專業人士。請與您的Stripe儀表板進行交叉驗證，因為Hi.Events可能缺少歷史數據。"
 
 #: src/components/routes/auth/ResetPassword/index.tsx:28
 msgid "This reset password link is invalid or expired."

@@ -1,7 +1,10 @@
 # Evento Comparison
 
-**Status:** WRITTEN · **Authority:** Derived · **Audit date:** 2026-09-28
+**Status:** WRITTEN · **Authority:** Derived · **Audit date:** 2026-09-28 · **Baseline:** `develop` @ `7dec84ca`
 **Source:** evento.ae/our-services-4, fetched 2026-09-28 · ARZO side from `02-current-state-audit.md`
+**Current state per gap:** `111-competitive-gap-closure.md` carries each gap at `e7228c1d`, including
+two advantages this document claims that are weaker than stated today: webhook retries do not run
+(`49`), and card payments may be unavailable to a Qatar business (`98`, `135`).
 
 ---
 

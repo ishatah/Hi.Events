@@ -10,6 +10,7 @@ class AccountDeletionRequest extends BaseModel
     {
         return [
             'deletion_manifest' => 'array',
+            'suspended_event_statuses' => 'array',
             'scheduled_deletion_at' => 'datetime',
             'reminder_sent_at' => 'datetime',
             'cancelled_at' => 'datetime',
@@ -33,6 +34,7 @@ class AccountDeletionRequest extends BaseModel
             'cancelled_by_user_id',
             'completed_at',
             'deletion_manifest',
+            'suspended_event_statuses',
         ];
     }
 

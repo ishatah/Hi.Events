@@ -41,6 +41,8 @@ abstract class AccountDeletionRequestDomainObjectAbstract extends AbstractDomain
 
     final public const DELETION_MANIFEST = 'deletion_manifest';
 
+    final public const SUSPENDED_EVENT_STATUSES = 'suspended_event_statuses';
+
     final public const CREATED_AT = 'created_at';
 
     final public const UPDATED_AT = 'updated_at';
@@ -73,6 +75,8 @@ abstract class AccountDeletionRequestDomainObjectAbstract extends AbstractDomain
 
     protected array|string|null $deletion_manifest = null;
 
+    protected array|string|null $suspended_event_statuses = null;
+
     protected ?string $created_at = null;
 
     protected ?string $updated_at = null;
@@ -94,6 +98,7 @@ abstract class AccountDeletionRequestDomainObjectAbstract extends AbstractDomain
             'cancelled_by_user_id' => $this->cancelled_by_user_id ?? null,
             'completed_at' => $this->completed_at ?? null,
             'deletion_manifest' => $this->deletion_manifest ?? null,
+            'suspended_event_statuses' => $this->suspended_event_statuses ?? null,
             'created_at' => $this->created_at ?? null,
             'updated_at' => $this->updated_at ?? null,
         ];
@@ -260,6 +265,18 @@ abstract class AccountDeletionRequestDomainObjectAbstract extends AbstractDomain
         $this->deletion_manifest = $deletion_manifest;
 
         return $this;
+    }
+
+    public function setSuspendedEventStatuses(array|string|null $suspended_event_statuses): self
+    {
+        $this->suspended_event_statuses = $suspended_event_statuses;
+
+        return $this;
+    }
+
+    public function getSuspendedEventStatuses(): array|string|null
+    {
+        return $this->suspended_event_statuses;
     }
 
     public function getDeletionManifest(): array|string|null

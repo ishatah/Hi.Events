@@ -113,16 +113,9 @@ class AccountDeletionService
                 AccountDeletionRequestDomainObjectAbstract::SCHEDULED_DELETION_AT => now()->addDays(self::GRACE_PERIOD_DAYS),
             ]);
 
-            $this->eventRepository->updateWhere(
-                attributes: [EventDomainObjectAbstract::STATUS => EventStatus::DRAFT->name],
-                where: [
-                    EventDomainObjectAbstract::ACCOUNT_ID => $accountId,
-                    [EventDomainObjectAbstract::STATUS, 'in', [
-                        EventStatus::LIVE->name,
-                        EventStatus::PENDING_MANUAL_REVIEW->name,
-                    ]],
-                ],
-            );
+            $this->deletionRequestRepository->updateFromArray($deletionRequest->getId(), [
+                AccountDeletionRequestDomainObjectAbstract::SUSPENDED_EVENT_STATUSES => $this->suspendSellingEvents($accountId),
+            ]);
 
             $account = $this->accountRepository->findById($accountId);
 
@@ -148,6 +141,51 @@ class AccountDeletionService
      * @throws AccountDeletionRequestNotFoundException
      * @throws Throwable
      */
+    /**
+     * @return array<int, string> the status each event held, keyed by event id
+     */
+    private function suspendSellingEvents(int $accountId): array
+    {
+        $suspendable = [EventStatus::LIVE->name, EventStatus::PENDING_MANUAL_REVIEW->name];
+
+        $previousStatuses = $this->databaseManager->table('events')
+            ->where(EventDomainObjectAbstract::ACCOUNT_ID, $accountId)
+            ->whereIn(EventDomainObjectAbstract::STATUS, $suspendable)
+            ->pluck(EventDomainObjectAbstract::STATUS, EventDomainObjectAbstract::ID)
+            ->all();
+
+        if ($previousStatuses === []) {
+            return [];
+        }
+
+        $this->eventRepository->updateWhere(
+            attributes: [EventDomainObjectAbstract::STATUS => EventStatus::DRAFT->name],
+            where: [
+                EventDomainObjectAbstract::ACCOUNT_ID => $accountId,
+                [EventDomainObjectAbstract::STATUS, 'in', $suspendable],
+            ],
+        );
+
+        return $previousStatuses;
+    }
+
+    /**
+     * @param  array<int|string, string>  $suspendedStatuses
+     */
+    private function restoreSuspendedEvents(int $accountId, array $suspendedStatuses): void
+    {
+        foreach ($suspendedStatuses as $eventId => $status) {
+            $this->eventRepository->updateWhere(
+                attributes: [EventDomainObjectAbstract::STATUS => $status],
+                where: [
+                    EventDomainObjectAbstract::ID => (int) $eventId,
+                    EventDomainObjectAbstract::ACCOUNT_ID => $accountId,
+                    EventDomainObjectAbstract::STATUS => EventStatus::DRAFT->name,
+                ],
+            );
+        }
+    }
+
     public function cancelDeletion(int $accountId, int $cancelledByUserId): AccountDeletionRequestDomainObject
     {
         $deletionRequest = $this->databaseManager->transaction(function () use ($accountId, $cancelledByUserId) {
@@ -164,6 +202,11 @@ class AccountDeletionService
                 AccountDeletionRequestDomainObjectAbstract::CANCELLED_AT => now(),
                 AccountDeletionRequestDomainObjectAbstract::CANCELLED_BY_USER_ID => $cancelledByUserId,
             ]);
+
+            $this->restoreSuspendedEvents(
+                $accountId,
+                $activeRequest->getSuspendedEventStatuses() ?? [],
+            );
 
             $account = $this->accountRepository->findById($accountId);
 

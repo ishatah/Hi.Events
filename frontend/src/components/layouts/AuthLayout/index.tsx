@@ -139,7 +139,7 @@ const AuthLayout = () => {
 
         if (clickCountRef.current >= 5) {
             clickCountRef.current = 0;
-            showInfo(`HiEvents v${__APP_VERSION__}`);
+            showInfo(`ARZO v${__APP_VERSION__}`);
         }
     }, []);
 
@@ -154,8 +154,8 @@ const AuthLayout = () => {
                     <main className={classes.container}>
                         <div className={classes.logo} onClick={handleLogoClick} style={{cursor: 'pointer'}}>
                             <img
-                                src={getConfig("VITE_APP_LOGO_DARK", "/logos/hi-events-horizontal-light.svg")}
-                                alt={t`${getConfig("VITE_APP_NAME", "Hi.Events")} logo`}
+                                src={getConfig("VITE_APP_LOGO_LIGHT", "/logos/arzo-horizontal-dark.svg")}
+                                alt={t`${getConfig("VITE_APP_NAME", "ARZO")} logo`}
                             />
                         </div>
                         <div className={classes.formArea}>

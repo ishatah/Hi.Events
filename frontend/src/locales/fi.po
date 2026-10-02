@@ -1498,6 +1498,14 @@ msgstr "Oletko ALV-rekisteröitynyt EU:ssa?"
 msgid "Art"
 msgstr "Taide"
 
+#: src/components/routes/organizer/Reports/PlatformFeesReport/index.tsx:75
+msgid "ARZO Fee"
+msgstr "ARZO-maksu"
+
+#: src/components/routes/organizer/Reports/index.tsx:42
+msgid "ARZO platform fees and VAT breakdown by transaction"
+msgstr "ARZO-alustamaksut ja ALV-erittely tapahtumittain"
+
 #: src/components/routes/organizer/Payments/Vat/VatSettings.tsx:28
 msgid "As your business is based in Ireland, Irish VAT at 23% applies automatically to all platform fees."
 msgstr "Koska yrityksesi sijaitsee Irlannissa, Irlannin 23 %:n ALV sovelletaan automaattisesti kaikkiin palvelumaksuihin."
@@ -5710,12 +5718,12 @@ msgid "Hi,"
 msgstr "Hei,"
 
 #: src/components/routes/organizer/Reports/PlatformFeesReport/index.tsx:75
-msgid "Hi.Events Fee"
-msgstr "Hi.Events-maksu"
+#~ msgid "Hi.Events Fee"
+#~ msgstr "Hi.Events-maksu"
 
 #: src/components/routes/organizer/Reports/index.tsx:42
-msgid "Hi.Events platform fees and VAT breakdown by transaction"
-msgstr "Hi.Eventsin palvelumaksut ja ALV-erittely transaktiokohtaisesti"
+#~ msgid "Hi.Events platform fees and VAT breakdown by transaction"
+#~ msgstr "Hi.Eventsin palvelumaksut ja ALV-erittely transaktiokohtaisesti"
 
 #: src/components/common/ProductsTable/SortableProduct/index.tsx:100
 #: src/components/common/ProductsTable/SortableProduct/index.tsx:360
@@ -8766,8 +8774,12 @@ msgid "Post Checkout message"
 msgstr "Kassanjälkeinen viesti"
 
 #: src/components/common/PoweredByFooter/index.tsx:60
-msgid "Powered by"
-msgstr "Powered by"
+#~ msgid "Powered by"
+#~ msgstr "Powered by"
+
+#: src/components/common/PoweredByFooter/index.tsx:60
+msgid "Powered by ARZO, based on"
+msgstr "Toteuttaa ARZO, perustuu alustaan"
 
 #: src/components/routes/event/Settings/Sections/HomepageAndCheckoutSettings/index.tsx:90
 msgid "Pre Checkout message"
@@ -11814,8 +11826,12 @@ msgid "This recurring event has no dates yet, so there's nothing for attendees t
 msgstr "Tälle toistuvalle tapahtumalle ei ole vielä määritetty päivämääriä, joten osallistujille ei ole mitään varattavaa."
 
 #: src/components/routes/organizer/Reports/PlatformFeesReport/index.tsx:113
-msgid "This report is for informational purposes only. Always consult with a tax professional before using this data for accounting or tax purposes. Please cross-reference with your Stripe dashboard as Hi.Events may be missing historical data."
-msgstr "Tämä raportti on tarkoitettu ainoastaan tiedoksi. Keskustele aina veroasiantuntijan kanssa ennen näiden tietojen käyttämistä kirjanpitoon tai verotukseen. Tarkista tiedot vertaamalla niitä Stripe-hallintapaneeliisi, sillä Hi.Events-palvelusta saattaa puuttua historiatietoja."
+msgid "This report is for informational purposes only. Always consult with a tax professional before using this data for accounting or tax purposes. Please cross-reference with your Stripe dashboard as ARZO may be missing historical data."
+msgstr "Tämä raportti on vain tiedoksi. Ota aina yhteyttä veroasiantuntijaan ennen näiden tietojen käyttämistä kirjanpito- tai verotustarkoituksiin. Vertaa tietoja Stripe-hallintapaneeliisi, sillä ARZO:lta voi puuttua historiatietoja."
+
+#: src/components/routes/organizer/Reports/PlatformFeesReport/index.tsx:113
+#~ msgid "This report is for informational purposes only. Always consult with a tax professional before using this data for accounting or tax purposes. Please cross-reference with your Stripe dashboard as Hi.Events may be missing historical data."
+#~ msgstr "Tämä raportti on tarkoitettu ainoastaan tiedoksi. Keskustele aina veroasiantuntijan kanssa ennen näiden tietojen käyttämistä kirjanpitoon tai verotukseen. Tarkista tiedot vertaamalla niitä Stripe-hallintapaneeliisi, sillä Hi.Events-palvelusta saattaa puuttua historiatietoja."
 
 #: src/components/routes/auth/ResetPassword/index.tsx:28
 msgid "This reset password link is invalid or expired."

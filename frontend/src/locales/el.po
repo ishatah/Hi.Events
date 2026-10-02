@@ -1498,6 +1498,14 @@ msgstr "Είστε εγγεγραμμένοι για ΦΠΑ στην ΕΕ;"
 msgid "Art"
 msgstr "Τέχνη"
 
+#: src/components/routes/organizer/Reports/PlatformFeesReport/index.tsx:75
+msgid "ARZO Fee"
+msgstr "Χρέωση ARZO"
+
+#: src/components/routes/organizer/Reports/index.tsx:42
+msgid "ARZO platform fees and VAT breakdown by transaction"
+msgstr "Χρεώσεις πλατφόρμας ARZO και ανάλυση ΦΠΑ ανά συναλλαγή"
+
 #: src/components/routes/organizer/Payments/Vat/VatSettings.tsx:28
 msgid "As your business is based in Ireland, Irish VAT at 23% applies automatically to all platform fees."
 msgstr "Καθώς η επιχείρησή σας εδρεύει στην Ιρλανδία, ο ιρλανδικός ΦΠΑ 23% εφαρμόζεται αυτόματα σε όλα τα τέλη πλατφόρμας."
@@ -5710,12 +5718,12 @@ msgid "Hi,"
 msgstr "Γεια σας,"
 
 #: src/components/routes/organizer/Reports/PlatformFeesReport/index.tsx:75
-msgid "Hi.Events Fee"
-msgstr "Χρέωση Hi.Events"
+#~ msgid "Hi.Events Fee"
+#~ msgstr "Χρέωση Hi.Events"
 
 #: src/components/routes/organizer/Reports/index.tsx:42
-msgid "Hi.Events platform fees and VAT breakdown by transaction"
-msgstr "Χρεώσεις πλατφόρμας Hi.Events και ανάλυση ΦΠΑ ανά συναλλαγή"
+#~ msgid "Hi.Events platform fees and VAT breakdown by transaction"
+#~ msgstr "Χρεώσεις πλατφόρμας Hi.Events και ανάλυση ΦΠΑ ανά συναλλαγή"
 
 #: src/components/common/ProductsTable/SortableProduct/index.tsx:100
 #: src/components/common/ProductsTable/SortableProduct/index.tsx:360
@@ -8766,8 +8774,12 @@ msgid "Post Checkout message"
 msgstr "Μήνυμα Μετά το Checkout"
 
 #: src/components/common/PoweredByFooter/index.tsx:60
-msgid "Powered by"
-msgstr "Με την υποστήριξη του"
+#~ msgid "Powered by"
+#~ msgstr "Με την υποστήριξη του"
+
+#: src/components/common/PoweredByFooter/index.tsx:60
+msgid "Powered by ARZO, based on"
+msgstr "Με την υποστήριξη της ARZO, βασισμένο στο"
 
 #: src/components/routes/event/Settings/Sections/HomepageAndCheckoutSettings/index.tsx:90
 msgid "Pre Checkout message"
@@ -11814,8 +11826,12 @@ msgid "This recurring event has no dates yet, so there's nothing for attendees t
 msgstr "Αυτή η επαναλαμβανόμενη εκδήλωση δεν έχει ακόμα ημερομηνίες, οπότε οι συμμετέχοντες δεν έχουν τίποτα να κρατήσουν."
 
 #: src/components/routes/organizer/Reports/PlatformFeesReport/index.tsx:113
-msgid "This report is for informational purposes only. Always consult with a tax professional before using this data for accounting or tax purposes. Please cross-reference with your Stripe dashboard as Hi.Events may be missing historical data."
-msgstr "Αυτή η αναφορά είναι μόνο για ενημερωτικούς σκοπούς. Πάντα συμβουλευτείτε φορολογικό σύμβουλο πριν χρησιμοποιήσετε αυτά τα δεδομένα."
+msgid "This report is for informational purposes only. Always consult with a tax professional before using this data for accounting or tax purposes. Please cross-reference with your Stripe dashboard as ARZO may be missing historical data."
+msgstr "Αυτή η αναφορά προορίζεται αποκλειστικά για ενημερωτικούς σκοπούς. Συμβουλευτείτε πάντα έναν φοροτεχνικό πριν χρησιμοποιήσετε αυτά τα δεδομένα για λογιστικούς ή φορολογικούς σκοπούς. Παρακαλούμε διασταυρώστε τα με τον πίνακα ελέγχου Stripe, καθώς ενδέχεται να λείπουν ιστορικά δεδομένα από την ARZO."
+
+#: src/components/routes/organizer/Reports/PlatformFeesReport/index.tsx:113
+#~ msgid "This report is for informational purposes only. Always consult with a tax professional before using this data for accounting or tax purposes. Please cross-reference with your Stripe dashboard as Hi.Events may be missing historical data."
+#~ msgstr "Αυτή η αναφορά είναι μόνο για ενημερωτικούς σκοπούς. Πάντα συμβουλευτείτε φορολογικό σύμβουλο πριν χρησιμοποιήσετε αυτά τα δεδομένα."
 
 #: src/components/routes/auth/ResetPassword/index.tsx:28
 msgid "This reset password link is invalid or expired."

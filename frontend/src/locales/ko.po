@@ -1498,6 +1498,14 @@ msgstr "EU에서 부가가치세(VAT) 등록이 되어 있으신가요?"
 msgid "Art"
 msgstr "예술"
 
+#: src/components/routes/organizer/Reports/PlatformFeesReport/index.tsx:75
+msgid "ARZO Fee"
+msgstr "ARZO 수수료"
+
+#: src/components/routes/organizer/Reports/index.tsx:42
+msgid "ARZO platform fees and VAT breakdown by transaction"
+msgstr "거래별 ARZO 플랫폼 수수료 및 부가세 내역"
+
 #: src/components/routes/organizer/Payments/Vat/VatSettings.tsx:28
 msgid "As your business is based in Ireland, Irish VAT at 23% applies automatically to all platform fees."
 msgstr "귀하의 사업체가 아일랜드에 소재하므로 모든 플랫폼 수수료에 아일랜드 부가가치세 23%가 자동으로 적용됩니다."
@@ -5710,12 +5718,12 @@ msgid "Hi,"
 msgstr "안녕하세요,"
 
 #: src/components/routes/organizer/Reports/PlatformFeesReport/index.tsx:75
-msgid "Hi.Events Fee"
-msgstr "Hi.Events 수수료"
+#~ msgid "Hi.Events Fee"
+#~ msgstr "Hi.Events 수수료"
 
 #: src/components/routes/organizer/Reports/index.tsx:42
-msgid "Hi.Events platform fees and VAT breakdown by transaction"
-msgstr "거래별 Hi.Events 플랫폼 수수료 및 부가가치세 내역"
+#~ msgid "Hi.Events platform fees and VAT breakdown by transaction"
+#~ msgstr "거래별 Hi.Events 플랫폼 수수료 및 부가가치세 내역"
 
 #: src/components/common/ProductsTable/SortableProduct/index.tsx:100
 #: src/components/common/ProductsTable/SortableProduct/index.tsx:360
@@ -8766,8 +8774,12 @@ msgid "Post Checkout message"
 msgstr "결제 완료 후 메시지"
 
 #: src/components/common/PoweredByFooter/index.tsx:60
-msgid "Powered by"
-msgstr "제공:"
+#~ msgid "Powered by"
+#~ msgstr "제공:"
+
+#: src/components/common/PoweredByFooter/index.tsx:60
+msgid "Powered by ARZO, based on"
+msgstr "ARZO 제공, 기반 플랫폼:"
 
 #: src/components/routes/event/Settings/Sections/HomepageAndCheckoutSettings/index.tsx:90
 msgid "Pre Checkout message"
@@ -11814,8 +11826,12 @@ msgid "This recurring event has no dates yet, so there's nothing for attendees t
 msgstr "이 반복 이벤트에는 아직 날짜가 없어 참가자가 예약할 수 있는 항목이 없습니다."
 
 #: src/components/routes/organizer/Reports/PlatformFeesReport/index.tsx:113
-msgid "This report is for informational purposes only. Always consult with a tax professional before using this data for accounting or tax purposes. Please cross-reference with your Stripe dashboard as Hi.Events may be missing historical data."
-msgstr "이 보고서는 정보 제공 목적으로만 제공됩니다. 회계 또는 세무 목적으로 이 데이터를 사용하기 전에 반드시 세무 전문가와 상담하세요. Hi.Events에 과거 데이터가 누락되었을 수 있으므로 Stripe 대시보드와 상호 확인해 주세요."
+msgid "This report is for informational purposes only. Always consult with a tax professional before using this data for accounting or tax purposes. Please cross-reference with your Stripe dashboard as ARZO may be missing historical data."
+msgstr "이 보고서는 정보 제공 목적으로만 제공됩니다. 이 데이터를 회계 또는 세무 목적으로 사용하기 전에 반드시 세무 전문가와 상담하십시오. ARZO에 과거 데이터가 누락되어 있을 수 있으므로 Stripe 대시보드와 대조해 주십시오."
+
+#: src/components/routes/organizer/Reports/PlatformFeesReport/index.tsx:113
+#~ msgid "This report is for informational purposes only. Always consult with a tax professional before using this data for accounting or tax purposes. Please cross-reference with your Stripe dashboard as Hi.Events may be missing historical data."
+#~ msgstr "이 보고서는 정보 제공 목적으로만 제공됩니다. 회계 또는 세무 목적으로 이 데이터를 사용하기 전에 반드시 세무 전문가와 상담하세요. Hi.Events에 과거 데이터가 누락되었을 수 있으므로 Stripe 대시보드와 상호 확인해 주세요."
 
 #: src/components/routes/auth/ResetPassword/index.tsx:28
 msgid "This reset password link is invalid or expired."

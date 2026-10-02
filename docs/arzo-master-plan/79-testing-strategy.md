@@ -1,10 +1,30 @@
 # Testing Strategy
 
-**Status:** WRITTEN · **Audit date:** 2026-09-28
+**Status:** WRITTEN · **Audit date:** 2026-09-29 (refreshed; first written 2026-09-28) · **Baseline:** `develop` @ `e7228c1d`
 
 ---
 
-## Current state — strong backend, zero frontend
+## Update — what Phase 0 and Phase 2 added, and the gap that undoes it
+
+Since the first revision, `CONFIRMED`:
+
+| Added | Item |
+|---|---|
+| Architecture tests: no Eloquent above repositories; every non-public Action authorizes | ARZ-004, ARZ-005 |
+| Cross-tenant 403 suite, 20 cases | ARZ-006 |
+| Vitest runner + `frontend-tests.yml`, 24 tests | ARZ-007 |
+| Migration/schema tests for Phase 1 and Phase 2 | `Phase1FoundationSchemaTest`, `Phase2AccreditationSchemaTest` |
+| `AccessDecisionServiceTest` — 35 table-driven cases on the pure function | `c34f6a59` |
+| `AccessScanServiceTest` — 11 DB-backed cases incl. re-entry, replay, late submission | `e7228c1d` |
+
+**And the gap that undoes all of it: ARZO's code runs in no CI.** The only remote is the public
+upstream repository, which ARZO cannot push to; every workflow runs there, on upstream's code. The
+tests above pass when someone runs them by hand, and nothing runs them on every change (`123`,
+`129`). Until ARZ-300, "CI gate" in this document means "a test that exists".
+
+The historical state below is kept for the record.
+
+## Current state at first revision (2026-09-28) — strong backend, zero frontend
 
 `CONFIRMED`:
 

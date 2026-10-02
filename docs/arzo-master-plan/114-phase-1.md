@@ -1,9 +1,29 @@
 # Phase 1 — Foundation
 
-**Status:** WRITTEN · **Audit date:** 2026-09-28 · **Complexity:** L
+**Status:** WRITTEN · **Audit date:** 2026-09-29 (status refreshed; first written 2026-09-28) · **Baseline:** `develop` @ `e7228c1d` · **Complexity:** L
 **Prerequisite:** Phase 0 complete (`113-roadmap.md`)
 
 ---
+
+## Status at `e7228c1d` — schema done, the risky half not started
+
+| Item | State |
+|---|---|
+| ARZ-010 `persons` + `attendees.person_id` | Schema **done**; backfill **defective** — skips alternate batches (ARZ-301, `122`) |
+| ARZ-020..023 Space | **Done** — schema, backfill, models, repositories; CRUD uncommitted, in progress |
+| ARZ-030..032 Time | **Done** — schema incl. GiST; models, repositories; CRUD uncommitted, in progress |
+| ARZ-040 `access_logs` | **Done**; first writer is `AccessScanService`. Missing `device_id` (`40`) |
+| ARZ-011 RBAC | **Not started** — permission tables exist; nothing reads them |
+| ARZ-012 Per-event roles | **Not started** — `event_users` has 0 rows, no reader |
+| ARZ-013 Tenant global scope | **Not started** |
+| ARZ-041 Check-in consolidation | **Not started** — F10 open |
+
+Against the exit criteria below: **met** — 2 (logic; ran on empty data), 4, 5, 7; **in progress** —
+1, 3; **not met** — 6 (would fail at scale until ARZ-301), 8, 9, 10 (the cross-tenant suite does not
+yet cover the new entities), 11; **unverifiable** — 12, because ARZO's code runs in no CI (`123`).
+
+Phase 2 schema and services have already landed on top of this (`115`). The additive half of Phase 1
+is complete; the half this document calls risky — steps 5–10 — has not begun.
 
 ## Objective
 

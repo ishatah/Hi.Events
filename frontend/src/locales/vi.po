@@ -1498,6 +1498,14 @@ msgstr "Bạn có đăng ký VAT tại EU không?"
 msgid "Art"
 msgstr "Nghệ thuật"
 
+#: src/components/routes/organizer/Reports/PlatformFeesReport/index.tsx:75
+msgid "ARZO Fee"
+msgstr "Phí ARZO"
+
+#: src/components/routes/organizer/Reports/index.tsx:42
+msgid "ARZO platform fees and VAT breakdown by transaction"
+msgstr "Phí nền tảng ARZO và chi tiết VAT theo giao dịch"
+
 #: src/components/routes/organizer/Payments/Vat/VatSettings.tsx:28
 msgid "As your business is based in Ireland, Irish VAT at 23% applies automatically to all platform fees."
 msgstr "Vì doanh nghiệp của bạn có trụ sở tại Ireland, VAT Ireland 23% sẽ được áp dụng tự động cho tất cả phí nền tảng."
@@ -5710,12 +5718,12 @@ msgid "Hi,"
 msgstr "Xin chào,"
 
 #: src/components/routes/organizer/Reports/PlatformFeesReport/index.tsx:75
-msgid "Hi.Events Fee"
-msgstr "Phí Hi.Events"
+#~ msgid "Hi.Events Fee"
+#~ msgstr "Phí Hi.Events"
 
 #: src/components/routes/organizer/Reports/index.tsx:42
-msgid "Hi.Events platform fees and VAT breakdown by transaction"
-msgstr "Phí nền tảng Hi.Events và phân tích VAT theo giao dịch"
+#~ msgid "Hi.Events platform fees and VAT breakdown by transaction"
+#~ msgstr "Phí nền tảng Hi.Events và phân tích VAT theo giao dịch"
 
 #: src/components/common/ProductsTable/SortableProduct/index.tsx:100
 #: src/components/common/ProductsTable/SortableProduct/index.tsx:360
@@ -8766,8 +8774,12 @@ msgid "Post Checkout message"
 msgstr "Tin nhắn sau phần thanh toán"
 
 #: src/components/common/PoweredByFooter/index.tsx:60
-msgid "Powered by"
-msgstr "Được cung cấp bởi"
+#~ msgid "Powered by"
+#~ msgstr "Được cung cấp bởi"
+
+#: src/components/common/PoweredByFooter/index.tsx:60
+msgid "Powered by ARZO, based on"
+msgstr "Được cung cấp bởi ARZO, dựa trên"
 
 #: src/components/routes/event/Settings/Sections/HomepageAndCheckoutSettings/index.tsx:90
 msgid "Pre Checkout message"
@@ -11814,8 +11826,12 @@ msgid "This recurring event has no dates yet, so there's nothing for attendees t
 msgstr "Sự kiện định kỳ này chưa có ngày nào, vì vậy người tham dự không có gì để đặt."
 
 #: src/components/routes/organizer/Reports/PlatformFeesReport/index.tsx:113
-msgid "This report is for informational purposes only. Always consult with a tax professional before using this data for accounting or tax purposes. Please cross-reference with your Stripe dashboard as Hi.Events may be missing historical data."
-msgstr "Báo cáo này chỉ dành cho mục đích thông tin. Luôn tham khảo ý kiến chuyên gia thuế trước khi sử dụng dữ liệu này cho mục đích kế toán hoặc thuế. Vui lòng kiểm tra chéo với bảng điều khiển Stripe của bạn vì Hi.Events có thể thiếu dữ liệu lịch sử."
+msgid "This report is for informational purposes only. Always consult with a tax professional before using this data for accounting or tax purposes. Please cross-reference with your Stripe dashboard as ARZO may be missing historical data."
+msgstr "Báo cáo này chỉ nhằm mục đích cung cấp thông tin. Luôn tham khảo ý kiến chuyên gia thuế trước khi sử dụng dữ liệu này cho mục đích kế toán hoặc thuế. Vui lòng đối chiếu với bảng điều khiển Stripe của bạn vì ARZO có thể thiếu dữ liệu lịch sử."
+
+#: src/components/routes/organizer/Reports/PlatformFeesReport/index.tsx:113
+#~ msgid "This report is for informational purposes only. Always consult with a tax professional before using this data for accounting or tax purposes. Please cross-reference with your Stripe dashboard as Hi.Events may be missing historical data."
+#~ msgstr "Báo cáo này chỉ dành cho mục đích thông tin. Luôn tham khảo ý kiến chuyên gia thuế trước khi sử dụng dữ liệu này cho mục đích kế toán hoặc thuế. Vui lòng kiểm tra chéo với bảng điều khiển Stripe của bạn vì Hi.Events có thể thiếu dữ liệu lịch sử."
 
 #: src/components/routes/auth/ResetPassword/index.tsx:28
 msgid "This reset password link is invalid or expired."

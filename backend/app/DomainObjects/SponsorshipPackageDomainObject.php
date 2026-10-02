@@ -2,6 +2,4 @@
 
 namespace HiEvents\DomainObjects;
 
-class SponsorshipPackageDomainObject extends Generated\SponsorshipPackageDomainObjectAbstract
-{
-}
+class SponsorshipPackageDomainObject extends Generated\SponsorshipPackageDomainObjectAbstract {}

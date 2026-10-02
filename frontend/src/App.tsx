@@ -68,7 +68,7 @@ export const App: FC<
                 theme={{
                     colors: props.themeColors,
                     primaryColor: "primary",
-                    fontFamily: "Outfit, sans-serif",
+                    fontFamily: "'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
                     primaryShade: 8,
                     defaultRadius: "sm",
                 }}
@@ -82,10 +82,10 @@ export const App: FC<
                                 <ThirdPartyScripts/>
                                 <ModalsProvider>
                                     <Helmet>
-                                        <title>{getConfig("VITE_APP_NAME", "Hi.Events")}</title>
+                                        <title>{getConfig("VITE_APP_NAME", "ARZO")}</title>
                                         <link rel="icon"
                                               type="image/svg+xml"
-                                              href={getConfig("VITE_APP_FAVICON", "/favicon.svg")}
+                                              href={getConfig("VITE_APP_FAVICON", "/manifest-icons/favicon.svg")}
                                         />
                                     </Helmet>
                                     {props.children}

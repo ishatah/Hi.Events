@@ -1,6 +1,6 @@
 # Risk Register
 
-**Status:** WRITTEN · **Audit date:** 2026-09-28
+**Status:** WRITTEN · **Audit date:** 2026-09-29 (R1–R3 updated, R21–R32 added; first written 2026-09-28) · **Baseline:** `develop` @ `e7228c1d`
 
 ---
 
@@ -9,19 +9,28 @@ of the roadmap.
 
 ## Critical
 
-### R1 — AGPL licensing blocks the commercial model · LIVE
-**L: medium · I: critical**
+### R1 — Licence terms and the commercial model · LIVE
+**L: high · I: critical** — *raised 2026-09-29 on evidence*
 
-`CONFIRMED`: the codebase is AGPL-3.0. Network-use copyleft means running modified AGPL software as a
-service obliges offering corresponding source to users of that service. Every subsystem in this plan,
-built inside this codebase, inherits that obligation.
+`CONFIRMED`: the codebase is AGPL-3.0 **with an additional term under §7(b)** — the "Powered by
+Hi.Events" attribution must be retained on every page and email, linking to hi.events, unless a
+commercial licence is bought (`LICENCE:1-8`). Network-use copyleft also obliges offering corresponding
+source to users of the service.
 
-`UNVERIFIED` whether ARZO has taken legal advice.
+Two findings turn this from a question into a defect (`98`, `66`):
 
-**Mitigation:** get advice **before Phase 2**, not after five phases of proprietary work are
-entangled with AGPL code. A commercial licence from Hi.Events is available. This is cheap to resolve
-now and very expensive later.
-**Owner:** business.
+- **The uncommitted rebrand suppresses the required web footer.** It sets
+  `VITE_I_HAVE_PURCHASED_A_LICENCE=false`; the check returns the raw string, and `"false"` is truthy,
+  so the footer disappears (`helpers.ts:160-162`, `PoweredByFooter/index.tsx:24`). The email footer
+  keeps a compliant rephrasing.
+- **Nothing in the UI offers ARZO's modified source** to users.
+
+The commercial licence has a published price (`98`, checked 2026-09-29) — which makes this cheap to
+resolve.
+
+**Mitigation:** decide now between buying the appropriate commercial licence and complying with
+attribution plus source offer; fix the string-parsing bug either way (ARZ-317). Take legal advice on
+the licence terms before signing. **Owner:** business.
 
 ### R2 — Cross-tenant data leak · LIVE
 **L: medium · I: critical**
@@ -34,6 +43,10 @@ cross-tenant test**. One omitted call is a full cross-tenant read, with no defen
 tenant global scope. All three, not one.
 **Owner:** engineering.
 
+**Update 2026-09-29:** the suite (20 cases) and the architecture test exist — and run in no CI (R21).
+The suite covers none of the 31 new entities, and the in-progress scan path can write logs against
+another account's access point (ARZ-321). The global scope (ARZ-013) is not started.
+
 ### R3 — Event-day data loss · LIVE
 **L: high · I: high**
 
@@ -42,6 +55,39 @@ At a real event this admits people without recording them, unfixably by staff.
 
 **Mitigation:** Phase 0 fix (small, isolated). Full resolution is `71`.
 **Owner:** engineering.
+
+**Update 2026-09-29:** F1 is fixed (ARZ-001) — the operator is now told to rescan. Nothing is queued,
+so the risk has moved from *silent* loss to *disclosed* non-recording; it closes only with `71`.
+
+### R21 — ARZO's code exists in one place and is gated by nothing · LIVE
+**L: high · I: critical**
+
+`CONFIRMED`: the only git remote is the public upstream repository, which ARZO cannot push to;
+14 commits — the plan, Phase 0 fixes, Phase 1–2 schema, the access engine — plus a large uncommitted
+working tree exist on one workstation (`123`). No CI has ever run ARZO's code; no change is reviewed
+before landing.
+
+**Mitigation:** ARZ-300 — private repository, CI, branch protection. An hour's work. **Owner:** engineering.
+
+### R22 — The payment processor may be unavailable to ARZO · LIVE
+**L: high · I: critical**
+
+Stripe's global availability page does not list Qatar (checked 2026-09-29 by `98` and `135`), and
+self-serve cross-border payouts reach only a handful of regions. If confirmed, ARZO cannot be merchant
+of record through its only integrated card processor, and SaaS fees — collected only as Stripe
+application fees — cannot work for Qatar organizers.
+
+**Mitigation:** confirm with Stripe; choose a Qatar-licensed gateway (ARZ-191, raised to P1); offline
+and invoice payment for B2B in the meantime. **Owner:** business + engineering.
+
+### R23 — Personal data escapes deletion · LIVE on first data-bearing deploy
+**L: high · I: high**
+
+`CONFIRMED`: the backfill copies attendee names and emails into `persons`, and no anonymizer touches
+`persons`, `credentials`, `badges`, `access_logs` or `invitations` (`108`). ID document fields would
+be plaintext (`65`). A deletion request would leave personal data behind.
+
+**Mitigation:** ARZ-323, ARZ-303 before any environment holds real data. **Owner:** engineering.
 
 ## High
 
@@ -163,6 +209,20 @@ touch. Accept that scaffolds will lag; the authoritative set must not.
 | R19 | Arabic/RTL larger than estimated | Treat as its own project (`135`) |
 | R20 | Kiosk accessibility obligations | `81` review before public deployment |
 
+## Added 2026-09-29 — High and Medium
+
+| # | Risk | L · I | Evidence | Mitigation |
+|---|---|---|---|---|
+| R24 | **Tests that cannot express the property** — 35 passing decision tests, yet rules ignore their subject; golden vectors would copy the bug to every device | M · H | `124` ST1 | ARZ-320; review fixtures for expressiveness, not only count (`129`) |
+| R25 | **Schema outruns authorization** — Phase 2 built before RBAC; the review UI will be tempting to ship on account-wide access | M · H | `115` | ARZ-011/012 as a hard gate for ARZ-051 (`119`) |
+| R26 | **Migrations proven only on empty data** — the `persons` backfill skips half its rows at scale | H · H | `122` | Key-paged backfills, rehearsal on production-shaped data (ARZ-301) |
+| R27 | **The scan path does not scale** — occupancy recomputed per scan over the zone's history | H · H | `74`, `75` | ARZ-307; `125` scenario 1 |
+| R28 | **Venue scanners share one per-IP rate limit** — roughly 45–180 scans/min per venue against a 600/min target | M · H | `75` K2, `125` L2 | Device keys with per-device limits (ARZ-092); interim per-route limit keyed differently (ARZ-309) |
+| R29 | **ARZO has no production environment** — the Vapor/DigitalOcean pipeline is upstream's; hosting, backups, monitoring undecided | H · H | `84`, `126` | Decide hosting (`84`) — in-country regions exist on Azure and Google Cloud |
+| R30 | **Upstream divergence** — the rebrand edits ~130 upstream files; merges grow costlier and upstream security fixes may be missed | H · M | `121` D2 | Sync cadence; brand values in configuration (`123`) |
+| R31 | **Third-party licence exposure in assets** — SF Pro served as a webfont, its own notice says not cleared for web | M · M | `88` D2 | Do not commit the fonts; licensed alternative incl. an Arabic face (ARZ-325) |
+| R32 | **Organizer PII to a processor by default** — Sentry receives email, name, IP on every exception; Bunny Fonts receives visitor IPs | H · M | `78`, `84` | ARZ-324, ARZ-310; processor register (`65`) |
+
 ## Review
 
 This register is reviewed at each phase boundary, and whenever an audit finding changes a
@@ -171,4 +231,5 @@ likelihood. Items marked LIVE are reviewed weekly until closed.
 ## Related
 
 `02-current-state-audit.md` · `03-gap-analysis.md` · `113-roadmap.md` · `121-technical-debt.md` ·
-`64-security.md` · `65-privacy-gdpr.md`
+`64-security.md` · `65-privacy-gdpr.md` · `66-compliance.md` · `98-commercial-model.md` ·
+`123-release-strategy.md` · `135-global-expansion.md` · `136-master-backlog.md`

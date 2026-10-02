@@ -1498,6 +1498,14 @@ msgstr "ÁFA regisztrált az EU-ban?"
 msgid "Art"
 msgstr "Művészet"
 
+#: src/components/routes/organizer/Reports/PlatformFeesReport/index.tsx:75
+msgid "ARZO Fee"
+msgstr "ARZO-díj"
+
+#: src/components/routes/organizer/Reports/index.tsx:42
+msgid "ARZO platform fees and VAT breakdown by transaction"
+msgstr "ARZO platformdíjak és áfa-bontás tranzakciónként"
+
 #: src/components/routes/organizer/Payments/Vat/VatSettings.tsx:28
 msgid "As your business is based in Ireland, Irish VAT at 23% applies automatically to all platform fees."
 msgstr "Mivel vállalkozása Írországban található, az ír 23%-os ÁFA automatikusan vonatkozik minden platformdíjra."
@@ -5710,12 +5718,12 @@ msgid "Hi,"
 msgstr "Üdvözöljük,"
 
 #: src/components/routes/organizer/Reports/PlatformFeesReport/index.tsx:75
-msgid "Hi.Events Fee"
-msgstr "Hi.Events díj"
+#~ msgid "Hi.Events Fee"
+#~ msgstr "Hi.Events díj"
 
 #: src/components/routes/organizer/Reports/index.tsx:42
-msgid "Hi.Events platform fees and VAT breakdown by transaction"
-msgstr "Hi.Events platform díjak és ÁFA bontás tranzakciónként"
+#~ msgid "Hi.Events platform fees and VAT breakdown by transaction"
+#~ msgstr "Hi.Events platform díjak és ÁFA bontás tranzakciónként"
 
 #: src/components/common/ProductsTable/SortableProduct/index.tsx:100
 #: src/components/common/ProductsTable/SortableProduct/index.tsx:360
@@ -8766,8 +8774,12 @@ msgid "Post Checkout message"
 msgstr "Fizetés utáni üzenet"
 
 #: src/components/common/PoweredByFooter/index.tsx:60
-msgid "Powered by"
-msgstr "Üzemelteti"
+#~ msgid "Powered by"
+#~ msgstr "Üzemelteti"
+
+#: src/components/common/PoweredByFooter/index.tsx:60
+msgid "Powered by ARZO, based on"
+msgstr "Üzemelteti az ARZO, alapja a"
 
 #: src/components/routes/event/Settings/Sections/HomepageAndCheckoutSettings/index.tsx:90
 msgid "Pre Checkout message"
@@ -11814,8 +11826,12 @@ msgid "This recurring event has no dates yet, so there's nothing for attendees t
 msgstr "Ennek az ismétlődő eseménynek még nincsenek időpontjai, így a résztvevők nem tudnak foglalni."
 
 #: src/components/routes/organizer/Reports/PlatformFeesReport/index.tsx:113
-msgid "This report is for informational purposes only. Always consult with a tax professional before using this data for accounting or tax purposes. Please cross-reference with your Stripe dashboard as Hi.Events may be missing historical data."
-msgstr "Ez a jelentés csak tájékoztató jellegű. Mindig konzultáljon adószakértővel, mielőtt ezeket az adatokat számviteli vagy adózási célokra használná. Kérjük, ellenőrizze a Stripe irányítópultjával, mivel a Hi.Events esetleg hiányos előzményadatokkal rendelkezik."
+msgid "This report is for informational purposes only. Always consult with a tax professional before using this data for accounting or tax purposes. Please cross-reference with your Stripe dashboard as ARZO may be missing historical data."
+msgstr "Ez a jelentés kizárólag tájékoztató jellegű. Mielőtt ezeket az adatokat könyvelési vagy adózási célra használná, mindig kérje ki adószakértő véleményét. Kérjük, vesse össze a Stripe irányítópultjával, mivel az ARZO esetében hiányozhatnak korábbi adatok."
+
+#: src/components/routes/organizer/Reports/PlatformFeesReport/index.tsx:113
+#~ msgid "This report is for informational purposes only. Always consult with a tax professional before using this data for accounting or tax purposes. Please cross-reference with your Stripe dashboard as Hi.Events may be missing historical data."
+#~ msgstr "Ez a jelentés csak tájékoztató jellegű. Mindig konzultáljon adószakértővel, mielőtt ezeket az adatokat számviteli vagy adózási célokra használná. Kérjük, ellenőrizze a Stripe irányítópultjával, mivel a Hi.Events esetleg hiányos előzményadatokkal rendelkezik."
 
 #: src/components/routes/auth/ResetPassword/index.tsx:28
 msgid "This reset password link is invalid or expired."

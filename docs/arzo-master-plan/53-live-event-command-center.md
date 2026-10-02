@@ -1,8 +1,8 @@
 # Live Event Command Center
 
-**Status:** WRITTEN · **Audit date:** 2026-09-28
-**Classification:** New subsystem
-**Depends on:** `71` (realtime), `24` (access logs), `40` (devices), `20` (queues)
+**Status:** WRITTEN · **Audit date:** 2026-09-29 (re-verified; first written 2026-09-28) · **Baseline:** `develop` @ `e7228c1d`
+**Classification:** New subsystem · **Priority:** P2 (ARZ-170) · **Phase:** 5
+**Depends on:** `71` (realtime), `24` (access logs), `40` (devices), `20` (queues), `52` (analytics)
 
 ---
 
@@ -18,12 +18,36 @@ stub, the codebase reads the pre-Laravel-11 `BROADCAST_DRIVER` key (set to `log`
 no event implements `ShouldBroadcast`, `routes/channels.php` still references the non-existent
 `App\Models\User` namespace, and there is no echo/pusher client in the frontend.
 
-What exists instead is client polling: `usePollGetOrderPublic` at 5s, occurrence-generation polling,
-export polling, VAT polling. Plus `StatsTab`, which computes a 5-minute throughput window
-client-side per check-in list.
+Re-verified 2026-09-29, unchanged: `BROADCAST_DRIVER=log` in `backend/.env.example:48`,
+`BROADCAST_CONNECTION` appears nowhere, `BroadcastServiceProvider` is commented out
+(`config/app.php:242`), `channels.php` holds only the stub `App.Models.User.{id}` channel, and there
+is no Reverb, Pusher or Echo package on either side.
+
+What exists instead is client polling — four hooks: `usePollGetOrderPublic` (5 s, always), answers
+export (5 s while running), occurrence generation (2 s while running), VAT validation (5 s while
+pending). Plus `StatsTab`, which computes a 5-minute throughput window client-side per check-in
+list — and **cannot display more than 4 per minute**, because it derives the rate from the 20 most
+recent check-ins the endpoint returns (`51` R7). The stats query itself is not polled; it refreshes
+only when a check-in on that device invalidates it.
 
 So the command center is blocked on **new infrastructure**, not new queries. Step zero is the
 `BROADCAST_DRIVER` → `BROADCAST_CONNECTION` migration and deleting the dead channel scaffold.
+
+### What landed since the first revision
+
+`c34f6a59` put the command center's data layer in the schema, and `e7228c1d` gave `access_logs` its
+first writer:
+
+| Table | State |
+|---|---|
+| `access_logs` | Written by `AccessScanService` (`e7228c1d`); its HTTP endpoint was uncommitted at audit time, and neither check-in path dual-writes yet (ARZ-041). **No `device_id` column** — added by `40`'s follow-on migration. |
+| `zone_occupancy_snapshots` | Exists: `zone_id`, `event_id`, `occupancy`, `capacity`, `captured_at`. No writer. |
+| `access_point_throughput_snapshots` | Exists, per `20`. No writer. |
+| `devices` | Exists with `last_seen_at`, `battery_level`, `last_sync_cursor`, `app_version`. No heartbeat endpoint. |
+| `AccessDecisionService` | A pure function of an `AccessContextDTO` with 35 tests — the denial reasons this screen breaks out come from its `AccessResult` enum |
+
+The remaining gap is the writers — the snapshot jobs (`52`), the heartbeat (`40`), the dual-write of
+check-ins into `access_logs` (ARZ-041) — and the transport.
 
 ## What it must show
 
@@ -67,7 +91,12 @@ dashboard is waste. Aggregate counters to 1 Hz; broadcast individual events only
 ### Data sourcing
 Counters derive from `access_logs` (`24`), never from stored counters that drift under offline replay.
 Occupancy uses the `zone_occupancy_snapshots` cache refreshed every 5–10s, with the live aggregate as
-the authoritative fallback.
+the authoritative fallback. Denial breakdowns use the `AccessResult` values —
+`DENIED_NO_GRANT`, `DENIED_TIME_WINDOW`, `DENIED_CAPACITY`, `DENIED_ANTIPASSBACK`,
+`DENIED_MAX_ENTRIES`, `DENIED_REVOKED`, `DENIED_RULE`, `DENIED_NO_CREDENTIAL` — so each spike maps
+to a cause rather than a single "denied" line.
+
+Figures from a window in which any device has not yet synced are marked **provisional** (`52`).
 
 `UNVERIFIED`: whether Postgres serves this at peak. Needs load modelling (`74`, `125`) before
 committing to the refresh interval.
@@ -105,5 +134,6 @@ Routing and on-call are `86`. Alerts without a watcher are decoration.
 ## Related
 
 `71-realtime-architecture.md` · `24-access-control.md` · `20-queue-management.md` ·
-`40-device-management.md` · `54-attendance-intelligence.md` · `60-incident-management.md` ·
-`86-monitoring.md` · `97-onsite-operations-app.md`
+`40-device-management.md` · `51-reporting.md` · `52-analytics.md` · `54-attendance-intelligence.md` ·
+`57-manpower-and-staffing.md` · `60-incident-management.md` · `86-monitoring.md` ·
+`97-onsite-operations-app.md`

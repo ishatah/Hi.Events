@@ -1,6 +1,6 @@
 # Roadmap
 
-**Status:** WRITTEN · **Authority:** AUTHORITATIVE for phase order · **Audit date:** 2026-09-28
+**Status:** WRITTEN · **Authority:** AUTHORITATIVE for phase order · **Audit date:** 2026-09-29 (status and hardening track added; first written 2026-09-28) · **Baseline:** `develop` @ `e7228c1d`
 
 ---
 
@@ -27,6 +27,38 @@ graph TD
     P4["Phase 4 — Hardware + offline<br/>devices, sync, kiosk"] --> P5
     P5["Phase 5 — Intelligence<br/>command center, analytics, AI"]
 ```
+
+## Status at `e7228c1d` (2026-09-29)
+
+| Phase | State |
+|---|---|
+| 0 — Stabilize | **Complete** — but its CI gates run nowhere: ARZO's code has no repository or CI of its own (`123`) |
+| 1 — Foundation | **Schema complete**; RBAC, per-event roles, tenant scope and check-in consolidation not started (`114`) |
+| 2 — Accreditation | **Started early**: schema complete, access engine core done; approval workflow, backfill, simulator, badges not started (`115`) |
+| 3 — Programme | Schema complete; CRUD in progress, uncommitted (`116`) |
+| 4 — Hardware + offline | Schema foundations only (`117`) |
+| 5 — Intelligence | Snapshot tables only (`118`) |
+
+## Hardening track — continuous, independent of phases · complexity **M** in total
+
+Added 2026-09-29. Writing documents 13–140 against the code surfaced about twenty **live** defects
+outside any phase — a second Phase 0. They are small, independent, and in several cases present
+risk today. They run alongside whatever phase is active and take precedence when they conflict.
+
+| Priority | Items (`136` ARZ-300 series — 37 items, 12 at P0) |
+|---|---|
+| **Now** | ARZ-300 ARZO repository + CI · ARZ-305 test sends reach real customers · ARZ-317 licence and attribution |
+| **Before the first data-bearing deploy** | ARZ-301 `persons` backfill · ARZ-323 anonymization of the new tables · ARZ-322 self-host defaults |
+| **Before the dependent feature** | ARZ-320 rules honour their subject and ARZ-302 venue timezone (before rule UI and golden vectors) · ARZ-321 scan endpoint trust (before the scan route merges) · ARZ-307 scan-path occupancy (before live scanning) · ARZ-303 encrypt ID fields (before ID collection) · ARZ-313 identifier format (before first print) · ARZ-314 empty-table schema corrections (before first writer) · ARZ-325 rebrand contrast and font licence (before the rebrand is committed) · ARZ-319 audit spine (before ARZ-051) |
+| **Soon** | ARZ-304 webhook retries · ARZ-306 Stripe webhook · ARZ-308 exports · ARZ-309 scanner and public check-in · ARZ-310 consent and SEO · ARZ-311 publish rules · ARZ-312 accounts and admin · ARZ-324 Sentry PII · ARZ-326 queue runtime · ARZ-327 ticket integrity · ARZ-328 admin search · ARZ-334 check-in list leaks every ticket code · ARZ-335 promo brute force via orders · ARZ-336 credential lifecycle |
+| **Later** | ARZ-315 statistics · ARZ-316 affiliates · ARZ-318 webhook secrets · ARZ-329 multi-currency money · ARZ-330 contrast · ARZ-331 localization · ARZ-332 auth refresh · ARZ-333 files |
+
+Three of the "before the dependent feature" items — ARZ-320, ARZ-321, ARZ-302 — concern code that
+landed in the last day and is about to gain HTTP routes. They are the cheapest fixes in the plan
+**this week** and among the most expensive once devices and golden vectors copy the behaviour.
+
+The lesson worth recording: Phase 0 was scoped from one audit. Every later audit found more. Budget
+for a hardening track permanently rather than declaring stabilization finished.
 
 ## Phase 0 — Stabilize · complexity **S** · **COMPLETE 2026-09-28**
 

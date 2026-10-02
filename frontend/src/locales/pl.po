@@ -1498,6 +1498,14 @@ msgstr "Czy jesteś zarejestrowany na VAT w UE?"
 msgid "Art"
 msgstr "Sztuka"
 
+#: src/components/routes/organizer/Reports/PlatformFeesReport/index.tsx:75
+msgid "ARZO Fee"
+msgstr "Opłata ARZO"
+
+#: src/components/routes/organizer/Reports/index.tsx:42
+msgid "ARZO platform fees and VAT breakdown by transaction"
+msgstr "Opłaty platformy ARZO i zestawienie VAT według transakcji"
+
 #: src/components/routes/organizer/Payments/Vat/VatSettings.tsx:28
 msgid "As your business is based in Ireland, Irish VAT at 23% applies automatically to all platform fees."
 msgstr "Ponieważ Twoja firma ma siedzibę w Irlandii, irlandzki VAT w wysokości 23% stosuje się automatycznie do wszystkich opłat platformy."
@@ -5710,12 +5718,12 @@ msgid "Hi,"
 msgstr "Cześć,"
 
 #: src/components/routes/organizer/Reports/PlatformFeesReport/index.tsx:75
-msgid "Hi.Events Fee"
-msgstr "Opłata Hi.Events"
+#~ msgid "Hi.Events Fee"
+#~ msgstr "Opłata Hi.Events"
 
 #: src/components/routes/organizer/Reports/index.tsx:42
-msgid "Hi.Events platform fees and VAT breakdown by transaction"
-msgstr "Opłaty platformy Hi.Events i zestawienie VAT według transakcji"
+#~ msgid "Hi.Events platform fees and VAT breakdown by transaction"
+#~ msgstr "Opłaty platformy Hi.Events i zestawienie VAT według transakcji"
 
 #: src/components/common/ProductsTable/SortableProduct/index.tsx:100
 #: src/components/common/ProductsTable/SortableProduct/index.tsx:360
@@ -8766,8 +8774,12 @@ msgid "Post Checkout message"
 msgstr "Wiadomość po płatności"
 
 #: src/components/common/PoweredByFooter/index.tsx:60
-msgid "Powered by"
-msgstr "Obsługiwane przez"
+#~ msgid "Powered by"
+#~ msgstr "Obsługiwane przez"
+
+#: src/components/common/PoweredByFooter/index.tsx:60
+msgid "Powered by ARZO, based on"
+msgstr "Obsługiwane przez ARZO, na bazie"
 
 #: src/components/routes/event/Settings/Sections/HomepageAndCheckoutSettings/index.tsx:90
 msgid "Pre Checkout message"
@@ -11814,8 +11826,12 @@ msgid "This recurring event has no dates yet, so there's nothing for attendees t
 msgstr "To cykliczne wydarzenie nie ma jeszcze terminów, więc uczestnicy nie mają czego rezerwować."
 
 #: src/components/routes/organizer/Reports/PlatformFeesReport/index.tsx:113
-msgid "This report is for informational purposes only. Always consult with a tax professional before using this data for accounting or tax purposes. Please cross-reference with your Stripe dashboard as Hi.Events may be missing historical data."
-msgstr "Ten raport jest tylko do celów informacyjnych. Zawsze konsultuj się z profesjonalistą podatkowymi przed użyciem tych danych do celów rachunkowych lub podatkowych. Proszę odnieść się do pulpitu Stripe, ponieważ Hi.Events może brakować danych historycznych."
+msgid "This report is for informational purposes only. Always consult with a tax professional before using this data for accounting or tax purposes. Please cross-reference with your Stripe dashboard as ARZO may be missing historical data."
+msgstr "Ten raport ma charakter wyłącznie informacyjny. Przed wykorzystaniem tych danych do celów księgowych lub podatkowych zawsze skonsultuj się z doradcą podatkowym. Porównaj je z panelem Stripe, ponieważ w ARZO mogą brakować dane historyczne."
+
+#: src/components/routes/organizer/Reports/PlatformFeesReport/index.tsx:113
+#~ msgid "This report is for informational purposes only. Always consult with a tax professional before using this data for accounting or tax purposes. Please cross-reference with your Stripe dashboard as Hi.Events may be missing historical data."
+#~ msgstr "Ten raport jest tylko do celów informacyjnych. Zawsze konsultuj się z profesjonalistą podatkowymi przed użyciem tych danych do celów rachunkowych lub podatkowych. Proszę odnieść się do pulpitu Stripe, ponieważ Hi.Events może brakować danych historycznych."
 
 #: src/components/routes/auth/ResetPassword/index.tsx:28
 msgid "This reset password link is invalid or expired."

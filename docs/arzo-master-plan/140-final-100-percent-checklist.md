@@ -1,6 +1,6 @@
 # Final 100% Checklist
 
-**Status:** WRITTEN · **Authority:** Derived from `02` and `128` · **Audit date:** 2026-09-28
+**Status:** WRITTEN · **Authority:** Derived from `02` and `128` · **Audit date:** 2026-09-29 (rescored; first written 2026-09-28) · **Baseline:** `develop` @ `e7228c1d`
 
 ---
 
@@ -8,215 +8,189 @@
 
 > "Is ARZO actually a complete event technology platform?"
 
-**Today: no.** Roughly one third complete, scored against the 19 gates in `128-definition-of-done.md`.
+**Today: no.** Roughly one third complete against the gates in `128` — the same verdict as the first
+revision, with a different shape: the Phase 1–2 **schema** now exists and the access engine has a
+core, while the audits behind documents 61–140 found that several foundations everyone assumed —
+a repository, CI, a hosting environment, a card processor that serves Qatar — are not in place.
 
-Scores are current state, `CONFIRMED` unless marked. Nothing scores 100%, because `128` requires
-observability, operational readiness and edge-case handling that no subsystem has documented.
-
-Legend: Status = `CONFIRMED` / `PARTIAL` / `MISSING` / `UNVERIFIED`. Owner is a role, not a person.
+Scores are current state, `CONFIRMED` unless marked. Nothing scores 100%. Schema without behaviour
+scores 10. Owner is a role, not a person.
 
 ---
 
-## Product & commerce
+## Foundations — found missing by this revision
 
-| Requirement | % | Status | Evidence | Remaining gap | Owner | Depends |
+| Requirement | % | Status | Evidence | Remaining gap | Owner | Item |
 |---|---|---|---|---|---|---|
-| Event creation & lifecycle | 90 | CONFIRMED | `events`, `event_settings` | Observability, runbook | Eng | — |
-| Recurring events | 85 | CONFIRMED | `event_occurrences` + RRULE | Occurrence-awareness audit | Eng | — |
-| Products & categories | 90 | CONFIRMED | `products`, `product_categories` | — | Eng | — |
-| Tiered / early-bird pricing | 85 | CONFIRMED | `ProductPriceType::TIERED` | — | Eng | — |
-| Promo codes | 90 | CONFIRMED | `promo_codes` | — | Eng | — |
-| Affiliates | 80 | CONFIRMED | `affiliates` | — | Eng | — |
-| Orders & checkout | 90 | CONFIRMED | Advisory-locked | Feature test for the lock | Eng | — |
-| Payments | 60 | PARTIAL | Stripe + offline only | More providers; delete Razorpay dead code | Eng | — |
-| Invoices & VAT | 85 | CONFIRMED | `invoices`, VAT settings | — | Eng | — |
-| Refunds | 80 | CONFIRMED | `order_refunds` | — | Eng | — |
-| Waitlist | 85 | CONFIRMED | `waitlist_entries` | Session support | Eng | 27 |
-| Capacity pools | 85 | CONFIRMED | `capacity_assignments` | — | Eng | — |
-| **RSVP flow** | 0 | MISSING | — | Whole feature | Eng | — |
+| **ARZO source repository + CI** | 0 | MISSING | Only remote is public upstream; 14 commits local-only | Private repo, CI, branch protection | Eng | ARZ-300 |
+| **ARZO hosting / production** | 0 | MISSING | Deploy pipeline is upstream's SaaS | Decide hosting; in-country options exist | Business + Eng | `84` |
+| **Card processing in Qatar** | 0 | UNVERIFIED — likely MISSING | Stripe does not list Qatar | Confirm; Qatar-licensed gateway | Business | ARZ-191 |
+| **Licence compliance** | 20 | PARTIAL | Email attribution compliant; web footer suppressed by a bug; no source offer | Decide licence; fix flag | Business | ARZ-317 |
 
-## Registration & attendees
+## Product and commerce
 
-| Requirement | % | Status | Remaining gap | Owner | Depends |
+| Requirement | % | Status | Remaining gap | Owner | Item |
 |---|---|---|---|---|---|
-| Branded registration pages | 90 | CONFIRMED | — | Eng | — |
-| Custom questions (9 types) | 90 | CONFIRMED | Conditional logic | Eng | — |
-| Group registration | 80 | CONFIRMED | — | Eng | — |
-| Embeddable widget | 85 | CONFIRMED | — | Eng | — |
-| Attendee CRUD & export | 80 | CONFIRMED | — | Eng | — |
-| Self-service edit | 75 | CONFIRMED | — | Eng | — |
-| **Person identity (non-buyers)** | 0 | MISSING | `persons` table | Eng | — |
-| **Demographics** | 0 | MISSING | Consented collection + reporting | Eng | 10 |
+| Events and lifecycle | 85 | CONFIRMED | Server-side transition and publish rules | Eng | ARZ-311 |
+| Recurring events | 85 | CONFIRMED | — | Eng | — |
+| Products, tiers, early bird | 90 | CONFIRMED | — | Eng | — |
+| Promo and access codes | 90 | CONFIRMED | Bulk single-use codes | Eng | `46` |
+| Affiliates | 75 | CONFIRMED | Money as float; unique code | Eng | ARZ-316 |
+| Checkout and orders | 90 | CONFIRMED | Lock shared with event edits | Eng | `125` |
+| Payments | 50 | PARTIAL | Stripe webhook verifies late; Qatar gateway | Eng + Business | ARZ-306, ARZ-191 |
+| Invoices and VAT | 85 | CONFIRMED | Order-bound only | Eng | — |
+| Platform fees | 60 | PARTIAL | 3-decimal currencies ×10; offline fees never collected | Eng | ARZ-329 |
+| Waitlists, capacity pools | 85 | CONFIRMED | Session waitlists (sibling table exists) | Eng | ARZ-081 |
+| RSVP | 10 | PARTIAL | Schema only | Eng | ARZ-190 |
 
-## Marketing & messaging
+## People, identity and registration
 
-| Requirement | % | Status | Remaining gap | Owner |
-|---|---|---|---|---|
-| Transactional email | 90 | CONFIRMED | — | Eng |
-| Bulk email | 75 | CONFIRMED | — | Eng |
-| Email templates (Liquid) | 80 | CONFIRMED | — | Eng |
-| Scheduled sends | 75 | CONFIRMED | — | Eng |
-| **Segmentation** | 20 | PARTIAL | Filter builder; only 5 fixed audiences | Eng |
-| **Campaign automation** | 0 | MISSING | Drips, open/click | Eng |
-| **SMS** | 0 | MISSING | Provider integration | Eng |
-| **Push** | 0 | MISSING | Infrastructure + app | Eng |
-| **Attendee in-app notifications** | 0 | MISSING | `announcements` target platform users only | Eng |
+| Requirement | % | Status | Remaining gap | Owner | Item |
+|---|---|---|---|---|---|
+| Registration pages, questions, widget | 85 | CONFIRMED | `PHONE` missing in frontend | Eng | ARZ-140 |
+| Attendee management | 75 | CONFIRMED | 10k export cap; ticket integrity on email change | Eng | ARZ-308, ARZ-327 |
+| Person identity | 30 | PARTIAL | Backfill defect; plaintext ID fields; not anonymized | Eng | ARZ-301, 303, 323 |
+| Demographics | 5 | PARTIAL | Attributes exist; consented collection + suppression | Eng | ARZ-173 |
+
+## Marketing and messaging
+
+| Requirement | % | Status | Remaining gap | Owner | Item |
+|---|---|---|---|---|---|
+| Transactional email | 85 | CONFIRMED | No per-recipient delivery record | Eng | `69` |
+| Organizer messaging | 55 | PARTIAL | Test sends reach customers; Premium default; no unsubscribe | Eng | ARZ-305, `42` |
+| Segmentation | 20 | PARTIAL | Filter builder | Eng | ARZ-142 |
+| SMS / WhatsApp | 0 | MISSING | Phone capture first | Eng | ARZ-140 |
+| Push | 0 | MISSING | Service worker | Eng | ARZ-141 |
+| Order source attribution | 0 | MISSING | Channel capture on orders | Eng | `41` |
+| Pixels, SEO | 60 | PARTIAL | Consent default; noindex ignored | Eng | ARZ-310 |
 
 ## On-site operations
 
-| Requirement | % | Status | Remaining gap | Owner | Depends |
+| Requirement | % | Status | Remaining gap | Owner | Item |
 |---|---|---|---|---|---|
-| QR scanning | 70 | CONFIRMED | Offline; retry on failure (F1) | Eng | 71 |
-| USB/HID scanning | 70 | CONFIRMED | Hardcoded `A-` prefix assumption | Eng | 38 |
-| Check-in lists | 80 | CONFIRMED | Migrate to access rules | Eng | 24 |
-| **Operator identity** | 0 | MISSING | URL short ID is the only credential (F3) | Eng | 09, 40 |
-| **Offline check-in** | 0 | MISSING | **Scans are lost today (F1)** | Eng | 71 |
-| **Self-service kiosk** | 0 | MISSING | Whole application | Eng | 19, 71 |
-| **Walk-in at the door** | 30 | PARTIAL | Backoffice only | Eng | 17 |
-| **Queue management** | 5 | MISSING | One throughput metric | Eng | 20 |
-| **Badge printing** | 0 | MISSING | Prints tickets via `window.print()` (F8) | Eng | 21, 22 |
-| **Photo capture** | 0 | MISSING | — | Eng | 23 |
-| **Badge stock / lanyards** | 0 | MISSING | **Procurement, not code** | Business | 102 |
-| **Trained on-site staff** | 0 | MISSING | **Hiring, not code** | Business | 57 |
+| QR / USB scanning | 60 | CONFIRMED | Arabic keyboard layout; public link can undo | Eng | ARZ-309 |
+| Operator identity | 10 | PARTIAL | Scan route in progress; staff credentials | Eng | `38`, `92` |
+| Offline check-in | 5 | MISSING | Sync protocol | Eng | ARZ-101 |
+| Walk-in at the door | 30 | PARTIAL | At-the-door flow | Eng | ARZ-111 |
+| Kiosk | 0 | MISSING | Windows + Electron print host (`96`) | Eng | ARZ-110 |
+| Queue management | 5 | MISSING | Snapshots; gauge capped at 4/min | Eng | ARZ-112 |
+| Badges and printing | 10 | PARTIAL | Schema only | Eng | ARZ-070..073 |
+| Photo capture | 0 | MISSING | — | Eng | ARZ-074 |
+| Devices | 10 | PARTIAL | Guard, pairing, heartbeat | Eng | ARZ-100 |
+| **Badge stock, printers** | 0 | MISSING | Procurement, not code | Business | `102` |
+| **Trained on-site staff** | 0 | MISSING | Hiring or partner | Business | `57` |
 
-## Accreditation & access control
+## Accreditation and access control
 
-| Requirement | % | Status | Remaining gap | Owner | Depends |
+| Requirement | % | Status | Remaining gap | Owner | Item |
 |---|---|---|---|---|---|
-| **Accreditation types** | 0 | MISSING | Whole subsystem | Eng | 23 |
-| **Application & approval** | 0 | MISSING | Whole subsystem | Eng | 23, 09 |
-| **Credentials** | 0 | MISSING | Whole subsystem | Eng | 23 |
-| **Zones** | 0 | MISSING | No space model | Eng | 25 |
-| **Access points** | 0 | MISSING | — | Eng | 25 |
-| **Access rules engine** | 0 | MISSING | — | Eng | 24 |
-| **Access logs** | 10 | MISSING | Check-out is a soft-delete, destroying history | Eng | 24 |
-| **Re-entry / anti-passback** | 0 | MISSING | **Structurally forbidden by a UNIQUE index (F2)** | Eng | 24 |
-| **Time-window rules** | 40 | PARTIAL | List activate/expire only | Eng | 24 |
-| **RFID / NFC** | 0 | MISSING | — | Eng+Business | 36, 102 |
-| **Face recognition** | 0 | MISSING | **Legal review required first** | Business | 133 |
-| **Seating** | 0 | MISSING | — | Eng | 26 |
+| Accreditation types | 15 | PARTIAL | CRUD in progress | Eng | ARZ-050 |
+| Applications and approval | 10 | PARTIAL | Workflow, RBAC-gated | Eng | ARZ-051 |
+| Credentials | 40 | PARTIAL | Backfill; identifier format | Eng | ARZ-053, ARZ-313 |
+| Zones, access points | 25 | PARTIAL | CRUD in progress | Eng | ARZ-021 |
+| Access rules engine | 40 | PARTIAL | **Rules ignore subject**; UTC windows | Eng | ARZ-320, ARZ-302 |
+| Access logs, re-entry, anti-passback | 40 | PARTIAL | Neither check-in path writes them; scan path trust | Eng | ARZ-041, ARZ-321 |
+| Occupancy | 20 | PARTIAL | Does not scale | Eng | ARZ-307 |
+| Rule simulator | 0 | MISSING | — | Eng | ARZ-064 |
+| RFID / NFC | 5 | MISSING | `credential_media`; tag procurement | Eng + Business | ARZ-122 |
+| Face recognition | 0 | MISSING | **Legal clearance first** | Business | ARZ-260 |
+| Seating | 10 | PARTIAL | Deferred | — | ARZ-160 |
 
 ## Programme
 
-| Requirement | % | Status | Remaining gap | Owner |
+| Requirement | % | Status | Remaining gap | Item |
 |---|---|---|---|---|
-| **Sessions** | 0 | MISSING | `event_occurrences` is not sessions | Eng |
-| **Tracks** | 0 | MISSING | — | Eng |
-| **Speakers** | 0 | MISSING | — | Eng |
-| **Agenda** | 0 | MISSING | — | Eng |
-| **Session registration** | 0 | MISSING | — | Eng |
-| **Session attendance** | 0 | MISSING | — | Eng |
-| Calendar export | 40 | PARTIAL | Event-level only; session ICS is an extension | Eng |
+| Sessions, tracks, rooms | 25 | PARTIAL | CRUD in progress; GiST done | ARZ-031 |
+| Speakers | 15 | PARTIAL | CRUD in progress | `28` |
+| Agenda, conflicts, ICS | 15 | PARTIAL | UI; personal feed | ARZ-083, 084 |
+| Session registration, waitlist, attendance | 10 | PARTIAL | Behaviour | ARZ-080..082 |
 
-## Exhibitors & sponsors
+## Exhibitors, sponsors, engagement, mobile
 
-All **0% / MISSING**: exhibitor entity, portal, booths, staff passes, lead capture, qualification,
-export, sponsor packages, exhibitor analytics. Depends on `32`–`35`, `09`, `25`.
+All **0–10%**: exhibitors, booths (schema, wrong-shaped), leads, sponsors, networking, eRaffle,
+polls, attendee app (and the installable-but-blank manifest trap), native scanner, staff and ops
+apps. Designs are complete in `31`–`35`, `92`–`97`; nothing is built.
 
-## Mobile
+## Platform, API and integrations
 
-| Requirement | % | Status | Note |
-|---|---|---|---|
-| **Attendee app** | 0 | MISSING | No PWA — manifest exists but **blank offline**, a trap |
-| **Scanner app (native)** | 0 | MISSING | Web route exists, online-only |
-| **Staff app** | 0 | MISSING | — |
-| **Kiosk app** | 0 | MISSING | — |
-| **Ops app** | 0 | MISSING | — |
-| **Networking / eRaffle / polls** | 0 | MISSING | Depends on the app |
-
-## Platform, API, integrations
-
-| Requirement | % | Status | Remaining gap | Owner |
+| Requirement | % | Status | Remaining gap | Item |
 |---|---|---|---|---|
-| Webhooks | 85 | CONFIRMED | Decouple payloads from API resources (F14); test SSRF defence | Eng |
-| **Public API** | 5 | MISSING | `personal_access_tokens` exists, **unused since 2020** | Eng |
-| **API keys / scopes** | 0 | MISSING | — | Eng |
-| **CRM integration** | 0 | MISSING | Blocked on the API | Eng |
-| **Device management** | 0 | MISSING | — | Eng |
-| **Realtime** | 0 | MISSING | Stub config, wrong env key, dead channel file | Eng |
-| OpenAPI docs | 85 | CONFIRMED | Strong contract test | Eng |
+| Webhooks | 70 | PARTIAL | **Retries never run**; payload coupling | ARZ-304, ARZ-091 |
+| Public API, keys | 5 | MISSING | — | ARZ-090 |
+| OpenAPI | 85 | CONFIRMED | — | — |
+| Integrations | 50 | PARTIAL | Conventions (`50`) | — |
+| CRM | 0 | MISSING | — | ARZ-180 |
+| Realtime | 0 | MISSING | Needs persistent hosting | ARZ-104 |
 
-## Analytics & reporting
+## Analytics, reporting, operations
 
-| Requirement | % | Status | Remaining gap |
-|---|---|---|---|
-| Sales reports | 75 | CONFIRMED | 4 report types, all revenue |
-| Data export | 85 | CONFIRMED | 5 exporters |
-| Check-in statistics | 60 | CONFIRMED | Per-list only |
-| **Live attendance** | 30 | PARTIAL | No realtime, no unified view |
-| **Session attendance** | 0 | MISSING | No sessions |
-| **Exhibitor leads** | 0 | MISSING | — |
-| **Command center** | 0 | MISSING | Blocked on realtime |
-| **Post-event reporting** | 40 | PARTIAL | Revenue only |
-
-## Operations (ARZO-as-operator)
-
-All **0% / MISSING**: staffing, shifts, tasks, checklists, readiness gates, incidents, vendors,
-procurement, event dossier, runbook. Depends on `56`–`63`, `09`.
+| Requirement | % | Status | Remaining gap | Item |
+|---|---|---|---|---|
+| Reports | 45 | PARTIAL | Nine, all commerce; two ignore dates | `51` |
+| Exports | 70 | CONFIRMED | Silent 10k cap; browser CSV | ARZ-308 |
+| Statistics rollups | 70 | CONFIRMED | Repair job; lost views | ARZ-315 |
+| Command center | 0 | MISSING | — | ARZ-170 |
+| Attendance intelligence | 0 | MISSING | — | ARZ-171 |
+| Operations: lifecycle, staff, tasks, readiness, incidents, vendors, dossier | 0–10 | MISSING | Designed in `56`–`63`, `105`–`108` | ARZ-200..204 |
 
 ## Security, privacy, compliance
 
-| Requirement | % | Status | Remaining gap | Owner |
+| Requirement | % | Status | Remaining gap | Owner | Item |
+|---|---|---|---|---|---|
+| Authentication | 65 | CONFIRMED | 7-day JWT; broken refresh path; no MFA | Eng | ARZ-332, `101` |
+| Authorization | 25 | PARTIAL | RBAC; admin deactivation lag | Eng | ARZ-011, ARZ-312 |
+| Tenant isolation | 55 | PARTIAL | Global scope; new entities untested; scan path | Eng | ARZ-013, ARZ-321 |
+| SSRF defence | 75 | CONFIRMED | Job untested | Eng | ARZ-304 |
+| Audit logging | 30 | PARTIAL | `event_logs` never written; no actor on order audit | Eng | ARZ-319 |
+| Deletion / anonymization | 55 | PARTIAL | New tables not covered | Eng | ARZ-323 |
+| Encryption of sensitive fields | 0 | MISSING | ID documents, DOB | Eng | ARZ-303 |
+| Consent | 30 | PARTIAL | Pixels default-on; marketing opt-in unused; no consent records | Eng | ARZ-310, `65` |
+| Processor register | 0 | MISSING | Sentry PII, Bunny Fonts | Business + Eng | ARZ-324, `65` |
+| PDPL review | 0 | UNVERIFIED | Not evidenced | Business | `65` |
+| PCI scope | 70 | PARTIAL | Stripe-hosted card entry; merchant of record open | Business | `66`, `15` |
+
+## Quality, infrastructure, experience
+
+| Requirement | % | Status | Remaining gap | Item |
 |---|---|---|---|---|
-| Authentication (JWT) | 75 | CONFIRMED | No refresh; no MFA | Eng |
-| **MFA** | 0 | MISSING | Before external SaaS | Eng |
-| **Authorization model** | 25 | PARTIAL | Role gate **no-op at default level** (F12) | Eng |
-| **Tenant isolation** | 60 | PARTIAL | No global scopes, no negative test (F11) | Eng |
-| Input sanitization | 80 | CONFIRMED | — | Eng |
-| SSRF defence | 80 | CONFIRMED | **Untested** | Eng |
-| Audit logging | 50 | PARTIAL | Not universal | Eng |
-| GDPR deletion | 75 | CONFIRMED | `AnonymizationStrategy` | Eng |
-| **Privacy for new data classes** | 0 | MISSING | Photos, ID docs, movement, leads | Business+Eng |
-| **PDPL compliance review** | 0 | UNVERIFIED | Not evidenced | Business |
-| **AGPL licensing position** | 0 | UNVERIFIED | **Resolve before Phase 2 (R1)** | Business |
-
-## Quality & infrastructure
-
-| Requirement | % | Status | Remaining gap |
-|---|---|---|---|
-| Backend unit tests | 75 | CONFIRMED | 1,215 tests |
-| **Action/authz tests** | 5 | PARTIAL | **7 of 268 Actions** |
-| E2E tests | 70 | CONFIRMED | 73 specs; check-in has 1 |
-| **Frontend tests** | 0 | MISSING | No runner |
-| **CI frontend gates** | 0 | MISSING | lint/typecheck not wired |
-| **Offline tests** | 0 | MISSING | Nothing to test yet |
-| **Hardware tests** | 0 | MISSING | No fakes, no hardware |
-| **Load tests** | 0 | MISSING | No evidence |
-| Observability (errors) | 70 | CONFIRMED | Sentry, both sides |
-| **Observability (metrics)** | 10 | MISSING | Tracing off; no metrics |
-| **Health checks** | 20 | PARTIAL | Static 200; **healthy with a dead DB** |
-| **DR tested** | 0 | UNVERIFIED | Untested restore is not a backup |
-| CI/CD | 75 | CONFIRMED | 5 workflows |
-| Localization | 80 | CONFIRMED | 20 locales, **no Arabic** |
-| **Accessibility** | 30 | UNVERIFIED | Good contrast math; no audit |
+| Backend tests | 70 | CONFIRMED | Run by hand only | ARZ-300 |
+| Frontend tests | 20 | PARTIAL | 24 tests; scan path untested | `79` |
+| E2E | 65 | CONFIRMED | Upstream's CI; 1 check-in spec; queues sync | ARZ-326 |
+| Load tests | 10 | PARTIAL | k6 scripts, no results, nothing for scanning | `125` |
+| Observability | 40 | PARTIAL | No metrics; no browser SDK | `78`, ARZ-324 |
+| Health checks | 20 | PARTIAL | Static `/up` | `76` |
+| DR | 0 | MISSING | No hosting, no rehearsal, one copy of the code | `77`, `126` |
+| Accessibility | 30 | PARTIAL | `lang` fixed to `en`; contrast failures; no audit | ARZ-310, ARZ-330 |
+| Localization | 70 | CONFIRMED | 19 selectable languages; **no Arabic, no RTL** | `82` |
+| Design system | 20 | PARTIAL | Rebrand uncommitted, fails contrast, font licence | ARZ-325 |
 
 ---
 
 ## Weighted verdict
 
-| Area | Completeness |
-|---|---|
-| Commerce & registration | **~85%** |
-| Messaging | **~45%** |
-| On-site operations | **~15%** |
-| Accreditation & access | **~5%** |
-| Programme | **~0%** |
-| Exhibitors | **0%** |
-| Mobile | **0%** |
-| Platform/API | **~30%** |
-| Analytics | **~35%** |
-| Operations | **0%** |
-| Security & quality | **~45%** |
+| Area | Completeness | Change since 2026-09-28 |
+|---|---|---|
+| Commerce & registration | **~80%** | Down: payments and fees findings |
+| Messaging | **~40%** | Down: test-send and tier defects |
+| On-site operations | **~15%** | — |
+| Accreditation & access | **~20%** | **Up**: schema, engine core |
+| Programme | **~15%** | **Up**: schema |
+| Exhibitors & mobile | **~0%** | — |
+| Platform/API | **~30%** | — |
+| Analytics | **~35%** | — |
+| Operations | **~0%** | — |
+| Security & privacy | **~40%** | Down: several new findings |
+| Engineering foundations | **~25%** | **Down**: no repo, CI, hosting |
 
-**Overall: roughly 30–35% of the target platform.** Strong where it is strong; the rest is genuinely
-absent rather than thin.
+**Overall: roughly 30% of the target platform.** The headline number barely moved while the
+distribution did: real progress on the access domain, offset by foundations that were assumed and
+turned out to be absent. The most valuable next hour of work is not a feature — it is ARZ-300.
 
 ## How to use this
 
-Update on every merged feature (`129`). If a row moves without evidence in `02`, the row is wrong —
-the audit is authoritative, this document is derived.
+Update on every merged feature (`129`). If a row moves without evidence in `02`, the row is wrong.
 
 ## Related
 
 `02-current-state-audit.md` · `128-definition-of-done.md` · `109-feature-matrix.md` ·
-`113-roadmap.md` · `136-master-backlog.md`
+`113-roadmap.md` · `136-master-backlog.md` · `120-risk-register.md` · `139-test-matrix.md`

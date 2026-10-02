@@ -83,7 +83,7 @@ export const createICSContent = (event: Event, occurrence?: EventOccurrence): st
     return [
         'BEGIN:VCALENDAR',
         'VERSION:2.0',
-        'PRODID:-//Hi.Events//NONSGML Event Calendar//EN',
+        'PRODID:-//ARZO//NONSGML Event Calendar//EN',
         'CALSCALE:GREGORIAN',
         'BEGIN:VEVENT',
         `DTSTART:${formatICSDate(startDate)}`,
@@ -92,7 +92,7 @@ export const createICSContent = (event: Event, occurrence?: EventOccurrence): st
         foldICSLine(`DESCRIPTION:${escapeICSText(stripHtml(event.description_preview || ''))}`),
         foldICSLine(`LOCATION:${escapeICSText(getEventLocation(event, occurrence))}`),
         `DTSTAMP:${formatICSDate(new Date().toISOString())}`,
-        `UID:${crypto.randomUUID()}@hi.events`,
+        `UID:${crypto.randomUUID()}@arzo.qa`,
         'END:VEVENT',
         'END:VCALENDAR'
     ].join('\r\n');

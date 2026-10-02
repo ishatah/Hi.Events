@@ -57,7 +57,7 @@ export const PoweredByFooter = (
         </>
     ) : (
         <>
-            {t`Powered by`}{" "}
+            {t`Powered by ARZO, based on`}{" "}
             <a
                 href={link}
                 target="_blank"

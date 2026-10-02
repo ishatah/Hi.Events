@@ -1498,6 +1498,14 @@ msgstr ""
 msgid "Art"
 msgstr ""
 
+#: src/components/routes/organizer/Reports/PlatformFeesReport/index.tsx:75
+msgid "ARZO Fee"
+msgstr "Комиссия ARZO"
+
+#: src/components/routes/organizer/Reports/index.tsx:42
+msgid "ARZO platform fees and VAT breakdown by transaction"
+msgstr "Комиссии платформы ARZO и разбивка НДС по транзакциям"
+
 #: src/components/routes/organizer/Payments/Vat/VatSettings.tsx:28
 msgid "As your business is based in Ireland, Irish VAT at 23% applies automatically to all platform fees."
 msgstr ""
@@ -5708,12 +5716,12 @@ msgid "Hi,"
 msgstr ""
 
 #: src/components/routes/organizer/Reports/PlatformFeesReport/index.tsx:75
-msgid "Hi.Events Fee"
-msgstr ""
+#~ msgid "Hi.Events Fee"
+#~ msgstr ""
 
 #: src/components/routes/organizer/Reports/index.tsx:42
-msgid "Hi.Events platform fees and VAT breakdown by transaction"
-msgstr ""
+#~ msgid "Hi.Events platform fees and VAT breakdown by transaction"
+#~ msgstr ""
 
 #: src/components/common/ProductsTable/SortableProduct/index.tsx:100
 #: src/components/common/ProductsTable/SortableProduct/index.tsx:360
@@ -8764,8 +8772,12 @@ msgid "Post Checkout message"
 msgstr ""
 
 #: src/components/common/PoweredByFooter/index.tsx:60
-msgid "Powered by"
-msgstr ""
+#~ msgid "Powered by"
+#~ msgstr ""
+
+#: src/components/common/PoweredByFooter/index.tsx:60
+msgid "Powered by ARZO, based on"
+msgstr "Работает на ARZO, на базе"
 
 #: src/components/routes/event/Settings/Sections/HomepageAndCheckoutSettings/index.tsx:90
 msgid "Pre Checkout message"
@@ -11810,8 +11822,12 @@ msgid "This recurring event has no dates yet, so there's nothing for attendees t
 msgstr "У этого повторяющегося мероприятия ещё нет дат, поэтому участникам нечего бронировать."
 
 #: src/components/routes/organizer/Reports/PlatformFeesReport/index.tsx:113
-msgid "This report is for informational purposes only. Always consult with a tax professional before using this data for accounting or tax purposes. Please cross-reference with your Stripe dashboard as Hi.Events may be missing historical data."
-msgstr ""
+msgid "This report is for informational purposes only. Always consult with a tax professional before using this data for accounting or tax purposes. Please cross-reference with your Stripe dashboard as ARZO may be missing historical data."
+msgstr "Этот отчёт предоставляется исключительно в информационных целях. Прежде чем использовать эти данные для бухгалтерских или налоговых целей, обязательно проконсультируйтесь с налоговым специалистом. Сверьте их с панелью управления Stripe, так как в ARZO могут отсутствовать исторические данные."
+
+#: src/components/routes/organizer/Reports/PlatformFeesReport/index.tsx:113
+#~ msgid "This report is for informational purposes only. Always consult with a tax professional before using this data for accounting or tax purposes. Please cross-reference with your Stripe dashboard as Hi.Events may be missing historical data."
+#~ msgstr ""
 
 #: src/components/routes/auth/ResetPassword/index.tsx:28
 msgid "This reset password link is invalid or expired."

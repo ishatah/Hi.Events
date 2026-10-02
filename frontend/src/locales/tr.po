@@ -1498,6 +1498,14 @@ msgstr "AB'de KDV kaydınız var mı?"
 msgid "Art"
 msgstr "Sanat"
 
+#: src/components/routes/organizer/Reports/PlatformFeesReport/index.tsx:75
+msgid "ARZO Fee"
+msgstr "ARZO Ücreti"
+
+#: src/components/routes/organizer/Reports/index.tsx:42
+msgid "ARZO platform fees and VAT breakdown by transaction"
+msgstr "İşlem bazında ARZO platform ücretleri ve KDV dökümü"
+
 #: src/components/routes/organizer/Payments/Vat/VatSettings.tsx:28
 msgid "As your business is based in Ireland, Irish VAT at 23% applies automatically to all platform fees."
 msgstr "İşletmeniz İrlanda merkezli olduğundan, tüm platform ücretlerine otomatik olarak %23 İrlanda KDV'si uygulanır."
@@ -5710,12 +5718,12 @@ msgid "Hi,"
 msgstr "Merhaba,"
 
 #: src/components/routes/organizer/Reports/PlatformFeesReport/index.tsx:75
-msgid "Hi.Events Fee"
-msgstr "Hi.Events Ücreti"
+#~ msgid "Hi.Events Fee"
+#~ msgstr "Hi.Events Ücreti"
 
 #: src/components/routes/organizer/Reports/index.tsx:42
-msgid "Hi.Events platform fees and VAT breakdown by transaction"
-msgstr "Hi.Events platform ücretleri ve işlem bazında KDV dökümü"
+#~ msgid "Hi.Events platform fees and VAT breakdown by transaction"
+#~ msgstr "Hi.Events platform ücretleri ve işlem bazında KDV dökümü"
 
 #: src/components/common/ProductsTable/SortableProduct/index.tsx:100
 #: src/components/common/ProductsTable/SortableProduct/index.tsx:360
@@ -8766,8 +8774,12 @@ msgid "Post Checkout message"
 msgstr "Ödeme sonrası mesaj"
 
 #: src/components/common/PoweredByFooter/index.tsx:60
-msgid "Powered by"
-msgstr "Altyapı sağlayıcı"
+#~ msgid "Powered by"
+#~ msgstr "Altyapı sağlayıcı"
+
+#: src/components/common/PoweredByFooter/index.tsx:60
+msgid "Powered by ARZO, based on"
+msgstr "ARZO tarafından sağlanmaktadır, şuna dayanır:"
 
 #: src/components/routes/event/Settings/Sections/HomepageAndCheckoutSettings/index.tsx:90
 msgid "Pre Checkout message"
@@ -11814,8 +11826,12 @@ msgid "This recurring event has no dates yet, so there's nothing for attendees t
 msgstr "Bu tekrarlayan etkinlikte henüz tarih yok, bu yüzden katılımcıların rezerve edebileceği bir şey yok."
 
 #: src/components/routes/organizer/Reports/PlatformFeesReport/index.tsx:113
-msgid "This report is for informational purposes only. Always consult with a tax professional before using this data for accounting or tax purposes. Please cross-reference with your Stripe dashboard as Hi.Events may be missing historical data."
-msgstr "Bu rapor yalnızca bilgilendirme amaçlıdır. Bu verileri muhasebe veya vergi amaçları için kullanmadan önce her zaman bir vergi uzmanına danışın. Hi.Events geçmiş verileri eksik olabileceğinden lütfen Stripe kontrol panelinizle çapraz kontrol yapın."
+msgid "This report is for informational purposes only. Always consult with a tax professional before using this data for accounting or tax purposes. Please cross-reference with your Stripe dashboard as ARZO may be missing historical data."
+msgstr "Bu rapor yalnızca bilgilendirme amaçlıdır. Bu verileri muhasebe veya vergi amacıyla kullanmadan önce mutlaka bir vergi uzmanına danışın. ARZO'da geçmiş veriler eksik olabileceğinden lütfen Stripe kontrol panelinizle karşılaştırın."
+
+#: src/components/routes/organizer/Reports/PlatformFeesReport/index.tsx:113
+#~ msgid "This report is for informational purposes only. Always consult with a tax professional before using this data for accounting or tax purposes. Please cross-reference with your Stripe dashboard as Hi.Events may be missing historical data."
+#~ msgstr "Bu rapor yalnızca bilgilendirme amaçlıdır. Bu verileri muhasebe veya vergi amaçları için kullanmadan önce her zaman bir vergi uzmanına danışın. Hi.Events geçmiş verileri eksik olabileceğinden lütfen Stripe kontrol panelinizle çapraz kontrol yapın."
 
 #: src/components/routes/auth/ResetPassword/index.tsx:28
 msgid "This reset password link is invalid or expired."

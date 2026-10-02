@@ -1,6 +1,6 @@
 # Definition of Done — What "100%" Means
 
-**Status:** WRITTEN · **Authority:** AUTHORITATIVE for completion · **Audit date:** 2026-09-28
+**Status:** WRITTEN · **Authority:** AUTHORITATIVE for completion · **Audit date:** 2026-09-29 (waiver rules tightened; first written 2026-09-28) · **Baseline:** `develop` @ `e7228c1d`
 
 ---
 
@@ -70,6 +70,14 @@ Used by `02-current-state-audit.md` and `140-final-100-percent-checklist.md`:
 
 A gate may be waived deliberately, in writing, with the reason and accepted risk recorded in the
 feature's work package. **An undocumented gap is a defect; a documented one is a decision.**
+
+**Two gates cannot be waived** (added 2026-09-29, adopting `127`): gate **7** — authorization and
+negative cross-tenant tests — and gate **21** — no silent data loss. A waiver of either is a defect
+in the review, not a decision. Waivers of other gates expire at the next phase boundary and are
+re-decided, so a temporary exception cannot become permanent by being forgotten (`127`).
+
+A gate enforced by CI is only enforced if CI runs. Until ARZO's code has its own repository and
+pipeline (ARZ-300, `123`), every "CI" gate here is satisfied by a recorded manual run.
 
 A legitimate example: waiving gate 24 for a kiosk feature during Phase 3 because hardware has not
 been procured, recording the residual risk that first hardware contact will surface issues.

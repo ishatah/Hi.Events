@@ -9,6 +9,7 @@ use HiEvents\DomainObjects\LocationDomainObject;
 use HiEvents\DomainObjects\Status\EventStatus;
 use HiEvents\Exceptions\AccountNotVerifiedException;
 use HiEvents\Exceptions\EventPendingReviewException;
+use HiEvents\Exceptions\EventStatusTransitionException;
 use HiEvents\Exceptions\ResourceNotFoundException;
 use HiEvents\Jobs\Event\Webhook\DispatchEventWebhookJob;
 use HiEvents\Repository\Eloquent\Value\Relationship;
@@ -45,6 +46,22 @@ readonly class UpdateEventStatusHandler
     /**
      * @throws AccountNotVerifiedException|EventPendingReviewException
      */
+    /**
+     * @throws EventStatusTransitionException
+     */
+    private function guardTransition(string $from, string $to): void
+    {
+        $isAllowed = defined(EventStatus::class.'::'.$from)
+            && defined(EventStatus::class.'::'.$to)
+            && EventStatus::fromName($from)->canTransitionTo(EventStatus::fromName($to));
+
+        if (! $isAllowed) {
+            throw new EventStatusTransitionException(
+                __('An event cannot move from :from to :to.', ['from' => $from, 'to' => $to]),
+            );
+        }
+    }
+
     private function updateEventStatus(UpdateEventStatusDTO $updateEventStatusDTO): EventDomainObject
     {
         $account = $this->accountRepository->findById($updateEventStatusDTO->accountId);
@@ -83,6 +100,8 @@ readonly class UpdateEventStatusHandler
         }
 
         $previousStatus = $event->getStatus();
+
+        $this->guardTransition($previousStatus, $updateEventStatusDTO->status);
 
         $this->eventRepository->updateWhere(
             attributes: ['status' => $updateEventStatusDTO->status],

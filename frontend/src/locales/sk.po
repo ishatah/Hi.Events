@@ -1498,6 +1498,14 @@ msgstr "Ste registrovaný pre DPH v EÚ?"
 msgid "Art"
 msgstr "Umenie"
 
+#: src/components/routes/organizer/Reports/PlatformFeesReport/index.tsx:75
+msgid "ARZO Fee"
+msgstr "Poplatok ARZO"
+
+#: src/components/routes/organizer/Reports/index.tsx:42
+msgid "ARZO platform fees and VAT breakdown by transaction"
+msgstr "Poplatky platformy ARZO a rozpis DPH podľa transakcie"
+
 #: src/components/routes/organizer/Payments/Vat/VatSettings.tsx:28
 msgid "As your business is based in Ireland, Irish VAT at 23% applies automatically to all platform fees."
 msgstr "Keďže vaša firma sídli v Írsku, na všetky poplatky platformy sa automaticky uplatňuje írska DPH vo výške 23 %."
@@ -5710,12 +5718,12 @@ msgid "Hi,"
 msgstr "Dobrý deň,"
 
 #: src/components/routes/organizer/Reports/PlatformFeesReport/index.tsx:75
-msgid "Hi.Events Fee"
-msgstr "Poplatok Hi.Events"
+#~ msgid "Hi.Events Fee"
+#~ msgstr "Poplatok Hi.Events"
 
 #: src/components/routes/organizer/Reports/index.tsx:42
-msgid "Hi.Events platform fees and VAT breakdown by transaction"
-msgstr "Poplatky platformy Hi.Events a rozklad DPH podľa transakcií"
+#~ msgid "Hi.Events platform fees and VAT breakdown by transaction"
+#~ msgstr "Poplatky platformy Hi.Events a rozklad DPH podľa transakcií"
 
 #: src/components/common/ProductsTable/SortableProduct/index.tsx:100
 #: src/components/common/ProductsTable/SortableProduct/index.tsx:360
@@ -8766,8 +8774,12 @@ msgid "Post Checkout message"
 msgstr "Správa po pokladni"
 
 #: src/components/common/PoweredByFooter/index.tsx:60
-msgid "Powered by"
-msgstr "Poháňané"
+#~ msgid "Powered by"
+#~ msgstr "Poháňané"
+
+#: src/components/common/PoweredByFooter/index.tsx:60
+msgid "Powered by ARZO, based on"
+msgstr "Poskytuje ARZO, postavené na"
 
 #: src/components/routes/event/Settings/Sections/HomepageAndCheckoutSettings/index.tsx:90
 msgid "Pre Checkout message"
@@ -11814,8 +11826,12 @@ msgid "This recurring event has no dates yet, so there's nothing for attendees t
 msgstr "Táto opakujúca sa udalosť zatiaľ nemá žiadne termíny, takže účastníci si nemajú čo rezervovať."
 
 #: src/components/routes/organizer/Reports/PlatformFeesReport/index.tsx:113
-msgid "This report is for informational purposes only. Always consult with a tax professional before using this data for accounting or tax purposes. Please cross-reference with your Stripe dashboard as Hi.Events may be missing historical data."
-msgstr "Táto správa slúži iba na informačné účely. Pred použitím týchto dát na účtovné alebo daňové účely vždy konzultujte s daňovým poradcom. Skontrolujte si aj Stripe dashboard, pretože Hi.Events môže mať chýbajúce historické dáta."
+msgid "This report is for informational purposes only. Always consult with a tax professional before using this data for accounting or tax purposes. Please cross-reference with your Stripe dashboard as ARZO may be missing historical data."
+msgstr "Táto správa má len informatívny charakter. Pred použitím týchto údajov na účtovné alebo daňové účely sa vždy poraďte s daňovým poradcom. Porovnajte ich so svojím panelom Stripe, pretože v ARZO môžu chýbať historické údaje."
+
+#: src/components/routes/organizer/Reports/PlatformFeesReport/index.tsx:113
+#~ msgid "This report is for informational purposes only. Always consult with a tax professional before using this data for accounting or tax purposes. Please cross-reference with your Stripe dashboard as Hi.Events may be missing historical data."
+#~ msgstr "Táto správa slúži iba na informačné účely. Pred použitím týchto dát na účtovné alebo daňové účely vždy konzultujte s daňovým poradcom. Skontrolujte si aj Stripe dashboard, pretože Hi.Events môže mať chýbajúce historické dáta."
 
 #: src/components/routes/auth/ResetPassword/index.tsx:28
 msgid "This reset password link is invalid or expired."

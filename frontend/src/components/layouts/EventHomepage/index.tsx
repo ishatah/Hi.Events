@@ -694,13 +694,13 @@ const EventHomepage = ({...loaderData}: EventHomepageProps) => {
                         <div className={classes.footerSection}>
                             <div className={classes.footerLinks}>
                                 <Anchor
-                                    href={getConfig('VITE_PRIVACY_URL', 'https://hi.events/privacy-policy?utm_source=app-event-footer')}
+                                    href={getConfig('VITE_PRIVACY_URL', 'https://arzo.qa/privacy')}
                                     className={classes.footerLink}
                                 >
                                     {t`Privacy Policy`}
                                 </Anchor>
                                 <Anchor
-                                    href={getConfig('VITE_TOS_URL', 'https://hi.events/terms-of-service?utm_source=app-event-footer')}
+                                    href={getConfig('VITE_TOS_URL', 'https://arzo.qa/terms')}
                                     className={classes.footerLink}
                                 >
                                     {t`Terms of Service`}

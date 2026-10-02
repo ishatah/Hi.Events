@@ -1,13 +1,16 @@
 # Performance Targets
 
-**Status:** WRITTEN · **Audit date:** 2026-09-28
+**Status:** WRITTEN · **Audit date:** 2026-09-29 (refreshed; first written 2026-09-28) · **Baseline:** `develop` @ `e7228c1d`
 
 ---
 
 ## Honesty about what is known
 
-`UNVERIFIED`: no load testing evidence exists in the repository, and this plan has **no stated target
-event profile** — no attendee count, gate count, or arrival pattern.
+`UNVERIFIED`: no load-test **results** exist in the repository, and this plan has **no stated target
+event profile** — no attendee count, gate count, or arrival pattern. (Corrected 2026-09-29: the
+first revision said no load-testing evidence existed at all. Upstream's k6 scripts do exist —
+`misc/k6/checkout-flow.js` and `misc/k6/event-page.js` — with thresholds looser than the targets
+below and nothing for the scan path. `125` builds on them.)
 
 Every number below is therefore derived from **human-perception thresholds and operational
 consequence**, not from measurement. They are targets to test against (`125`), not observed values.
@@ -74,9 +77,26 @@ sales. Worth load-testing specifically (`125`).
 | Occupancy read, cached | < 100 ms | Dashboard refresh |
 | Occupancy snapshot refresh | 5–10 s | Balance freshness against query cost |
 
-**`UNVERIFIED`:** whether the derived occupancy aggregate survives peak. If not, the snapshot cache
-moves from optimization to hard requirement. This is the single most important thing to load-test
-before Phase 5.
+**Update 2026-09-29 — code reading now predicts the answer.** The first implementation of the scan
+path landed in `e7228c1d`, and it computes occupancy the expensive way on the critical path:
+
+```
+AccessScanService::scan()                         -- every scan with a zone (line 90)
+  -> occupancyFor(zone, event)                    -- lines 174-186
+       SELECT credential_id, SUM(±1) ... GROUP BY credential_id  -- all granted logs in the zone
+       ->get()                                     -- every group transferred to PHP
+       ->filter(net_inside > 0)->count()           -- counted in PHP
+```
+
+It runs **whether or not any rule enforces capacity**, and its cost grows with every credential that
+has entered the zone — so across an arrival spike the total work is roughly quadratic in arrivals.
+For a 10,000-person zone at 600 scans a minute it cannot meet the < 150 ms online target.
+
+The snapshot cache is therefore a **hard requirement**, not an optimization. Three changes, in
+order of value: compute occupancy only when a matching grant enforces capacity and the zone has one;
+aggregate in SQL instead of transferring rows; and read `zone_occupancy_snapshots` on the hot path
+with the live aggregate as the fallback. Load-testing this path is scenario 1 in `125`, and now its
+purpose is to confirm a prediction rather than to discover a risk.
 
 ### API
 
@@ -99,6 +119,14 @@ Stated so they can be corrected rather than left implicit:
 | Concurrent checkout sessions at launch | 500 | Low |
 
 All **low confidence**. They exist to be replaced by real figures from `04`.
+
+**Inconsistency noted by `102`:** 20 scanners producing 600 scans a minute implies a 2-second service
+time per scanner — optimistic for a door with bag checks or photo verification. At 6 seconds the same
+peak needs about 75 lanes. Similarly, "60+ badges per hour per printer" (a desk rate including
+capture and conversation) sits far below "under 10 s per badge" (the machine). Both pairs measure
+different things; neither is wrong, but sizing must use `102`'s formula —
+positions = ⌈λ · s / 60 / ρ⌉ for arrival rate λ per minute, service time s in seconds, utilization
+ρ — with **measured** service times from the pilot, not these placeholders.
 
 ## Known performance characteristics
 
