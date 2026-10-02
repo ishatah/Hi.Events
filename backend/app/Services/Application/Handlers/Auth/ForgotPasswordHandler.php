@@ -6,6 +6,7 @@ use HiEvents\DomainObjects\UserDomainObject;
 use HiEvents\Mail\User\ForgotPassword;
 use HiEvents\Repository\Interfaces\PasswordResetTokenRepositoryInterface;
 use HiEvents\Repository\Interfaces\UserRepositoryInterface;
+use HiEvents\Services\Infrastructure\TokenGenerator\EmailedTokenHasher;
 use HiEvents\Services\Infrastructure\TokenGenerator\TokenGeneratorService;
 use Illuminate\Contracts\Mail\Mailer;
 use Illuminate\Database\DatabaseManager;
@@ -21,6 +22,7 @@ class ForgotPasswordHandler
         private readonly LoggerInterface $logger,
         private readonly PasswordResetTokenRepositoryInterface $passwordResetTokenRepository,
         private readonly TokenGeneratorService $tokenGeneratorService,
+        private readonly EmailedTokenHasher $emailedTokenHasher,
         private readonly DatabaseManager $databaseManager,
     ) {}
 
@@ -59,7 +61,7 @@ class ForgotPasswordHandler
         $this->passwordResetTokenRepository->deleteWhere(['email' => $email]);
         $this->passwordResetTokenRepository->create([
             'email' => $email,
-            'token' => $token,
+            'token' => $this->emailedTokenHasher->hash($token),
         ]);
 
         return $token;

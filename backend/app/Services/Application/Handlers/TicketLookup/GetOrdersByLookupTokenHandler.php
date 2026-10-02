@@ -25,6 +25,7 @@ use HiEvents\Repository\Interfaces\OrderRepositoryInterface;
 use HiEvents\Repository\Interfaces\TicketLookupTokenRepositoryInterface;
 use HiEvents\Services\Application\Handlers\TicketLookup\DTO\GetOrdersByLookupTokenDTO;
 use HiEvents\Services\Domain\Order\OfflinePaymentInstructionsRenderService;
+use HiEvents\Services\Infrastructure\TokenGenerator\EmailedTokenHasher;
 use Illuminate\Support\Collection;
 
 class GetOrdersByLookupTokenHandler
@@ -33,6 +34,7 @@ class GetOrdersByLookupTokenHandler
         private readonly TicketLookupTokenRepositoryInterface $ticketLookupTokenRepository,
         private readonly OrderRepositoryInterface $orderRepository,
         private readonly OfflinePaymentInstructionsRenderService $offlinePaymentInstructionsRenderService,
+        private readonly EmailedTokenHasher $emailedTokenHasher,
     ) {}
 
     /**
@@ -53,7 +55,9 @@ class GetOrdersByLookupTokenHandler
      */
     private function validateAndFetchToken(string $token): TicketLookupTokenDomainObject
     {
-        $tokenRecord = $this->ticketLookupTokenRepository->findFirstWhere(['token' => $token]);
+        $tokenRecord = $this->ticketLookupTokenRepository->findFirstWhere([
+            'token' => $this->emailedTokenHasher->hash($token),
+        ]);
 
         if (! $tokenRecord) {
             throw new InvalidTicketLookupTokenException(__('Invalid or expired link. Please request a new one.'));

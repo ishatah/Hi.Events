@@ -73,6 +73,12 @@ class SelfServiceEditAttendeeService
 
                 $oldValues['short_id'] = $attendee->getShortId();
                 $newValues['short_id'] = $newShortId;
+
+                $newPublicId = IdHelper::publicId(IdHelper::ATTENDEE_PREFIX);
+                $updateData['public_id'] = $newPublicId;
+
+                $oldValues['public_id'] = $attendee->getPublicId();
+                $newValues['public_id'] = $newPublicId;
             }
 
             $this->attendeeRepository->updateWhere(
@@ -177,7 +183,7 @@ class SelfServiceEditAttendeeService
 
         $changedFields = [];
         foreach ($oldValues as $field => $oldValue) {
-            if ($field === 'short_id') {
+            if ($field === 'short_id' || $field === 'public_id') {
                 continue;
             }
             $label = $fieldLabels[$field] ?? $field;

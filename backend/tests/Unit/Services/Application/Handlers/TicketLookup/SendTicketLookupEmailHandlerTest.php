@@ -8,6 +8,7 @@ use HiEvents\Repository\Interfaces\OrderRepositoryInterface;
 use HiEvents\Repository\Interfaces\TicketLookupTokenRepositoryInterface;
 use HiEvents\Services\Application\Handlers\TicketLookup\DTO\SendTicketLookupEmailDTO;
 use HiEvents\Services\Application\Handlers\TicketLookup\SendTicketLookupEmailHandler;
+use HiEvents\Services\Infrastructure\TokenGenerator\EmailedTokenHasher;
 use HiEvents\Services\Infrastructure\TokenGenerator\TokenGeneratorService;
 use Illuminate\Contracts\Mail\Mailer;
 use Illuminate\Database\DatabaseManager;
@@ -47,6 +48,7 @@ class SendTicketLookupEmailHandlerTest extends TestCase
             $this->orderRepository,
             $this->ticketLookupTokenRepository,
             $this->tokenGeneratorService,
+            new EmailedTokenHasher,
             $this->mailer,
             $this->logger,
             $this->databaseManager,

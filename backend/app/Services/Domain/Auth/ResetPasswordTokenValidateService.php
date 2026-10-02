@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use HiEvents\DomainObjects\PasswordResetTokenDomainObject;
 use HiEvents\Exceptions\InvalidPasswordResetTokenException;
 use HiEvents\Repository\Interfaces\PasswordResetTokenRepositoryInterface;
+use HiEvents\Services\Infrastructure\TokenGenerator\EmailedTokenHasher;
 use Illuminate\Config\Repository;
 
 class ResetPasswordTokenValidateService
@@ -14,12 +15,16 @@ class ResetPasswordTokenValidateService
 
     private Repository $config;
 
+    private EmailedTokenHasher $emailedTokenHasher;
+
     public function __construct(
         PasswordResetTokenRepositoryInterface $passwordResetTokenRepository,
-        Repository $config
+        Repository $config,
+        EmailedTokenHasher $emailedTokenHasher
     ) {
         $this->passwordResetTokenRepository = $passwordResetTokenRepository;
         $this->config = $config;
+        $this->emailedTokenHasher = $emailedTokenHasher;
     }
 
     /**
@@ -27,7 +32,9 @@ class ResetPasswordTokenValidateService
      */
     public function validateAndFetchToken(string $token): PasswordResetTokenDomainObject
     {
-        $resetToken = $this->passwordResetTokenRepository->findFirstWhere(['token' => $token]);
+        $resetToken = $this->passwordResetTokenRepository->findFirstWhere([
+            'token' => $this->emailedTokenHasher->hash($token),
+        ]);
         if (! $resetToken) {
             throw new InvalidPasswordResetTokenException(__('Invalid reset token'));
         }

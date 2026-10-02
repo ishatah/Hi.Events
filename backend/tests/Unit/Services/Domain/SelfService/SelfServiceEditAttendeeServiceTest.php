@@ -141,6 +141,7 @@ class SelfServiceEditAttendeeServiceTest extends TestCase
         $attendee->shouldReceive('getLastName')->andReturn('Doe');
         $attendee->shouldReceive('getEmail')->andReturn('old@example.com');
         $attendee->shouldReceive('getShortId')->andReturn('a_oldshortid123');
+        $attendee->shouldReceive('getPublicId')->andReturn('a_oldpublicid123');
 
         $this->attendeeRepository
             ->shouldReceive('updateWhere')
@@ -150,6 +151,8 @@ class SelfServiceEditAttendeeServiceTest extends TestCase
                     && $attributes['email'] === 'new@example.com'
                     && isset($attributes['short_id'])
                     && str_starts_with($attributes['short_id'], 'a_')
+                    && isset($attributes['public_id'])
+                    && $attributes['public_id'] !== 'a_oldpublicid123'
                     && $where === ['id' => 456];
             })
             ->andReturn(1);
@@ -261,6 +264,7 @@ class SelfServiceEditAttendeeServiceTest extends TestCase
         $attendee->shouldReceive('getLastName')->andReturn('Doe');
         $attendee->shouldReceive('getEmail')->andReturn('old@example.com');
         $attendee->shouldReceive('getShortId')->andReturn('a_oldshortid123');
+        $attendee->shouldReceive('getPublicId')->andReturn('a_oldpublicid123');
 
         $this->attendeeRepository
             ->shouldReceive('updateWhere')
@@ -274,6 +278,8 @@ class SelfServiceEditAttendeeServiceTest extends TestCase
                     && $attributes['email'] === 'new@example.com'
                     && isset($attributes['short_id'])
                     && str_starts_with($attributes['short_id'], 'a_')
+                    && isset($attributes['public_id'])
+                    && $attributes['public_id'] !== 'a_oldpublicid123'
                     && $where === ['id' => 456];
             })
             ->andReturn(1);

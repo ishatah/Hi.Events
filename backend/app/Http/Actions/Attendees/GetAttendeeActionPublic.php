@@ -52,6 +52,7 @@ class GetAttendeeActionPublic extends BaseAction
             ))
             ->findFirstWhere([
                 AttendeeDomainObjectAbstract::SHORT_ID => $attendeeShortId,
+                AttendeeDomainObjectAbstract::EVENT_ID => $eventId,
             ]);
 
         if (! $attendee) {

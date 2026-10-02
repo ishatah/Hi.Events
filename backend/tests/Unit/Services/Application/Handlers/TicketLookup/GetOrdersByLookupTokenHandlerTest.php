@@ -11,6 +11,7 @@ use HiEvents\Repository\Interfaces\TicketLookupTokenRepositoryInterface;
 use HiEvents\Services\Application\Handlers\TicketLookup\DTO\GetOrdersByLookupTokenDTO;
 use HiEvents\Services\Application\Handlers\TicketLookup\GetOrdersByLookupTokenHandler;
 use HiEvents\Services\Domain\Order\OfflinePaymentInstructionsRenderService;
+use HiEvents\Services\Infrastructure\TokenGenerator\EmailedTokenHasher;
 use Illuminate\Support\Collection;
 use Mockery as m;
 use Tests\TestCase;
@@ -34,6 +35,7 @@ class GetOrdersByLookupTokenHandlerTest extends TestCase
             $this->ticketLookupTokenRepository,
             $this->orderRepository,
             app(OfflinePaymentInstructionsRenderService::class),
+            new EmailedTokenHasher,
         );
     }
 
@@ -56,7 +58,7 @@ class GetOrdersByLookupTokenHandlerTest extends TestCase
         $this->ticketLookupTokenRepository
             ->shouldReceive('findFirstWhere')
             ->once()
-            ->with(['token' => $token])
+            ->with(['token' => (new EmailedTokenHasher)->hash($token)])
             ->andReturn($tokenRecord);
 
         $this->orderRepository
@@ -82,7 +84,7 @@ class GetOrdersByLookupTokenHandlerTest extends TestCase
         $this->ticketLookupTokenRepository
             ->shouldReceive('findFirstWhere')
             ->once()
-            ->with(['token' => $token])
+            ->with(['token' => (new EmailedTokenHasher)->hash($token)])
             ->andReturn(null);
 
         $this->orderRepository
@@ -106,7 +108,7 @@ class GetOrdersByLookupTokenHandlerTest extends TestCase
         $this->ticketLookupTokenRepository
             ->shouldReceive('findFirstWhere')
             ->once()
-            ->with(['token' => $token])
+            ->with(['token' => (new EmailedTokenHasher)->hash($token)])
             ->andReturn($tokenRecord);
 
         $this->orderRepository

@@ -9,6 +9,7 @@ use HiEvents\Mail\TicketLookup\TicketLookupEmail;
 use HiEvents\Repository\Interfaces\OrderRepositoryInterface;
 use HiEvents\Repository\Interfaces\TicketLookupTokenRepositoryInterface;
 use HiEvents\Services\Application\Handlers\TicketLookup\DTO\SendTicketLookupEmailDTO;
+use HiEvents\Services\Infrastructure\TokenGenerator\EmailedTokenHasher;
 use HiEvents\Services\Infrastructure\TokenGenerator\TokenGeneratorService;
 use Illuminate\Contracts\Mail\Mailer;
 use Illuminate\Database\DatabaseManager;
@@ -24,6 +25,7 @@ class SendTicketLookupEmailHandler
         private readonly OrderRepositoryInterface $orderRepository,
         private readonly TicketLookupTokenRepositoryInterface $ticketLookupTokenRepository,
         private readonly TokenGeneratorService $tokenGeneratorService,
+        private readonly EmailedTokenHasher $emailedTokenHasher,
         private readonly Mailer $mailer,
         private readonly LoggerInterface $logger,
         private readonly DatabaseManager $databaseManager,
@@ -71,7 +73,7 @@ class SendTicketLookupEmailHandler
         $this->ticketLookupTokenRepository->deleteWhere(['email' => $email]);
         $this->ticketLookupTokenRepository->create([
             'email' => $email,
-            'token' => $token,
+            'token' => $this->emailedTokenHasher->hash($token),
             'expires_at' => Carbon::now()->addHours(self::TOKEN_EXPIRY_HOURS)->toDateTimeString(),
         ]);
 
