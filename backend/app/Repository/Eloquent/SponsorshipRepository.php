@@ -2,9 +2,9 @@
 
 namespace HiEvents\Repository\Eloquent;
 
-use HiEvents\DomainObjects${n}DomainObject;
-use HiEvents\Models${n};
-use HiEvents\Repository\Interfaces${n}RepositoryInterface;
+use HiEvents\DomainObjects\SponsorshipDomainObject;
+use HiEvents\Models\Sponsorship;
+use HiEvents\Repository\Interfaces\SponsorshipRepositoryInterface;
 
 /**
  * @extends BaseRepository<SponsorshipDomainObject>

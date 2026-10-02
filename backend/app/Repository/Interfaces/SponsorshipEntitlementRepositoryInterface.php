@@ -2,7 +2,7 @@
 
 namespace HiEvents\Repository\Interfaces;
 
-use HiEvents\DomainObjects${n}DomainObject;
+use HiEvents\DomainObjects\SponsorshipEntitlementDomainObject;
 
 /**
  * @extends RepositoryInterface<SponsorshipEntitlementDomainObject>
