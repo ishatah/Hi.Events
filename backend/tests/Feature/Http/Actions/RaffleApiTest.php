@@ -288,7 +288,7 @@ class RaffleApiTest extends TestCase
             'recorded_at' => now()->subHours(2),
             'direction' => 'ENTRY',
             'result' => 'GRANTED',
-            'raw_identifier' => Str::upper(Str::random(12)),
+            'identifier_hash' => Str::upper(Str::random(12)),
             'identifier_type' => 'QR',
             'source' => 'SCANNER',
             'created_at' => now(),

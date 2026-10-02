@@ -365,7 +365,7 @@ class QueueEstimationServiceTest extends TestCase
             'recorded_at' => $occurredAt,
             'direction' => $direction,
             'result' => $result,
-            'raw_identifier' => Str::upper(Str::random(12)),
+            'identifier_hash' => Str::upper(Str::random(12)),
             'identifier_type' => 'QR',
             'source' => 'SCANNER',
             'created_at' => now(),

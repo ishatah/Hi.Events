@@ -54,25 +54,42 @@ class CredentialIssuanceService
         string $credentialType,
         ?int $accreditationTypeId = null,
         ?array $approvedZoneIds = null,
+        ?int $issuedByUserId = null,
     ): CredentialDomainObject {
         return $this->issue($eventId, [
             CredentialDomainObjectAbstract::ACCREDITATION_ID => $accreditationId,
             CredentialDomainObjectAbstract::PERSON_ID => $personId,
             CredentialDomainObjectAbstract::CREDENTIAL_TYPE => $credentialType,
+            CredentialDomainObjectAbstract::ISSUED_BY => $issuedByUserId,
         ], $accreditationTypeId, $approvedZoneIds);
     }
 
+    /**
+     * Revoking twice keeps the first revocation: who revoked the credential and why is an
+     * accountability record, and the grants are already gone.
+     */
     public function revoke(int $credentialId, ?int $revokedByUserId, string $reason): void
     {
-        $this->credentialRepository->updateWhere(
-            attributes: [
-                CredentialDomainObjectAbstract::STATUS => CredentialStatus::REVOKED->value,
-                CredentialDomainObjectAbstract::REVOKED_AT => now()->toDateTimeString(),
-                CredentialDomainObjectAbstract::REVOKED_BY => $revokedByUserId,
-                CredentialDomainObjectAbstract::REVOCATION_REASON => $reason,
-            ],
-            where: [CredentialDomainObjectAbstract::ID => $credentialId],
-        );
+        $this->databaseManager->transaction(function () use ($credentialId, $revokedByUserId, $reason): void {
+            $updated = $this->credentialRepository->updateWhere(
+                attributes: [
+                    CredentialDomainObjectAbstract::STATUS => CredentialStatus::REVOKED->value,
+                    CredentialDomainObjectAbstract::REVOKED_AT => now()->toDateTimeString(),
+                    CredentialDomainObjectAbstract::REVOKED_BY => $revokedByUserId,
+                    CredentialDomainObjectAbstract::REVOCATION_REASON => $reason,
+                ],
+                where: [
+                    CredentialDomainObjectAbstract::ID => $credentialId,
+                    [CredentialDomainObjectAbstract::REVOKED_AT, 'null', null],
+                ],
+            );
+
+            if ($updated === 0) {
+                return;
+            }
+
+            $this->grantMaterializationService->revokeExisting($credentialId);
+        });
     }
 
     /**

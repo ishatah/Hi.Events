@@ -234,6 +234,7 @@ class AccreditationApprovalService
             credentialType: (string) $type->code,
             accreditationTypeId: (int) $accreditation->accreditation_type_id,
             approvedZoneIds: $this->parseIntArray($accreditation->approved_zones),
+            issuedByUserId: $actorUserId,
         );
 
         return $credential->getId();

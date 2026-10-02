@@ -187,7 +187,7 @@ class GrantMaterializationService
         ], array_filter($attributes, static fn ($value): bool => $value !== null)));
     }
 
-    private function revokeExisting(int $credentialId): void
+    public function revokeExisting(int $credentialId): void
     {
         $this->accessGrantRepository->deleteWhere([
             AccessGrantDomainObjectAbstract::CREDENTIAL_ID => $credentialId,

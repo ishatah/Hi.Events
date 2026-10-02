@@ -6,6 +6,7 @@ use HiEvents\DomainObjects\Status\AccreditationStatus;
 use HiEvents\Exceptions\ResourceConflictException;
 use HiEvents\Models\User;
 use HiEvents\Services\Domain\Accreditation\AccreditationApprovalService;
+use HiEvents\Services\Domain\Credential\CredentialIssuanceService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -65,6 +66,89 @@ class AccreditationApprovalServiceTest extends TestCase
             AccreditationStatus::APPROVED->value,
             DB::table('accreditations')->where('id', $id)->value('status')
         );
+    }
+
+    public function test_an_issued_credential_records_who_issued_it(): void
+    {
+        $credentialId = $this->approveAndIssue();
+
+        $this->assertSame(
+            $this->userId,
+            (int) DB::table('credentials')->where('id', $credentialId)->value('issued_by'),
+            'A credential grants physical access, so the row has to say which operator '
+            .'granted it; issued_by was never written.'
+        );
+    }
+
+    public function test_revoking_a_credential_removes_its_access_grants(): void
+    {
+        $credentialId = $this->approveAndIssue();
+
+        $this->assertGreaterThan(
+            0,
+            DB::table('access_grants')->where('credential_id', $credentialId)->count(),
+            'Expected issuance to materialise at least one grant.'
+        );
+
+        app(CredentialIssuanceService::class)->revoke($credentialId, $this->userId, 'Lost badge');
+
+        $this->assertSame(
+            0,
+            DB::table('access_grants')->where('credential_id', $credentialId)->count(),
+            'Grants are the snapshot an offline reader carries, so leaving them active after '
+            .'revocation keeps a revoked badge usable wherever that snapshot is trusted.'
+        );
+    }
+
+    public function test_a_second_revocation_keeps_the_first_record(): void
+    {
+        $credentialId = $this->approveAndIssue();
+
+        $service = app(CredentialIssuanceService::class);
+
+        $service->revoke($credentialId, $this->userId, 'Lost badge');
+
+        $first = DB::table('credentials')->where('id', $credentialId)->first();
+
+        $otherUserId = (int) User::factory()->withAccount()->create()->id;
+
+        $service->revoke($credentialId, $otherUserId, 'Different reason entirely');
+
+        $second = DB::table('credentials')->where('id', $credentialId)->first();
+
+        $this->assertSame(
+            (int) $first->revoked_by,
+            (int) $second->revoked_by,
+            'Who revoked a credential is an accountability record, so a later call must not '
+            .'overwrite it.'
+        );
+
+        $this->assertSame($first->revocation_reason, $second->revocation_reason);
+        $this->assertSame($first->revoked_at, $second->revoked_at);
+    }
+
+    private function approveAndIssue(): int
+    {
+        $zoneId = $this->makeZone('REVOKEHALL');
+
+        DB::table('accreditation_type_rules')->insert([
+            'accreditation_type_id' => $this->typeId,
+            'zone_id' => $zoneId,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $accreditationId = $this->service->submit(
+            eventId: $this->eventId,
+            personId: $this->personId,
+            accreditationTypeId: $this->typeId,
+            requestedZoneIds: [$zoneId],
+            actorUserId: $this->userId,
+        );
+
+        $this->service->approve($accreditationId, $this->userId, approvedZoneIds: [$zoneId]);
+
+        return $this->service->issueCredential($accreditationId, $this->userId);
     }
 
     public function test_every_transition_is_audited(): void

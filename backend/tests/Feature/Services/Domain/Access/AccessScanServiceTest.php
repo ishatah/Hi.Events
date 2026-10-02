@@ -9,6 +9,7 @@ use HiEvents\DomainObjects\Enums\AccessLogSource;
 use HiEvents\DomainObjects\Enums\AccessResult;
 use HiEvents\Models\User;
 use HiEvents\Services\Domain\Access\AccessScanService;
+use HiEvents\Services\Domain\Credential\CredentialIdentifierService;
 use HiEvents\Services\Domain\Credential\CredentialIssuanceService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
@@ -74,7 +75,31 @@ class AccessScanServiceTest extends TestCase
         $this->assertDatabaseHas('access_logs', [
             'event_id' => $this->eventId,
             'result' => AccessResult::DENIED_NO_CREDENTIAL->value,
-            'raw_identifier' => 'not-a-real-credential',
+            'identifier_hash' => app(CredentialIdentifierService::class)->hash('not-a-real-credential'),
+        ]);
+    }
+
+    public function test_a_scan_never_logs_the_scanned_identifier(): void
+    {
+        $credential = $this->issueAttendeeCredential();
+        $identifier = $this->identifierFor($credential->getId());
+
+        $this->scanService->scan(
+            eventId: $this->eventId,
+            identifier: $identifier,
+            accessPointId: $this->accessPointId,
+        );
+
+        $this->assertSame(
+            0,
+            DB::table('access_logs')->where('identifier_hash', $identifier)->count(),
+            'Credentials store only a hash precisely so a leaked database hands nobody a '
+            .'working badge; logging the scanned token on every pass undoes that.'
+        );
+
+        $this->assertDatabaseHas('access_logs', [
+            'credential_id' => $credential->getId(),
+            'identifier_hash' => app(CredentialIdentifierService::class)->hash($identifier),
         ]);
     }
 

@@ -150,7 +150,7 @@ class AccountDeletionExecutionTest extends TestCase
             'recorded_at' => now()->subHour(),
             'direction' => 'ENTRY',
             'result' => 'GRANTED',
-            'raw_identifier' => 'IDENTIFIERTEST',
+            'identifier_hash' => 'IDENTIFIERTEST',
             'identifier_type' => 'QR',
             'source' => 'SCANNER',
             'created_at' => now(),

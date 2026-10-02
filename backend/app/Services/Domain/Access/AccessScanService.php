@@ -378,7 +378,7 @@ class AccessScanService
                 'recorded_at' => Carbon::now(),
                 'direction' => $direction->value,
                 'result' => $decision->result->value,
-                'raw_identifier' => $identifier,
+                'identifier_hash' => $this->identifierService->hash($identifier),
                 'identifier_type' => $identifierType,
                 'operator_user_id' => $operatorUserId,
                 'device_id' => $deviceId,

@@ -43,7 +43,7 @@ abstract class AccessLogDomainObjectAbstract extends AbstractDomainObject
 
     final public const RESULT = 'result';
 
-    final public const RAW_IDENTIFIER = 'raw_identifier';
+    final public const IDENTIFIER_HASH = 'identifier_hash';
 
     final public const IDENTIFIER_TYPE = 'identifier_type';
 
@@ -91,7 +91,7 @@ abstract class AccessLogDomainObjectAbstract extends AbstractDomainObject
 
     protected string $result;
 
-    protected ?string $raw_identifier = null;
+    protected ?string $identifier_hash = null;
 
     protected string $identifier_type = 'QR';
 
@@ -127,7 +127,7 @@ abstract class AccessLogDomainObjectAbstract extends AbstractDomainObject
             'recorded_at' => $this->recorded_at ?? null,
             'direction' => $this->direction ?? null,
             'result' => $this->result ?? null,
-            'raw_identifier' => $this->raw_identifier ?? null,
+            'identifier_hash' => $this->identifier_hash ?? null,
             'identifier_type' => $this->identifier_type ?? null,
             'override_reason' => $this->override_reason ?? null,
             'client_generated_id' => $this->client_generated_id ?? null,
@@ -319,16 +319,16 @@ abstract class AccessLogDomainObjectAbstract extends AbstractDomainObject
         return $this->result;
     }
 
-    public function setRawIdentifier(?string $raw_identifier): self
+    public function setIdentifierHash(?string $identifier_hash): self
     {
-        $this->raw_identifier = $raw_identifier;
+        $this->identifier_hash = $identifier_hash;
 
         return $this;
     }
 
-    public function getRawIdentifier(): ?string
+    public function getIdentifierHash(): ?string
     {
-        return $this->raw_identifier;
+        return $this->identifier_hash;
     }
 
     public function setIdentifierType(string $identifier_type): self
