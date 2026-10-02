@@ -47,19 +47,14 @@ class Handler extends ExceptionHandler
             try {
                 $user = auth()->user();
                 if ($user) {
-                    $ip = request()->ip();
-                    $isImpersonating = (bool) auth()->payload()->get('is_impersonating', false);
-                    $impersonatorId = $isImpersonating ? auth()->payload()->get('impersonator_id') : null;
+                    $impersonatorId = $this->impersonatorId();
 
-                    Sentry::configureScope(function (Scope $scope) use ($user, $ip, $isImpersonating, $impersonatorId): void {
+                    Sentry::configureScope(function (Scope $scope) use ($user, $impersonatorId): void {
                         $scope->setUser([
                             'id' => $user->id,
-                            'email' => $user->email,
-                            'username' => trim($user->first_name.' '.$user->last_name),
-                            'ip_address' => $ip,
                         ]);
 
-                        if ($isImpersonating) {
+                        if ($impersonatorId !== null) {
                             $scope->setTag('is_impersonating', 'true');
                             $scope->setTag('impersonator_id', (string) $impersonatorId);
                         }
@@ -71,6 +66,19 @@ class Handler extends ExceptionHandler
         }
 
         parent::report($e);
+    }
+
+    private function impersonatorId(): int|string|null
+    {
+        try {
+            $payload = auth()->payload();
+        } catch (Throwable) {
+            return null;
+        }
+
+        return $payload->get('is_impersonating', false)
+            ? $payload->get('impersonator_id')
+            : null;
     }
 
     /**
