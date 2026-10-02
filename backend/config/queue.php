@@ -32,6 +32,20 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Worker Timeout
+    |--------------------------------------------------------------------------
+    |
+    | The --timeout the queue workers are started with. It must cover the
+    | longest $timeout any job declares, and must stay below the connection
+    | retry_after so a timed-out job fails before the queue reissues it.
+    | Enforced by tests/Feature/Queue/QueueTimeoutInvariantTest.php.
+    |
+    */
+
+    'worker_timeout' => env('QUEUE_WORKER_TIMEOUT', 120),
+
+    /*
+    |--------------------------------------------------------------------------
     | Queue Connections
     |--------------------------------------------------------------------------
     |
@@ -81,7 +95,7 @@ return [
             'driver' => 'redis',
             'connection' => 'default',
             'queue' => env('REDIS_QUEUE', 'default'),
-            'retry_after' => 60,
+            'retry_after' => env('QUEUE_RETRY_AFTER', 150),
             'block_for' => null,
             'after_commit' => true,
         ],
