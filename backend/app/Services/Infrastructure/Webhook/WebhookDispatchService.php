@@ -207,7 +207,7 @@ class WebhookDispatchService
                     'event_id' => $eventId,
                     'event_type' => $eventType->name,
                 ])
-                ->dispatchSync();
+                ->dispatch();
         }
     }
 }
