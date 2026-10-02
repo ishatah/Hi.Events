@@ -29,6 +29,11 @@ class RouteServiceProvider extends ServiceProvider
                 ->by($request->user()?->id ?: $request->ip());
         });
 
+        RateLimiter::for('order-create', function (Request $request) {
+            return Limit::perMinute(config('app.order_create_rate_limit_per_minute'))
+                ->by($request->ip().'|'.$request->route('event_id'));
+        });
+
         RateLimiter::for('self-service-email', function (Request $request) {
             return Limit::perHour(20)->by($request->route('order_short_id') ?? $request->ip());
         });

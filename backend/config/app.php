@@ -25,6 +25,21 @@ return [
     'saas_default_pass_platform_fee_to_buyer' => env('APP_SAAS_DEFAULT_PASS_PLATFORM_FEE_TO_BUYER', true),
     'disable_registration' => env('APP_DISABLE_REGISTRATION', true),
     'api_rate_limit_per_minute' => env('APP_API_RATE_LIMIT_PER_MINUTE', 180),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Order Creation Rate Limit
+    |--------------------------------------------------------------------------
+    |
+    | Order creation applies a promo code, so leaving it on the global API
+    | limit makes hidden VIP and comp products brute-forceable far faster than
+    | the dedicated promo validation throttle allows. The limit is keyed on IP
+    | and event, and a checkout makes one request, so it is set well above a
+    | real buyer's rate to leave room for a venue or office behind one address.
+    |
+    */
+
+    'order_create_rate_limit_per_minute' => env('APP_ORDER_CREATE_RATE_LIMIT_PER_MINUTE', 30),
     'stripe_connect_account_type' => env('APP_STRIPE_CONNECT_ACCOUNT_TYPE', 'express'),
     'platform_support_email' => env('APP_PLATFORM_SUPPORT_EMAIL', 'support@example.com'),
     'event_spam_check_enabled' => env('APP_EVENT_SPAM_CHECK_ENABLED', false),
